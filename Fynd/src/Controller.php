@@ -12,11 +12,11 @@ class Fynd_Controller
 	protected function _selectView($view,$type = null)
 	{
 		ob_start();
-		if(empty($type) || $type == self::$HtmlViewType)
+		if(empty($type) || $type == self::HTML_VIEW)
 		{
 			include 'views/'.$view.'.php';
 		}
-		else if($type == self::$JsonViewType)
+		else if($type == self::JSON_VIEW)
 		{
 			header("content-type:text/plain");
 			include_once "views/$view".'.php';
@@ -31,8 +31,8 @@ class Fynd_Controller
 		echo "$act has nerver been defined";
 		var_dump($param);
 	}
-	public static $JsonViewType = 1;
-	public static $HtmlViewType = 2;
-	public static $XmlViewType = 3;
+	const JSON_VIEW = 1;
+	const HTML_VIEW = 2;
+	const XML_VIEW = 3;
 }
 ?>
