@@ -1,10 +1,12 @@
 <?php
+require_once 'Util.php';
 class Fynd_RequestHandler
 {
 	public static function GetControllerName()
 	{
 		$ctrl = trim(strtolower($_GET['c']));
 		unset($_GET['c']);
+		$ctrl = Fynd_Util::upperCaseFirstChar($ctrl);
 		if(empty($ctrl))
 			$ctrl = 'Index';			
 		return $ctrl;
