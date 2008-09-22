@@ -3,6 +3,7 @@ require_once 'PublicPropertyClass.php';
 require_once 'Model/ModelStatus.php';
 require_once 'Db.php';
 require_once 'Model/ModelEntry.php';
+require_once 'Db/DbParameter.php';
 abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAggregate
 {
     protected $_fyndStatus;
@@ -29,13 +30,12 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
     public function acceptChange ()
     {
         $primary = $this->_fyndPrimaryProperty;
-        if(empty($this->$primary))
+        if (empty($this->$primary))
         {
             $this->_acceptAdded();
         }
         else
         {
-            
         }
     }
     /**
@@ -51,8 +51,8 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         $fetchMode = PDO::FETCH_CLASS;
         if ($isCount)
         {
-            $sql = 'Select Count(*) From ' . $this->_fyndTableName;
-            $fetchMode = PDO::FETCH_COLUMN;
+            $sql = 'Select Count(*) From `' . $this->_fyndTableName . '` ';
+            $fetchMode = PDO::FETCH_ASSOC;
         }
         else
         {
@@ -84,6 +84,7 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
     protected function _getWhereClause (Fynd_Model_ModelSelection $mc)
     {
         $entry = $this->_fyndModelEntryCollection[$mc->Property];
+        $sql = '';
         if (! empty($mc->LeftBrackets))
         {
             $sql .= ' ' . $mc->LeftBrackets;
@@ -108,7 +109,14 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         }
         else
         {
-            $sql .= $mc->Operation . $mc->ConditionValue;
+            if ($entry->DataType == 'string')
+            {
+                $sql .= $mc->Operation . "'" . $mc->ConditionValue . "'";
+            }
+            else
+            {
+                $sql .= $mc->Operation . $mc->ConditionValue;
+            }
         }
         if (! empty($mc->NextLogicOperater))
         {
@@ -123,33 +131,32 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
     protected function _acceptAdded ()
     {
         $properties = $this->getIterator();
-        $sql = "Insert Into ".$this->_fyndTableName.' (';
+        $sql = "Insert Into " . $this->_fyndTableName . ' (';
         $params = array();
-        foreach ($properties as $name=>$value)
+        foreach ($properties as $name => $value)
         {
             $entry = $this->_fyndModelEntryCollection[$name];
             $p = new Fynd_DbParameter();
-            $p->Name = ':v_'.$name;
+            $p->Name = ':v_' . $name;
             $p->Value = $value;
-            
-            $fields .= '`'.$entry->Field.'`,';
-            $values .= $p->Name.",";
-            if($entry->DataType != 'number')
+            $fields .= '`' . $entry->Field . '`,';
+            $values .= $p->Name . ",";
+            if ($entry->DataType != 'number')
             {
                 $p->DbDataType = PDO::PARAM_STR;
             }
-            else 
+            else
             {
                 $p->DbDataType = PDO::PARAM_INT;
             }
             $params[] = $p;
         }
-        $fields = Fynd_Util::stringRemoveEnd($fields,1);
-        $values = Fynd_Util::stringRemoveEnd($values,1);
-        $sql .= $fields.') Values ('.$values .')';
+        $fields = Fynd_Util::stringRemoveEnd($fields, 1);
+        $values = Fynd_Util::stringRemoveEnd($values, 1);
+        $sql .= $fields . ') Values (' . $values . ')';
         $db = Fynd_Db::getInstance();
         $db->open();
-        $db->excute($sql,$params);
+        $db->excute($sql, $params);
         $db->close();
     }
     protected function _setModelStatus ()
@@ -171,13 +178,13 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
     {
         $ref = new ReflectionObject($this);
         $filename = str_replace('.php', '.xml', $ref->getFileName());
-        $entry = new Fynd_Model_ModelEntry();
         $xml = simplexml_load_file($filename);
         $this->_fyndTableName = (string) $xml['Table'];
         $this->_fyndPrimaryProperty = (string) $xml['PrimaryProperty'];
         $this->_fyndModelEntryCollection = array();
         foreach ($xml as $node)
         {
+            $entry = new Fynd_Model_ModelEntry();
             $entry->Property = (string) $node->Property;
             $entry->Field = (string) $node->Field;
             $entry->DataType = (string) $node->DataType;
@@ -217,6 +224,9 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
             {
                 continue;
             }
+            if(Fynd_Util::startWith($propertyName,'_'))
+                $propertyName = str_replace('_','',$propertyName);
+            $propertyName = Fynd_Util::upperCaseFirstChar($propertyName);                
             $modelPropertis[$propertyName] = $this->$propertyName;
         }
         return new ArrayObject($modelPropertis);
