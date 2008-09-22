@@ -34,13 +34,22 @@ abstract class Fynd_PublicPropertyClass
 	 */
 	public function __get($key)
 	{
+	    //TODO:私有属性如_foobar也可以通过该方法访问，应该屏蔽
 		$privateVar = Fynd_Util::convertToPrivateVar($key);
 		$getter = 'get'.$key;
-		if(method_exists($this,$getter))
+		$type = $this->getType();
+		try 
+		{
+		    $method = $type->getMethod($getter);
+		}
+		catch (Exception $e)
+		{
+		}
+		if($method && !$method->isStatic())
 		{
 			return $this->$getter($key);
 		}
-		else if(!isset($this->$privateVar))
+		else if(!$type->getProperty($privateVar))
 		{
 			throw new Exception('property:'.$key." does not exsist");
 		}
