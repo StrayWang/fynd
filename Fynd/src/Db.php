@@ -21,7 +21,7 @@ class Fynd_Db
      *
      * @var int
      */
-    protected $_fetchMode = PDO::FETCH_BOTH;
+    protected $_fetchMode = PDO::FETCH_ASSOC;
     /**
      * sql缓存
      *
@@ -44,16 +44,21 @@ class Fynd_Db
     {
         if (! self::$_instance instanceof Fynd_Db)
         {
-            $dbConfig = Fynd_Config_ConfigManager::getConfig(Fynd_Config_ConfigType::DbConfig, dirname(__FILE__) . '/../app/configs/DbConfig.xml');
+            $dbConfig = Fynd_Config_ConfigManager::getConfig(Fynd_Config_ConfigType::DbConfig, Fynd_Application::getConfigPath().'DbConfig.xml');
             $connConfig = $dbConfig->getDefaultConnectionConfig();
             self::$_instance = new Fynd_Db($connConfig);
         }
-        $this->_persistent = $persistent;
+        self::$_instance->setPersistent($persistent);
         return self::$_instance;
     }
-    protected function __construct (Fynd_Config_DbConnectionConfig $config)
+    protected function __construct (Fynd_Config_DbConnectionConfig $config,$persistent = true)
     {
         $this->_config = $config;
+        $this->_persistent = $persistent;
+    }
+    public function setPersistent($persistent = true)
+    {
+        $this->_persistent = $persistent;
     }
     /**
      * 开启数据库连接
@@ -178,7 +183,11 @@ class Fynd_Db
         }
         if (is_array($result) && count($result) == 1)
         {
-            $result = $result[0];
+            if(is_array($result[0]) && count($result[0]) == 1)
+            {
+                $value = array_values($result[0]);
+                $result = $value[0];
+            }
         }
         return $result;
     }
