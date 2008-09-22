@@ -1,12 +1,10 @@
 <?php
 class Fynd_Controller
 {
-	protected  $_responseType;
-	protected function _redirect($ctrl,$act,$type)
+	protected function _redirect($ctrl,$act)
 	{
 		$act = empty($act) ? 'index' : $act;
-		$type = empty($type) ? $this->_responseType : $type;
-		$header = "location:index.php?c=$ctrl&a=$act&t=$type";
+		$header = "location:index.php?c=$ctrl&a=$act";
 		header($header);
 	}
 	protected function _selectView($view,$type = null)
@@ -14,12 +12,12 @@ class Fynd_Controller
 		ob_start();
 		if(empty($type) || $type == self::HTML_VIEW)
 		{
-			include 'views/'.$view.'.php';
+			include Fynd_Application::getViewPath().$view.'.php';
 		}
 		else if($type == self::JSON_VIEW)
 		{
 			header("content-type:text/plain");
-			include_once "views/$view".'.php';
+			include_once Fynd_Application::getViewPath().$view.'.php';
 			$view = new $view();
 			$data = $view->render();
 			echo $data;
