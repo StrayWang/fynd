@@ -51,7 +51,7 @@ class Fynd_Application extends Fynd_PublicPropertyClass
      */
     public function getAppWorkPath ()
     {
-        return realpath('../');
+        return realpath('../').'/';
     }
     public function init ()
     {
