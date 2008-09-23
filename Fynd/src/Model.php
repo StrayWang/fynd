@@ -4,16 +4,27 @@ require_once 'Model/ModelStatus.php';
 require_once 'Db.php';
 require_once 'Model/ModelEntry.php';
 require_once 'Db/DbParameter.php';
-abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAggregate
+abstract class Fynd_Model 
+    extends Fynd_PublicPropertyClass 
+    implements IteratorAggregate
 {
     protected $_fyndStatus;
-    protected $_fyndLockStatus = false;
+    protected $_fyndInitializing = false;
     protected $_fyndModelEntryCollection;
     protected $_fyndTableName;
     protected $_fyndPrimaryProperty;
     public function __construct ()
     {
         $this->_fyndStatus = Fynd_Model_ModelStatus::None;
+        $this->_loadMapXml();
+    }
+    public function beginInitializtion()
+    {
+        $this->_fyndInitializing = true;
+    }
+    public function endInitializtion()
+    {
+        $this->_fyndInitializing = false;
     }
     public function getStatus ()
     {
@@ -27,16 +38,47 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         }
         $this->_fyndStatus = $status;
     }
-    public function acceptChange ()
+    /**
+     * Save model data to database
+     *
+     */
+    public function save ()
     {
         $primary = $this->_fyndPrimaryProperty;
-        if (empty($this->$primary))
+        $primaryValue = $this->$primary;
+        if (empty($primaryValue))
         {
             $this->_acceptAdded();
         }
         else
         {
+            $this->_acceptModified();
         }
+    }
+    /**
+     * Delete model data from database
+     *
+     */
+    public function delete()
+    {
+        $primaryProperty = $this->_fyndPrimaryProperty;
+        $entry = $this->_fyndModelEntryCollection[$primaryProperty];
+        $p = new Fynd_DbParameter();
+        $p->Name = ':v_'.$entry->Property;
+        $p->Value = $this->$primaryProperty;
+        if($entry->DataType == 'number')
+        {
+            $p->DbDataType = PDO::PARAM_INT;
+        }
+        else 
+        {
+            $p->DbDataType = PDO::PARAM_STR;
+        }
+        $sql = "Delete From `".$this->_fyndTableName."` Where ".$entry->Field." = ".$p->Name;
+        $db = Fynd_Db::getInstance();
+        $db->open();
+        $db->excute($sql,array($p));
+        $db->close();
     }
     /**
      * 根据过滤条件获取Model或Model集合
@@ -45,9 +87,8 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
      * @param bool 是否只求符合条件的Model数量
      * @return Fynd_Model | array
      */
-    public function select ($condition, $isCount)
+    public function select ($condition, $isCount = false)
     {
-        $this->_loadMapXml();
         $fetchMode = PDO::FETCH_CLASS;
         if ($isCount)
         {
@@ -56,8 +97,9 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         }
         else
         {
-            $sql = 'Select * From ' . $this->_fyndTableName;
+            $sql = 'Select * From `' . $this->_fyndTableName .'` ';
         }
+        $params = array();
         if (is_array($condition) && count($condition) > 0)
         {
             $sql .= ' Where ';
@@ -67,18 +109,52 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
                 if (! empty($whereClause))
                 {
                     $sql .= $whereClause;
+                    if (!is_array($mc->ConditionValue))
+                    {
+                        $p = new Fynd_DbParameter();
+                        $entry = $this->_fyndModelEntryCollection[$mc->Property];
+                        $p->Name = ':v_'.$entry->Property;
+                        $p->Value = $mc->ConditionValue;
+                        if($entry->DataType != 'number')
+                        {
+                            $p->DbDataType = PDO::PARAM_STR;
+                        }
+                        else 
+                        {
+                            $p->DbDataType = PDO::PARAM_INT;
+                        }
+                        $params[] = $p;
+                    }
                 }
             }
         }
-        else
+        else if($condition instanceof Fynd_Model_ModelSelection )
         {
             $sql .= ' Where ' . $this->_getWhereClause($condition);
+            if (!is_array($condition->ConditionValue))
+            {
+                $p = new Fynd_DbParameter();
+                $entry = $this->_fyndModelEntryCollection[$condition->Property];
+                $p->Name = ':v_'.$entry->Property;
+                $p->Value = $condition->ConditionValue;
+                if($entry->DataType != 'number')
+                {
+                    $p->DbDataType = PDO::PARAM_STR;
+                }
+                else 
+                {
+                    $p->DbDataType = PDO::PARAM_INT;
+                }
+                $params[] = $p;
+            }
         }
+
         $db = Fynd_Db::getInstance();
         $db->open();
         $db->setFetchMode($fetchMode);
-        $models = $db->query($sql, NULL, $this->getType()->getName());
+        $models = $db->query($sql, $params, $this->getType()->getName());
         $db->close();
+
         return $models;
     }
     protected function _getWhereClause (Fynd_Model_ModelSelection $mc)
@@ -109,14 +185,7 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         }
         else
         {
-            if ($entry->DataType == 'string')
-            {
-                $sql .= $mc->Operation . "'" . $mc->ConditionValue . "'";
-            }
-            else
-            {
-                $sql .= $mc->Operation . $mc->ConditionValue;
-            }
+            $sql .= $mc->Operation . ":v_" . $mc->Property;           
         }
         if (! empty($mc->NextLogicOperater))
         {
@@ -133,12 +202,20 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         $properties = $this->getIterator();
         $sql = "Insert Into " . $this->_fyndTableName . ' (';
         $params = array();
+        $db = Fynd_Db::getInstance();
         foreach ($properties as $name => $value)
         {
             $entry = $this->_fyndModelEntryCollection[$name];
             $p = new Fynd_DbParameter();
             $p->Name = ':v_' . $name;
-            $p->Value = $value;
+            if($name == $this->_fyndPrimaryProperty)
+            {
+               $p->Value = $db->getNextId($entry->Field); 
+            }
+            else 
+            {
+                $p->Value = $value;
+            }
             $fields .= '`' . $entry->Field . '`,';
             $values .= $p->Name . ",";
             if ($entry->DataType != 'number')
@@ -154,9 +231,50 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         $fields = Fynd_Util::stringRemoveEnd($fields, 1);
         $values = Fynd_Util::stringRemoveEnd($values, 1);
         $sql .= $fields . ') Values (' . $values . ')';
-        $db = Fynd_Db::getInstance();
+        
         $db->open();
         $db->excute($sql, $params);
+        $db->close();
+    }
+    protected function _acceptModified()
+    {
+        $properties = $this->getIterator();
+        $sql = "Update `" . $this->_fyndTableName . '` As t Set ';
+        $params = array();
+        $db = Fynd_Db::getInstance();
+        foreach ($properties as $name => $value)
+        {
+            $entry = $this->_fyndModelEntryCollection[$name];
+            $p = new Fynd_DbParameter();
+            $p->Name = ':v_' . $name;
+            if($name == $this->_fyndPrimaryProperty)
+            {
+               $where = " Where t.".$entry->Field." = ".$p->Name;
+               $p->Value = $value;
+            }
+            else 
+            {
+                $set .= "t.".$entry->Field." = ".$p->Name.",";
+                $p->Value = $value;
+            }
+            
+            if ($entry->DataType != 'number')
+            {
+                $p->DbDataType = PDO::PARAM_STR;
+                echo $entry->DataType."\n";
+            }
+            else
+            {
+                $p->DbDataType = PDO::PARAM_INT;
+                echo $entry->DataType."\n";
+            }
+            $params[] = $p;
+        }
+        $set = Fynd_Util::stringRemoveEnd($set,1);
+        $sql .= $set . $where;
+        
+        $db->open();
+        $db->excute($sql,$params);
         $db->close();
     }
     protected function _setModelStatus ()
@@ -194,17 +312,25 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
     }
     public function __set ($key, $value)
     {
-        try
-        {
-            parent::__set($key, $value);
-        }
-        catch (Exception $e)
+        if($this->_fyndInitializing)
         {
             //For Db
             $parts = split('_', $key);
-            $parts[1] = Fynd_Util::upperCaseFirstChar($parts[1]);
+            for($i=1;$i<count($parts);$i++)
+            {
+                $parts[$i] = Fynd_Util::upperCaseFirstChar($parts[$i]);
+            }
             $privateVar = implode('', $parts);
-            parent::__set($privateVar, $value);
+            $privateVar = '_'.$privateVar;
+            if(!$this->getType()->getProperty($privateVar))
+            {
+                throw new Exception("Property '".$privateVar."' does not exist");
+            }
+            $this->$privateVar = $value;
+        }
+        else 
+        {
+            parent::__set($key, $value);
         }
     }
     /**
@@ -231,10 +357,6 @@ abstract class Fynd_Model extends Fynd_PublicPropertyClass implements IteratorAg
         }
         return new ArrayObject($modelPropertis);
     }
-    //	public abstract function validate();
-//	public abstract function getInsertSql();
-//	public abstract function getUpdateSql();
-//	public abstract function getSelectSql();
-//	public abstract function getDeleteSql();
+
 }
 ?>
