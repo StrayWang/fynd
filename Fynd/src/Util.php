@@ -60,6 +60,15 @@ class Fynd_Util
         }
         return false;
     }
+    public static function endWith($string,$with)
+    {
+        $part1 = substr($string,-1,strlen($with));
+        if($part1 == $with)
+        {
+            return true;
+        }
+        return false;
+    }
     public static function jsonEncode ($a = false)
     {
         if (is_null($a))
