@@ -3,6 +3,11 @@ require_once 'Config/ConfigManager.php';
 require_once 'Config/ConfigType.php';
 class Fynd_Db
 {
+    /**
+     * single instance of Fynd_Db
+     *
+     * @var Fynd_Db
+     */
     protected static $_instance;
     /**
      * 数据库连接配置
@@ -51,6 +56,13 @@ class Fynd_Db
         self::$_instance->setPersistent($persistent);
         return self::$_instance;
     }
+    /**
+     * Constructor of Fynd_Db,
+     * accept Fynd_Config_DbConnectionConfig as datatbase connection configure
+     *
+     * @param Fynd_Config_DbConnectionConfig $config
+     * @param bool $persistent
+     */
     protected function __construct (Fynd_Config_DbConnectionConfig $config,$persistent = true)
     {
         $this->_config = $config;
@@ -70,7 +82,8 @@ class Fynd_Db
         {
             $dsn = strtolower($this->_config->getDbType()) . ':host=' . $this->_config->getServer() . ';port=' . $this->_config->getPort() . ';dbname=' . $this->_config->getDatabase();
             $this->_pdo = new PDO($dsn, $this->_config->getUser(), $this->_config->getPassword());
-            $this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+            $this->_pdo->setAttribute(PDO::ATTR_AUTOCOMMIT,true);
+            //$this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
         }
     }
     /**
@@ -108,7 +121,7 @@ class Fynd_Db
         if (! $this->_stmt->execute())
         {
             include_once 'Db/DbException.php';
-            throw new Fynd_DbException($this->_stmt->errorCode() . " " . $this->_stmt->errorInfo());
+            throw new Fynd_DbException($this->_stmt->errorCode() . " " . implode(', ',$this->_stmt->errorInfo()));
         }
         $result = $this->_fetchAll($fetchClassName, $fetchObj);
         $this->_stmt->closeCursor();
@@ -120,18 +133,49 @@ class Fynd_Db
      * @param string $sql
      * @param array $param
      */
-    public function excute ($sql, array $param = null)
+    public function excute ($sql, array $param = array())
     {
         $this->open();
         $this->_createStatement($sql, $param);
-        if (! $this->_stmt->execute())
+        $this->_stmt->execute();
+//        $sql.=' ';
+//        foreach ($param as $p)
+//        {
+//            $pattern1 = '/'.$p->Name.'([^\w])/';
+//            //$pattern2 = "/".$p->Name."$/";
+//            
+//            if($p->DbDatatType == PDO::PARAM_INT)
+//            {
+//                $sql = preg_replace($pattern1,$p->Value.'$1',$sql);
+//                //$sql = preg_replace($pattern2,$p->Value,$sql);
+//                echo $p->Value."\n";
+//            }
+//            else 
+//            {
+//                $sql = preg_replace($pattern1,"'".$p->Value."'$1",$sql);
+//                //$sql = preg_replace($pattern2,"'".$p->Value."'",$sql);
+//                echo $p->Value."\n";
+//            }
+//        }
+//        echo "$sql\n";
+//        $this->_pdo->exec($sql);
+        if ($this->_stmt->errorCode() != '00000')
+//        if($this->_pdo->errorCode() != '00000')
         {
             include_once 'Db/DbException.php';
-            throw new Fynd_DbException($this->_stmt->errorCode() . " " . $this->_stmt->errorInfo());
+            //throw new Fynd_DbException($this->_stmt->errorCode() . " " . implode(', ',$this->_stmt->errorInfo()));
+            throw new Fynd_DbException($this->_pdo->errorCode() . " " . implode(', ',$this->_pdo->errorInfo()));
         }
         $this->_stmt->closeCursor();
     }
-    public function _createStatement ($sql, array $param = null)
+    /**
+     * 创建Satatement，如果sql对应的statement被缓存过，则取缓存的Statement
+     *
+     * @param string $sql
+     * @param array $param
+     * @return PDOStatement
+     */
+    protected function _createStatement ($sql, array $param = null)
     {
         if ($this->_sql != $sql)
         {
@@ -142,9 +186,10 @@ class Fynd_Db
         {
             foreach ($param as $p)
             {
-                $this->_stmt->bindParam($p->Name, $p->Value, $p->DbDataType);
+                $this->_stmt->bindValue($p->Name, $p->Value, $p->DbDataType);
             }
         }
+        return $this->_stmt;
     }
     /**
      * 获取结果集
@@ -155,17 +200,33 @@ class Fynd_Db
      */
     protected function _fetchAll ($fetchClassName = null, $fetchObj = null)
     {
-        $result = null;
+        $result = array();
         switch ($this->_fetchMode)
         {
             case PDO::FETCH_CLASS:
                 if (empty($fetchClassName))
                 {
                     include_once 'Db/DbException.php';
-                    throw new Fynd_DbException('fetchObject参数不能为null');
+                    throw new Fynd_DbException('fetchClass parameter can not be null');
                 }
-                $this->_stmt->setFetchMode($this->_fetchMode, $fetchClassName);
-                $result = $this->_stmt->fetchAll();
+                $this->_stmt->setFetchMode(PDO::FETCH_ASSOC);
+                $resultSet = $this->_stmt->fetchAll();
+                $result = array();
+                foreach ($resultSet as $row)
+                {
+                    $obj = new $fetchClassName();
+                    $obj->beginInitializtion();
+                    foreach ($row as $field=>$value)
+                    {
+                        $obj->$field = $value;
+                    }
+                    $obj->endInitializtion();
+                    $result[] = $obj;
+                }
+                if(count($result) == 1)
+                {
+                    $result = $result[0];
+                }
                 break;
             case PDO::FETCH_INTO:
                 if (is_null($fetchObj))
@@ -190,6 +251,34 @@ class Fynd_Db
             }
         }
         return $result;
+    }
+    /**
+     * Get next value of filed from sequence
+     *
+     * @param string $field
+     * @return int
+     */
+    public function getNextId($field)
+    {
+        $sql = "Select s.sequence+1 From sequence As s Where s.field_name = :v_field";
+        $p1 = new Fynd_DbParameter();
+        $p1->Name = ':v_field';
+        $p1->Value = $field;
+        $p1->DbDataType = PDO::PARAM_STR; 
+        $this->open();
+        $this->setFetchMode(PDO::FETCH_ASSOC);
+        $seq = $this->query($sql,array($p1));
+        if($seq)
+        {
+            $sqlUpdate = "Update `sequence` As s Set s.sequence = :v_sequence Where s.field_name = :v_field";
+            $p2 = new Fynd_DbParameter();
+            $p2->Name = ':v_sequence';
+            $p2->Value = $seq;
+            $p2->DbDataType = PDO::PARAM_INT;
+            $this->excute($sqlUpdate,array($p1,$p2));
+        }
+        $this->close();
+        return $seq;
     }
 }
 ?>
