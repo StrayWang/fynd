@@ -17,7 +17,7 @@ abstract class Fynd_PublicPropertyClass
 		{
 			$this->$setter($value);
 		}
-		else if(!property_exists($this->getType()->getName(),$privateVar))
+		else if(!$this->getType()->getProperty($privateVar))
 		{
 			throw new Exception('property:'.$key." does not exsist");
 		}
