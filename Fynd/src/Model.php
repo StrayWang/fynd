@@ -296,18 +296,22 @@ abstract class Fynd_Model
     {
         $ref = new ReflectionObject($this);
         $filename = str_replace('.php', '.xml', $ref->getFileName());
-        $xml = simplexml_load_file($filename);
+        //忽略错误，比如无法找到映射XML文件之类
+        $xml = @simplexml_load_file($filename);
         $this->_fyndTableName = (string) $xml['Table'];
         $this->_fyndPrimaryProperty = (string) $xml['PrimaryProperty'];
         $this->_fyndModelEntryCollection = array();
-        foreach ($xml as $node)
+        if($xml)
         {
-            $entry = new Fynd_Model_ModelEntry();
-            $entry->Property = (string) $node->Property;
-            $entry->Field = (string) $node->Field;
-            $entry->DataType = (string) $node->DataType;
-            $entry->DataLength = (string) $node->DataLength;
-            $this->_fyndModelEntryCollection[$entry->Property] = $entry;
+            foreach ($xml as $node)
+            {
+                $entry = new Fynd_Model_ModelEntry();
+                $entry->Property = (string) $node->Property;
+                $entry->Field = (string) $node->Field;
+                $entry->DataType = (string) $node->DataType;
+                $entry->DataLength = (string) $node->DataLength;
+                $this->_fyndModelEntryCollection[$entry->Property] = $entry;
+            }
         }
     }
     public function __set ($key, $value)
