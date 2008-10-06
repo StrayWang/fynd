@@ -4,7 +4,7 @@ class Fynd_RequestHandler
 {
 	public static function GetControllerName()
 	{
-		$ctrl = trim(strtolower($_GET['c']));
+		$ctrl = trim($_GET['c']);
 		unset($_GET['c']);
 		$ctrl = Fynd_Util::upperCaseFirstChar($ctrl);
 		if(empty($ctrl))
@@ -13,7 +13,7 @@ class Fynd_RequestHandler
 	}
 	public static function GetControllerAction()
 	{
-		$action = strtolower($_GET['a']);
+		$action = trim($_GET['a']);
 		unset($_GET['a']);
 		if(empty($action))
 			$action = 'Index';	
