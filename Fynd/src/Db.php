@@ -1,6 +1,12 @@
 <?php
 require_once 'Config/ConfigManager.php';
 require_once 'Config/ConfigType.php';
+/**
+ * Database abstract layer,
+ * now it support mysql only,
+ * in furture ,it can support other databases,or xml,text file etc.
+ *
+ */
 class Fynd_Db
 {
     /**
@@ -39,19 +45,27 @@ class Fynd_Db
      * @var PDOStatement
      */
     protected $_stmt;
+    /**
+     * Show that database's connection is persistent or not
+     *
+     * @var unknown_type
+     */
     protected $_persistent = true;
     /**
      * 获取DB实例
      *
      * @return Fynd_Db
      */
-    public static function getInstance ($persistent = true)
+    public static function getInstance ($config = null,$persistent = true)
     {
         if (! self::$_instance instanceof Fynd_Db)
         {
-            $dbConfig = Fynd_Config_ConfigManager::getConfig(Fynd_Config_ConfigType::DbConfig, Fynd_Application::getConfigPath().'DbConfig.xml');
-            $connConfig = $dbConfig->getDefaultConnectionConfig();
-            self::$_instance = new Fynd_Db($connConfig);
+            if($config == null)
+            {
+                $config = Fynd_Config_ConfigManager::getConfig(Fynd_Config_ConfigType::DbConfig, Fynd_Application::getConfigPath().'DbConfig.xml')
+                        ->getDefaultConnectionConfig();
+            }
+            self::$_instance = new Fynd_Db($config);
         }
         self::$_instance->setPersistent($persistent);
         return self::$_instance;
@@ -68,6 +82,11 @@ class Fynd_Db
         $this->_config = $config;
         $this->_persistent = $persistent;
     }
+    /**
+     * Set database's connection is persistent or not.
+     *
+     * @param bool $persistent
+     */
     public function setPersistent($persistent = true)
     {
         $this->_persistent = $persistent;
@@ -138,32 +157,9 @@ class Fynd_Db
         $this->open();
         $this->_createStatement($sql, $param);
         $this->_stmt->execute();
-//        $sql.=' ';
-//        foreach ($param as $p)
-//        {
-//            $pattern1 = '/'.$p->Name.'([^\w])/';
-//            //$pattern2 = "/".$p->Name."$/";
-//            
-//            if($p->DbDatatType == PDO::PARAM_INT)
-//            {
-//                $sql = preg_replace($pattern1,$p->Value.'$1',$sql);
-//                //$sql = preg_replace($pattern2,$p->Value,$sql);
-//                echo $p->Value."\n";
-//            }
-//            else 
-//            {
-//                $sql = preg_replace($pattern1,"'".$p->Value."'$1",$sql);
-//                //$sql = preg_replace($pattern2,"'".$p->Value."'",$sql);
-//                echo $p->Value."\n";
-//            }
-//        }
-//        echo "$sql\n";
-//        $this->_pdo->exec($sql);
         if ($this->_stmt->errorCode() != '00000')
-//        if($this->_pdo->errorCode() != '00000')
         {
             include_once 'Db/DbException.php';
-            //throw new Fynd_DbException($this->_stmt->errorCode() . " " . implode(', ',$this->_stmt->errorInfo()));
             throw new Fynd_DbException($this->_pdo->errorCode() . " " . implode(', ',$this->_pdo->errorInfo()));
         }
         $this->_stmt->closeCursor();
@@ -237,6 +233,12 @@ class Fynd_Db
                 $this->_stmt->setFetchMode($this->_fetchMode, $fetchObj);
                 $result = $this->_stmt->fetch($this->_fetchMode);
                 break;
+            case Fynd_DB::FETCH_SINGLE_COLUMN:
+                while($col = $this->_stmt->fetchColumn(0))
+                {
+                    $result[] = $col;
+                }
+                break;
             default:
                 $this->_stmt->setFetchMode($this->_fetchMode);
                 $result = $this->_stmt->fetchAll();
@@ -280,5 +282,7 @@ class Fynd_Db
         $this->close();
         return $seq;
     }
+    
+    const FETCH_SINGLE_COLUMN = 1001;
 }
 ?>
