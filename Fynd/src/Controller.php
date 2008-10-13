@@ -26,18 +26,11 @@ class Fynd_Controller
 	protected function _selectView($view,$type = null)
 	{
 		ob_start();
-		if(empty($type) || $type == self::HTML_VIEW)
-		{
-			include Fynd_Application::getViewPath().$view.'.php';
-		}
-		else if($type == self::JSON_VIEW)
-		{
-			header("content-type:text/plain");
-			include_once Fynd_Application::getViewPath().$view.'.php';
-			$view = new $view();
-			$data = $view->render();
-			echo $data;
-		}
+		include_once Fynd_Application::getViewPath().$view.'.php';
+		$view = new $view();
+		$data = $view->render();
+		if(!empty($data))
+		    echo $data;
 		ob_end_flush();
 	}
 	/**
