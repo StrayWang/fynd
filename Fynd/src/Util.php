@@ -19,6 +19,22 @@ class Fynd_Util
         return $privateVar;
     }
     /**
+     * 将以下划线分割的字段名转换成Pasical风格的属性名
+     *
+     * @param string $field
+     * @return string
+     */
+    public static function convertFieldToProperty($field)
+    {
+        $parts = split('_',$field);
+        for($i=0;$i<count($parts);$i++)
+        {
+            $parts[$i] = Fynd_Util::upperCaseFirstChar($parts[$i]); 
+        }
+        $property = implode('',$parts);
+        return $property;
+    }
+    /**
      * 首字母大写
      *
      * @param string $str
@@ -62,7 +78,7 @@ class Fynd_Util
     }
     public static function endWith($string,$with)
     {
-        $part1 = substr($string,-1,strlen($with));
+        $part1 = substr($string,0-strlen($with));
         if($part1 == $with)
         {
             return true;
