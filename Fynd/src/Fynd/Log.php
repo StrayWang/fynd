@@ -98,51 +98,17 @@ class Fynd_Log
         return $message;
     }
     /**
-     * get logger existed or create a new logger named by $name.
-     *
-     * @param string $name
-     * @param Fynd_Log_IWriter $writer
-     * @return Fynd_Log
-     */
-    public static function getLogger ($name, $writer)
-    {
-        if (is_array(self::$_loggers) && array_key_exists($name, self::$_loggers))
-        {
-            if (! self::$_loggers[$name] instanceof Fynd_Log)
-            {
-                if (! is_null($writer))
-                {
-                    self::$_loggers[$name] = new Fynd_Log($name, $writer);
-                }
-                else
-                {
-                    //TODO:read default log store configure from configure file
-                    throw new Exception('$writer can not be null');
-                }
-            }
-        }
-        else
-        {
-            if (! is_null($writer))
-            {
-                self::$_loggers[$name] = new Fynd_Log($name, $writer);
-            }
-            else
-            {
-                //TODO:read default log store configure from configure file
-                throw new Exception('$writer can not be null');
-            }
-        }
-        return self::$_loggers[$name];
-    }
-    /**
      * constructor of Fynd_Log
      *
      * @param string $name
      * @param Fynd_Log_IWriter $writer
      */
-    private function __construct ($name, Fynd_Log_IWriter $writer)
+    public function __construct ($name, Fynd_Log_IWriter $writer)
     {
+        if(empty($name))
+        {
+            throw new Exception('$name can not be null or empty');
+        }
         $this->_name = $name;
         $this->_writer = $writer;
     }
@@ -183,12 +149,3 @@ class Fynd_Log
     }
 }
 ?>
-
-
-
-
-
-
-
-
-

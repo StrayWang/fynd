@@ -69,8 +69,7 @@ class Fynd_Util
      */
     public static function startWith ($string, $with)
     {
-        $part1 = substr($string, 0, strlen($with));
-        if ($part1 == $with)
+        if(substr_compare($string,$with,0,strlen($with)) === 0)
         {
             return true;
         }
@@ -78,8 +77,7 @@ class Fynd_Util
     }
     public static function endWith($string,$with)
     {
-        $part1 = substr($string,0-strlen($with));
-        if($part1 == $with)
+        if(substr_compare($string,$with,(0-strlen($with))) === 0)
         {
             return true;
         }

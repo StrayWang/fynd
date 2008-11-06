@@ -1,7 +1,6 @@
 <?php
-require_once 'PublicPropertyClass.php';
 require_once 'Util.php';
-abstract class Fynd_PublicPropertyClass
+class Fynd_Object
 {
 	/**
 	 * 设置公共属性值

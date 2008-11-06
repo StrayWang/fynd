@@ -12,24 +12,17 @@ abstract class Fynd_Config_AbstractConfig
 	 */
 	protected $_config = null;
 	/**
-	 * 配置文件路径
-	 *
-	 * @var string
-	 */
-	protected $_configFilePath;
-	/**
 	 * 构造函数
 	 *
-	 * @param string $configFilePath
+	 * @param string $configXml
 	 */
-	public function __construct($configFilePath)
+	public function __construct($configXml)
 	{
-		if(empty($configFilePath))
+		if(empty($configXml))
 		{
-			throw new Exception('Empty value of parameter $configFilePath that can not be empty');
+			throw new Exception('Parameter $configXml can not be empty');
 		}
-		$this->_configFilePath = $configFilePath;
-		$this->_readXml($configFilePath);
+		$this->_readXml($configXml);
 		$this->_initConfig();
 	}
 	/**
@@ -43,14 +36,14 @@ abstract class Fynd_Config_AbstractConfig
 	/**
 	 * 读取XML配置文件
 	 *
-	 * @param String $xmlFilePath Xml文件路径
+	 * @param String $xmlFilePath xml configure string
 	 */
-	protected function _readXml($xmlFilePath)
+	protected function _readXml($configXml)
 	{
-		$this->_config = @simplexml_load_file($xmlFilePath);
+		$this->_config = @simplexml_load_string($configXml);
 		if($this->_config === false || is_null($this->_config)) 
 		{
-			throw new Exception('Unable read the configure file or it doesn\'t exsit');
+			throw new Exception('Unable load xml document object from given configure xml string');
 		}
 	}
 	/**
