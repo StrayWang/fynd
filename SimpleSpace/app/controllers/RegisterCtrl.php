@@ -1,5 +1,5 @@
 <?php
-include_once 'Controller.php';
+include_once 'Fynd/Controller.php';
 include_once Fynd_Application::getModelPath(). 'User.php';
 class RegisterCtrl extends Fynd_Controller
 {
