@@ -1,9 +1,10 @@
 <?php
-require_once 'PublicPropertyClass.php';
+require_once 'src/Fynd/Util.php';
+require_once 'Fynd/Object.php';
 require_once 'Fynd/Config/ConfigManager.php';
 require_once 'Fynd/Config/ConfigType.php';
-require_once 'RequestHandler.php';
-require_once 'Log.php';
+require_once 'Fynd/RequestHandler.php';
+require_once 'Fynd/Log.php';
 require_once 'Fynd/Log/StreamWriter.php';
 /**
  * This class describe your application,
@@ -27,7 +28,7 @@ require_once 'Fynd/Log/StreamWriter.php';
  * @author FishTrees
  *
  */
-class Fynd_Application extends Fynd_PublicPropertyClass
+class Fynd_Application extends Fynd_Object
 {
     private static $_sessionStarted = false;
     /**
@@ -273,7 +274,7 @@ class Fynd_Application extends Fynd_PublicPropertyClass
         }
     }
     /**
-     * Used PHP autoload functionality
+     * Used by PHP autoload functionality
      *
      * @param string $class
      */
