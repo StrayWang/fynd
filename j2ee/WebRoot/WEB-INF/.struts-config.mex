@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowViewLayout Version="1.2">
+  <StrutsActivity path="/customerType.do" location="50,50" dimension="270,88" />
+  <StrutsActivity path="/customerTypeView.do" location="950,350" dimension="292,88" />
+  <StrutsActivity path="/customerTypeList.do" location="50,750" dimension="286,88" />
+  <StrutsActivity path="/customerTypeEdit.do" location="950,750" dimension="288,88" />
+  <StrutsActivity path="/customer.do" location="950,50" dimension="246,88" />
+  <StrutsActivity path="success;6" location="195,316" dimension="150,100" />
+  <StrutsActivity path="error;6" location="135,538" dimension="150,100" />
+  <StrutsActivity path="customerTypePage;6" location="950,550" dimension="231,75" />
+  <StrutsActivity path="/views/customers/customerTypeView.jsp" location="350,550" dimension="225,49" />
+  <StrutsActivity path="/views/customers/customerTypeEdit.jsp" location="660,195" dimension="221,49" />
+  <StrutsActivity path="/views/customers/customerTypeList.jsp" location="650,550" dimension="219,49" />
+  <StrutsActivity path="/views/customers/customerTypeNew.jsp" location="650,850" dimension="224,49" />
+  <StrutsActivity path="/views/customers/customerEdit.jsp" location="950,250" dimension="197,49" />
+  <StrutsActivity path="/views/common/success.jsp" location="585,345" dimension="162,49" />
+  <StrutsActivity path="/views/common/error.jsp" location="650,450" dimension="149,49" />
+  <StrutsActivity path="customerType;6" location="487,696" dimension="150,100" />
+  <StrutsTransition id="/customerType.do,customerTypeEdit,/views/customers/customerTypeEdit.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="320,94" />
+      <AbsolutePoint location="770,94" />
+      <AbsolutePoint location="770,195" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeList.do,customerTypeEdit,/views/customers/customerTypeEdit.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="120,750" />
+      <AbsolutePoint location="120,219" />
+      <AbsolutePoint location="660,219" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/views/customers/customerEdit.jsp,null,/customer.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1048,250" />
+      <AbsolutePoint location="1048,138" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeView.do,customerTypeEdit,/views/customers/customerTypeEdit.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="950,379" />
+      <AbsolutePoint location="844,379" />
+      <AbsolutePoint location="844,244" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/views/customers/customerTypeList.jsp,null,/customerTypeList.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="759,599" />
+      <AbsolutePoint location="759,811" />
+      <AbsolutePoint location="336,811" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="success;6,null,/views/common/success.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="345,366" />
+      <AbsolutePoint location="585,366" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerType.do,customerTypeView,/views/customers/customerTypeView.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="320,124" />
+      <AbsolutePoint location="432,124" />
+      <AbsolutePoint location="432,550" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/views/customers/customerTypeEdit.jsp,null,/customerTypeEdit.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="881,219" />
+      <AbsolutePoint location="1317,219" />
+      <AbsolutePoint location="1317,794" />
+      <AbsolutePoint location="1238,794" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/views/customers/customerTypeNew.jsp,null,/customerType.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="650,874" />
+      <AbsolutePoint location="-25,874" />
+      <AbsolutePoint location="-25,94" />
+      <AbsolutePoint location="50,94" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeView.do,customerTypeList,/views/customers/customerTypeList.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1096,438" />
+      <AbsolutePoint location="1096,514" />
+      <AbsolutePoint location="814,514" />
+      <AbsolutePoint location="814,550" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="error;6,null,/views/common/error.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="210,538" />
+      <AbsolutePoint location="210,474" />
+      <AbsolutePoint location="650,474" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeView.do,customerTypeView,/views/customers/customerTypeView.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1162,350" />
+      <AbsolutePoint location="1162,154" />
+      <AbsolutePoint location="462,154" />
+      <AbsolutePoint location="462,550" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeEdit.do,customerTypeEdit,/views/customers/customerTypeEdit.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1196,750" />
+      <AbsolutePoint location="1196,465" />
+      <AbsolutePoint location="814,465" />
+      <AbsolutePoint location="814,244" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/views/customers/customerTypeView.jsp,null,/customerTypeView.do,2" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="492,550" />
+      <AbsolutePoint location="492,331" />
+      <AbsolutePoint location="1096,331" />
+      <AbsolutePoint location="1096,350" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeList.do,customerTypeList,/views/customers/customerTypeList.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="193,750" />
+      <AbsolutePoint location="193,653" />
+      <AbsolutePoint location="789,653" />
+      <AbsolutePoint location="789,599" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerTypeView.do,customerTypeNew,/views/customers/customerTypeEdit.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="950,409" />
+      <AbsolutePoint location="770,409" />
+      <AbsolutePoint location="770,244" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="/customerType.do,customerTypeList,/views/customers/customerTypeList.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="180,138" />
+      <AbsolutePoint location="180,514" />
+      <AbsolutePoint location="759,514" />
+      <AbsolutePoint location="759,550" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+  <StrutsTransition id="customerTypePage;6,null,/views/customers/customerTypeNew.jsp,1" routingType="0">
+    <AutomaticBendpoints>
+      <AbsolutePoint location="1065,625" />
+      <AbsolutePoint location="1065,711" />
+      <AbsolutePoint location="789,711" />
+      <AbsolutePoint location="789,850" />
+    </AutomaticBendpoints>
+  </StrutsTransition>
+</FlowViewLayout>
+
