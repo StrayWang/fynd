@@ -1,7 +1,7 @@
 <%@ page language="java" pageEncoding="UTF-8"%>
 <%@ page language="java" import="java.util.*"%>
-<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%> 
-<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+<%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://struts.apache.org/tags-tiles" prefix="tiles" %>
  
@@ -25,7 +25,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 	</div>
 
 	<hr />
-		<html:form>
+		<html:form action="customerType.do?action=pager">
 	<div style="width:100%;height:100%;text-align:center;">
 		<table cellspacing="0" cellpadding="0" style="width:70%;font-size:11pt">
 		<tr>
