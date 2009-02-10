@@ -1,0 +1,7 @@
+MIDlet-Version: 0.1.0
+MIDlet-Vendor: www.fishtrees.cn
+MIDlet-Jar-URL: FyndMobileReader.jar
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+MIDlet-1: FyndMobileReader,,cn.fishtrees.fynd.mobile.MobileReader
+MIDlet-Name: FyndMobileReader
