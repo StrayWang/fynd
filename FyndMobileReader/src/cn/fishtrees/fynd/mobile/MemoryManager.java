@@ -24,7 +24,7 @@ public class MemoryManager {
 	/**
 	 * 强制执行垃圾回收
 	 */
-	public final static void releasseForce(){
+	public final static void releaseForce(){
 		Console.WriteLine("回收前的空闲内存==>" + MemoryManager.getFreeMemoryKByte());
 		System.gc();
 		Console.WriteLine("回收后的空闲内存==>" + MemoryManager.getFreeMemoryKByte());
