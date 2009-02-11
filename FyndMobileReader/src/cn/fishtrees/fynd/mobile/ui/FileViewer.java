@@ -16,6 +16,7 @@ import gr.fire.ui.TextComponent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
@@ -145,14 +146,15 @@ public class FileViewer extends Container implements KeyListener,
 											 : PAGE_BYTE_SIZE * (pageNum - 1) + 1;
 
 		InputStream ins = null;
-		
+		//TODO:将字节读入到vector中，如果按指定的编码解码失败，则向前多读取1个字节
 		try {
 			byte[] buffer = null;
-			if (this.fileLength > PAGE_BYTE_SIZE) {
-				buffer = new byte[PAGE_BYTE_SIZE];
-			} else {
-				buffer = new byte[(int) this.fileLength];
-			}
+			int bufferLength = PAGE_BYTE_SIZE;
+			if (this.fileLength <= PAGE_BYTE_SIZE) {
+				bufferLength = (int) this.fileLength;
+				
+			} 
+			buffer = new byte[bufferLength];
 			Console.WriteLine("Buffer was created");
 			try {
 				ins = this.file.openRead();
@@ -172,7 +174,28 @@ public class FileViewer extends Container implements KeyListener,
 					}
 				}
 			}
-			String pageText = new String(buffer, this.encoding);
+			String pageText = "";
+			try
+			{
+				pageText = new String(buffer, this.encoding);
+			}
+			catch(Exception e){
+				try
+				{
+					ins.close();
+					buffer = null;
+					MemoryManager.releasseForce();
+					
+					buffer = new byte[bufferLength];
+					ins = this.file.openRead();
+					ins.skip(beginByteOffset);
+					ins.read(buffer);
+				}
+				catch(IOException ioe){
+					Console.WriteLine("Read prev byte error:",ioe);
+					throw ioe;
+				}
+			}
 			Console.WriteLine("Buffer has been converted to string with encoding " + this.encoding);
 			Console.WriteLine("The pageText's length is " + pageText.length());
 			buffer = null;
