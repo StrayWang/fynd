@@ -35,7 +35,7 @@ public class FileViewer extends Container implements KeyListener,
     /**
      * 默认分页大小（字节）
      */
-    private static int PAGE_BYTE_SIZE = 32768;// 32KB
+    private static int PAGE_BYTE_SIZE = 8192;// 8KB
     private boolean isPageFirstDisplayed = true;
     /**
      * 文件完整路径
@@ -146,7 +146,7 @@ public class FileViewer extends Container implements KeyListener,
                 : PAGE_BYTE_SIZE * (pageNum - 1) + 1;
 
         InputStream ins = null;
-        //TODO:将字节读入到vector中，如果按指定的编码解码失败，则向前多读取1个字节
+        
         try {
             byte[] buffer = null;
             int bufferLength = PAGE_BYTE_SIZE;
@@ -165,20 +165,12 @@ public class FileViewer extends Container implements KeyListener,
             } catch (IOException e) {
                 this.setTextContent(e.getMessage());
                 throw e;
-            } finally {
-                if (null != ins) {
-                    try {
-                        ins.close();
-                    } catch (IOException ex) {
-                        Console.WriteLine("When closing input stream,an exception has been throwed", ex);
-                    }
-                }
             }
             String pageText = "";
             try {
                 Console.WriteLine("First byte of buffer is " + Integer.toHexString(buffer[0] & 0xFF));
                 Console.WriteLine("Second byte of buffer is " + Integer.toHexString(buffer[1] & 0xFF));
-                if (this.encoding.equals("UTF-8") && (((int)buffer[0] & 0xFF) > (int)0x7F) && (((int)buffer[0] & 0xFF) < (int)0xC0)) {
+                if (this.encoding.equals("UTF-8") && (((int) buffer[0] & 0xFF) > (int) 0x7F) && (((int) buffer[0] & 0xFF) < (int) 0xC0)) {
                     try {
                         ins.close();
                         buffer = null;
@@ -190,13 +182,10 @@ public class FileViewer extends Container implements KeyListener,
                         ins.read(buffer);
                         Console.WriteLine("First byte of buffer is " + Integer.toHexString(buffer[0] & 0xFF));
                         Console.WriteLine("Second byte of buffer is " + Integer.toHexString(buffer[1] & 0xFF));
-                        
-                        if (this.encoding.equals("UTF-8") && (((int)buffer[0] & 0xFF) > (int)0x7F) && (((int)buffer[0] & 0xFF) < (int)0xC0)) {
+
+                        if (this.encoding.equals("UTF-8") && (((int) buffer[0] & 0xFF) > (int) 0x7F) && (((int) buffer[0] & 0xFF) < (int) 0xC0)) {
                             try {
                                 ins.close();
-                                buffer = null;
-                                MemoryManager.releaseForce();
-
                                 buffer = new byte[bufferLength];
                                 ins = this.file.openRead();
                                 ins.skip(beginByteOffset - 3);
@@ -214,20 +203,32 @@ public class FileViewer extends Container implements KeyListener,
                     }
                 }
                 pageText = new String(buffer, this.encoding);
+                Console.WriteLine("Buffer has been converted to string with encoding " + this.encoding);
             } catch (Exception e) {
-                pageText = e.getMessage();
+                Console.WriteLine("Decoding bytes with encoding " + this.encoding + " failed.", e);
+                pageText = e.toString();
             }
-            Console.WriteLine("Buffer has been converted to string with encoding " + this.encoding);
-            Console.WriteLine("The pageText's length is " + pageText.length());
-            buffer = null;
-            
+            try {
+                Console.WriteLine("The pageText's length is " + pageText.length());
+            } catch (Exception e) {
+                Console.WriteLine("When accessing the 'pageText',an exception has been thrown,", e);
+            }
+
             this.currentPageNo = pageNum;
             this.setPanelTitle();
             this.setTextContent(pageText);
-            
+
             Console.WriteLine("FileViewer.displayPage : current page No. is '" + pageNum + "'");
         } catch (Exception ex) {
             Console.WriteLine("When displaying page,an exception has been throwed," + ex.getClass(), ex);
+        } finally {
+            if (null != ins) {
+                try {
+                    ins.close();
+                } catch (IOException ex) {
+                    Console.WriteLine("When closing input stream,an exception has been throwed", ex);
+                }
+            }
         }
     }
 
@@ -383,6 +384,7 @@ public class FileViewer extends Container implements KeyListener,
             }
         }
         this.isPageFirstDisplayed = false;
+        Console.WriteLine("Page text has been setted.");
     }
 
     public void cleanCurrentPage() {
