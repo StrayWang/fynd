@@ -326,6 +326,7 @@ public class FileViewer extends Container implements KeyListener,
             Console.WriteLine("File's length is " + this.fileLength);
             this.pageCount = (int) Math.ceil((double) this.fileLength / (double) PAGE_BYTE_SIZE);
             this.charPageCounts.setSize(this.pageCount);
+            this.currentPageNo = 0;
             this.displayPage(1);
         }
 
