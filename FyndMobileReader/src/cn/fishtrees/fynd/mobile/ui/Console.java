@@ -33,11 +33,13 @@ public class Console extends Form implements CommandListener, Logger {
 			buf.delete(0, buf.length() - SIZE);
 		super.deleteAll();
 		super.append(buf.toString());
+        System.out.println(txt);
 	}
 
 	public void println(String txt, Exception e) {
 		this.println(txt);
-		this.println(e.getMessage());
+		this.println(e.toString());
+        e.printStackTrace();
 	}
 
 	/*
