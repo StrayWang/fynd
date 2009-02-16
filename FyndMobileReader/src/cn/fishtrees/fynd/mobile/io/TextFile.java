@@ -15,31 +15,19 @@ public class TextFile extends File {
 		this.encoding = encoding;
 	}
 	public TextFile(String fileFullPath){
-		super(fileFullPath);
+		this(fileFullPath,"UTF-8");
 	}
+    public TextFile(String fileFullPath,String enc){
+        super(fileFullPath);
+        this.encoding = enc;
+    }
+    /**
+     * 创建InputStreamReader用于按特定编码读取字符
+     * @return InputStreamReader
+     * @throws java.io.UnsupportedEncodingException
+     * @throws java.io.IOException
+     */
 	public InputStreamReader createReader() throws UnsupportedEncodingException, IOException{
 		return new InputStreamReader(this.openRead(),this.encoding);
 	}
-	public long getCharLength(){
-		InputStreamReader reader = null;
-		long length = 0;
-		try
-		{
-			reader = new InputStreamReader(this.openRead(),this.encoding);
-		}
-		catch(Exception e){
-			
-		}
-		finally{
-			if(null != reader){
-				try {
-					reader.close();
-				} catch (IOException e) {
-					Console.WriteLine("TextFile.getCharLength,exception:", e);
-				}
-			}
-		}
-		return length;
-	}
-	
 }
