@@ -23,6 +23,7 @@ import javax.microedition.lcdui.Font;
 
 import cn.fishtrees.fynd.mobile.MemoryManager;
 import cn.fishtrees.fynd.mobile.io.File;
+import cn.fishtrees.fynd.mobile.io.TextFile;
 
 /**
  * 文件浏览器，读取UTF8格式的文本文件，以一页32KB分页显示，支持按键导航，触摸屏导航
@@ -56,7 +57,7 @@ public class FileViewer extends Container implements KeyListener,
     /**
      * 封装的文件操作，目前主要用于读取文件
      */
-    private File file;
+    private TextFile file;
     /**
      * 文件字符编码，目前只支持UTF8格式 TODO:Must support multi-encoding
      */
@@ -73,7 +74,7 @@ public class FileViewer extends Container implements KeyListener,
      * 屏幕指针按下时的Y坐标，用于计算拖拽方向
      */
     private int pointerPressedY;
-
+    private Vector charPageCounts;
     /**
      *
      * @param manager
@@ -83,6 +84,7 @@ public class FileViewer extends Container implements KeyListener,
         super(manager);
         this.setKeyListener(this);
         this.setPointerListener(this);
+        this.charPageCounts = new Vector();
     }
 
     /**
@@ -98,7 +100,7 @@ public class FileViewer extends Container implements KeyListener,
      */
     public void setFileFullPath(String fileFullPath) {
         this.fileFullPath = fileFullPath;
-        File f = new File(fileFullPath);
+        TextFile f = new TextFile(fileFullPath, this.encoding);
         this.setFile(f);
     }
 
@@ -133,100 +135,83 @@ public class FileViewer extends Container implements KeyListener,
      *
      * @param pageNum
      */
-    public void displayPage(int pageNum) {
+    public synchronized void displayPage(int pageNum) {
         MemoryManager.releaseForce();
-
+        Console.WriteLine("判断页码是否正确");
         if (pageNum <= 0) {
             pageNum = 1;
         }
         if (pageNum > this.pageCount) {
             pageNum = this.pageCount;
         }
-        int beginByteOffset = (pageNum == 0) ? PAGE_BYTE_SIZE * (pageNum - 1)
-                : PAGE_BYTE_SIZE * (pageNum - 1) + 1;
+        if(this.currentPageNo == pageNum){
+            return;
+        }
+        InputStreamReader reader = null;
 
-        InputStream ins = null;
-        
         try {
-            byte[] buffer = null;
+            Console.WriteLine("计算读取本页字符前应该跳过的字符");
+            long skipCharCount = 0;
+            for (int i = 0; i < this.charPageCounts.size(); i++) {
+                if(null != this.charPageCounts.elementAt(i)){
+                    skipCharCount = skipCharCount + ((Long)this.charPageCounts.elementAt(i)).longValue();
+                }
+            }
+            Console.WriteLine("创建pageChars:Vector对象");
+            Vector pageChars = null;
+            if (this.pageCount > 1) {
+                pageChars = new Vector(4096);
+            } else {
+                pageChars = new Vector();
+            }
+            Console.WriteLine("计算本页应该读取的字节长度");
             int bufferLength = PAGE_BYTE_SIZE;
             if (this.fileLength <= PAGE_BYTE_SIZE) {
                 bufferLength = (int) this.fileLength;
-
             }
-            buffer = new byte[bufferLength];
-            Console.WriteLine("Buffer was created");
-            try {
-                ins = this.file.openRead();
-                ins.skip(beginByteOffset - 1);
-                Console.WriteLine("Skiped " + (beginByteOffset - 1) + " bytes");
-                ins.read(buffer);
-                Console.WriteLine("Current page has been readed to buffer.");
-            } catch (IOException e) {
-                this.setTextContent(e.getMessage());
-                throw e;
-            }
-            String pageText = "";
-            try {
-                Console.WriteLine("First byte of buffer is " + Integer.toHexString(buffer[0] & 0xFF));
-                Console.WriteLine("Second byte of buffer is " + Integer.toHexString(buffer[1] & 0xFF));
-                if (this.encoding.equals("UTF-8") && (((int) buffer[0] & 0xFF) > (int) 0x7F) && (((int) buffer[0] & 0xFF) < (int) 0xC0)) {
-                    try {
-                        ins.close();
-                        buffer = null;
-                        MemoryManager.releaseForce();
-
-                        buffer = new byte[bufferLength];
-                        ins = this.file.openRead();
-                        ins.skip(beginByteOffset - 2);
-                        ins.read(buffer);
-                        Console.WriteLine("First byte of buffer is " + Integer.toHexString(buffer[0] & 0xFF));
-                        Console.WriteLine("Second byte of buffer is " + Integer.toHexString(buffer[1] & 0xFF));
-
-                        if (this.encoding.equals("UTF-8") && (((int) buffer[0] & 0xFF) > (int) 0x7F) && (((int) buffer[0] & 0xFF) < (int) 0xC0)) {
-                            try {
-                                ins.close();
-                                buffer = new byte[bufferLength];
-                                ins = this.file.openRead();
-                                ins.skip(beginByteOffset - 3);
-                                ins.read(buffer);
-                                Console.WriteLine("First byte of buffer is " + Integer.toHexString(buffer[0] & 0xFF));
-                                Console.WriteLine("Second byte of buffer is " + Integer.toHexString(buffer[1] & 0xFF));
-                            } catch (Exception e3) {
-                                Console.WriteLine("Read prev byte error:", e3);
-                                throw e3;
-                            }
-                        }
-                    } catch (Exception e2) {
-                        Console.WriteLine("Read prev byte error:", e2);
-                        throw e2;
-                    }
+            Console.WriteLine("创建InputStreamReader");
+            reader = this.file.createReader();
+            Console.WriteLine("跳过"+skipCharCount+"个字符");
+            reader.skip(skipCharCount);
+            Console.WriteLine("读取字符");
+            int ci = -1;
+            int readedByteCount = 0;
+            while ((ci = reader.read()) != -1) {
+                if (readedByteCount >= bufferLength) {
+                    break;
                 }
-                pageText = new String(buffer, this.encoding);
-                Console.WriteLine("Buffer has been converted to string with encoding " + this.encoding);
-            } catch (Exception e) {
-                Console.WriteLine("Decoding bytes with encoding " + this.encoding + " failed.", e);
-                pageText = e.toString();
+                Character c = new Character((char) ci);
+                readedByteCount += c.toString().getBytes(this.encoding).length;
+                pageChars.addElement(c);
             }
-            try {
-                Console.WriteLine("The pageText's length is " + pageText.length());
-            } catch (Exception e) {
-                Console.WriteLine("When accessing the 'pageText',an exception has been thrown,", e);
+            Console.WriteLine("记录每页显示的实际字符数");
+            if(this.charPageCounts.size() > pageNum-1){
+                this.charPageCounts.setElementAt(new Long(pageChars.size()), pageNum-1);
+            } else {
+                this.charPageCounts.addElement(new Long(pageChars.size()));
             }
-
+            Console.WriteLine("将pageChars转换成String");
+            char[] chars = new char[pageChars.size()];
+            for (int i = 0; i < pageChars.size(); i++) {
+                chars[i] = ((Character) pageChars.elementAt(i)).charValue();
+            }
+            String pageText = new String(chars);
+            Console.WriteLine("显示当前页面");
             this.currentPageNo = pageNum;
             this.setPanelTitle();
             this.setTextContent(pageText);
-
             Console.WriteLine("FileViewer.displayPage : current page No. is '" + pageNum + "'");
-        } catch (Exception ex) {
-            Console.WriteLine("When displaying page,an exception has been throwed," + ex.getClass(), ex);
+
+        } catch (IOException ioe) {
+            Console.WriteLine("IOException:", ioe);
+        } catch (Exception e) {
+            Console.WriteLine("Exception:", e);
         } finally {
-            if (null != ins) {
+            if (null != reader) {
                 try {
-                    ins.close();
+                    reader.close();
                 } catch (IOException ex) {
-                    Console.WriteLine("When closing input stream,an exception has been throwed", ex);
+                    Console.WriteLine("Close InputStreamReader failed:", ex);
                 }
             }
         }
@@ -241,16 +226,22 @@ public class FileViewer extends Container implements KeyListener,
             case Canvas.DOWN:
                 this.scrollDown(false);
                 break;
+
             case Canvas.LEFT:
                 this.moveToNextPage();
                 break;
+
             case Canvas.RIGHT:
                 this.moveToPrevPage();
                 break;
+
             case Canvas.UP:
                 this.scrollUp(false);
                 break;
+
         }
+
+
     }
 
     public void keyRepeated(int code, Component src) {
@@ -281,6 +272,7 @@ public class FileViewer extends Container implements KeyListener,
                 // pointer moved from right to left,we will show the next page.
                 this.moveToNextPage();
             }
+
         } else if (absIncreaseX < absIncreaseY) {
             // pointer moved in vertical direction
             if (increaseY > 0) {
@@ -288,6 +280,7 @@ public class FileViewer extends Container implements KeyListener,
             } else if (increaseY < 0) {
                 this.scrollDown(false);
             }
+
         }
     }
 
@@ -326,15 +319,16 @@ public class FileViewer extends Container implements KeyListener,
      * @param file
      *            the file to set
      */
-    public void setFile(File file) {
+    public void setFile(TextFile file) {
         if (null != file) {
             this.file = file;
-            this.fileLength = file.getLength();
+            this.fileLength = this.file.getLength();
             Console.WriteLine("File's length is " + this.fileLength);
             this.pageCount = (int) Math.ceil((double) this.fileLength / (double) PAGE_BYTE_SIZE);
-            this.currentPageNo = 1;
-            this.displayPage(this.currentPageNo);
+            this.charPageCounts.setSize(this.pageCount);
+            this.displayPage(1);
         }
+
     }
 
     /**
@@ -360,13 +354,14 @@ public class FileViewer extends Container implements KeyListener,
     protected void setTextContent(String text) {
         TextComponent newTextCmp = new TextComponent(text);
         newTextCmp.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN,
-                Font.SIZE_MEDIUM));
+                Font.SIZE_SMALL));
         newTextCmp.validate();
         int textHeight = newTextCmp.getHeight();
         if (textHeight > this.height) {
             this.height = textHeight;
             this.setPrefSize(this.width, textHeight);
         }
+
         if (null != this.txtCmp) {
             this.remove(this.txtCmp);
             this.txtCmp = null;
@@ -382,6 +377,7 @@ public class FileViewer extends Container implements KeyListener,
             } else {
                 this.repaint();
             }
+
         }
         this.isPageFirstDisplayed = false;
         Console.WriteLine("Page text has been setted.");
@@ -391,6 +387,7 @@ public class FileViewer extends Container implements KeyListener,
         if (this.txtCmp != null) {
             this.remove(this.txtCmp);
         }
+
     }
 
     public int getCurrentPageNo() {
@@ -407,6 +404,7 @@ public class FileViewer extends Container implements KeyListener,
             p.setLabel(this.file.getFileName() + " " + this.currentPageNo + "/" + this.pageCount);
             Console.WriteLine("Panle's title has been setted!");
         }
+
     }
 
     public void setParent(Panel p) {
