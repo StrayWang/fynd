@@ -73,10 +73,10 @@ public class ProgressbarAnimation extends Animation
 	public ProgressbarAnimation(String str)
 	{
 		theme = FireScreen.getTheme();
-		font = theme.getFontProperty("titlebar.font");
-		progressbarColor = theme.getIntProperty("titlebar.gradient.end.color");
-		fgcolor = theme.getIntProperty("titlebar.fg.color");
-		fillColor = theme.getIntProperty("titlebar.gradient.start.color");
+		font = theme.getFontProperty("progressbar.font");
+		progressbarColor = theme.getIntProperty("progressbar.gradient.end.color");
+		fgcolor = theme.getIntProperty("progressbar.fg.color");
+		fillColor = theme.getIntProperty("progressbar.gradient.start.color");
 		this.str = str;
 	}
 	

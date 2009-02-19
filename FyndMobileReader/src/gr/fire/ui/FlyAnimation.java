@@ -35,16 +35,24 @@ public class FlyAnimation extends Animation
 	private boolean running=true;
 	private long lastFrame;
 	private int xstep=0,ystep=0,step=0;
+	private int endX,endY;
 	
 	
 	private Image offscreen=null;
 	
-	public FlyAnimation(int startX,int startY,int endX,int endY)
+	public FlyAnimation(int startX,int startY,int endX,int endY,int w,int h)
 	{
+		this.endX = endX;
+		this.endY = endY;
+		
 		int totalX = endX-startX;
 		int totalY = endY-startY;
 		xstep = totalX/MAX_STEP;
 		ystep = totalY/MAX_STEP;
+		setX(startX);
+		setY(startY);
+		width = w;
+		height = h;
 	}
 
 	public boolean isRunning()
@@ -77,17 +85,16 @@ public class FlyAnimation extends Animation
 		else if(now-lastFrame>=MILISECONDS_PER_FRAME)
 		{
 			lastFrame = now;
-			parent.move(xstep,ystep);
+			move(xstep,ystep);
 			step++;
-			return running;
 		}
-		return false;
+		return running;
 	}
 
 	public void stop()
 	{
+		setPosition(endX,endY);
 		running=false;
-		offscreen=null;
 	}
 
 }

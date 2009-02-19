@@ -25,6 +25,7 @@ package gr.fire.ui;
 import gr.fire.core.CommandListener;
 import gr.fire.core.Component;
 import gr.fire.core.FireScreen;
+import gr.fire.core.Panel;
 import gr.fire.util.Lang;
 
 import javax.microedition.lcdui.Command;
@@ -67,8 +68,14 @@ public class TextArea extends TextBox implements CommandListener
 			owner.setValue(getString());
 		}
 		// else its back
-		FireScreen.getScreen().setCurrent(lastComponent);
-		lastComponent.repaint(); // fully repaint the last component  (some phones, like nokia s60, need this)
+		FireScreen screen = FireScreen.getScreen();
+		screen.setCurrent(lastComponent);
+		screen.setSelectedComponent(owner);
+		if(lastComponent instanceof Panel)
+		{
+			((Panel)lastComponent).scrollToSelectedComponent(-1,-1);
+		}
+		// fully repaint screen (some phones, like nokia s60, need this)
+		screen.repaint();
 	}
-
 }

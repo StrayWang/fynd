@@ -250,7 +250,7 @@ public class TextComponent extends Component
 		int h;
 		if(formatedText!=null)
 		{
-			h = (font.getHeight()+LINE_DISTANCE)*formatedText.size();
+			h = ((font.getHeight() + LINE_DISTANCE)*formatedText.size()) + lastLineExtraHeight;
 		}
 		else h = font.getHeight();
 		return new int[]{textWidth,h};

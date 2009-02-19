@@ -173,8 +173,8 @@ public class ImageComponent extends Component
 		if (command != null && commandListener != null)
 		{
 			setSelected(!isSelected());
-			if (isSelected())
-				commandListener.commandAction(command, this);
+			if(isSelected())
+				commandListener.commandAction(command,this);
 		}
 		super.pointerReleased(x, y);
 	}

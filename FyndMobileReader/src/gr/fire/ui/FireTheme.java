@@ -40,6 +40,9 @@ import javax.microedition.lcdui.Image;
  */
 
 /**
+ * The default implementation of a Theme. This implementation reads key=value pairs from a given file or map 
+ * and parses font, color, etc values.
+ *  
  * @author padeler
  *
  */
@@ -47,11 +50,24 @@ public class FireTheme extends Theme
 {
 	private Image logo=null;
 	
+	/**
+	 * Creates an instance of this theme with the values loaded from the given file name. 
+	 * 
+	 * @param themeFile
+	 * @throws IOException
+	 */
 	public FireTheme(String themeFile) throws IOException
 	{
 		this(StringUtil.loadProperties((new FireConnector()).openInputStream(themeFile),':',"UTF-8"));
 	}
 	
+	/**
+	 * Creates an instance of this theme with the values of the given hashtable
+	 * This constructor does not copy the values of the hashtable internally but alters the one given. 
+	 * If the hashtable contents change later, the behaivior is not defined. 
+	 * @param props
+	 * @throws IOException
+	 */
 	public FireTheme(Hashtable props) throws IOException
 	{
 		this.themeProperties = props;

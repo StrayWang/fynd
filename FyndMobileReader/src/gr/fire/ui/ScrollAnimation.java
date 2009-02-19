@@ -23,7 +23,6 @@
 package gr.fire.ui;
 
 import gr.fire.core.Animation;
-import gr.fire.core.FireScreen;
 import gr.fire.core.Panel;
 
 import javax.microedition.lcdui.Graphics;
@@ -38,20 +37,15 @@ public class ScrollAnimation extends Animation
 	
 	public static final int SCROLL_FRAMES = 3; // number of frames in this animation.
 	
-	
-	private int scrollPercent = 35; // percent of the viewports dimensions to scroll.
-	private int direction;
 	private int frameCount=0;
-	private int stepChange=0;
+	private int stepHChange=0,stepVChange=0;
 	private long lastFrame;
-	int width,height;
+	private int endVpX,endVpY;
 	
 	public void paint(Graphics g)
 	{
 		parent.paint(g);
 	}
-	
-	
 	
 	public boolean isRunning()
 	{
@@ -64,24 +58,23 @@ public class ScrollAnimation extends Animation
 	 * @param Trigger is ignored.
 	 * @param properties is an Integer with the animation direction. Animation directions are FireScreen.LEFT, FireScreen.RIGHT, FireScreen.UP, FireScreen.DOWN. 
 	 */
-	public ScrollAnimation(Panel destinationPanel,int direction,int percent)
+	public ScrollAnimation(Panel destinationPanel,int startVpX,int startVpY,int endVpX,int endVpY)
 	{
 		super(destinationPanel);
-		this.direction= direction;
-		this.scrollPercent= percent;
+		this.endVpX = endVpX;
+		this.endVpY = endVpY;
+		destinationPanel.setViewPortPosition(startVpX,startVpY);
 		
-		int vpD;
-		if(direction==FireScreen.UP || direction==FireScreen.DOWN)
-			vpD = destinationPanel.getViewPortHeight();
-		else 
-			vpD = destinationPanel.getViewPortWidth();
+		int hPixels = endVpX - startVpX;
+		int vPixels = endVpY - startVpY;
 		
-		
-		
-		stepChange = ((vpD * scrollPercent)/SCROLL_FRAMES) / 100;
+		stepHChange = hPixels/SCROLL_FRAMES;
+		stepVChange = vPixels/SCROLL_FRAMES;
+
 		width = destinationPanel.getWidth();
 		height = destinationPanel.getHeight();
-		
+		setX(destinationPanel.getX());
+		setY(destinationPanel.getY());
 		lastFrame = System.currentTimeMillis();
 	}
 
@@ -99,58 +92,26 @@ public class ScrollAnimation extends Animation
 			frameCount++;
 			int vpX = destinationPanel.getViewPortPositionX();
 			int vpY = destinationPanel.getViewPortPositionY();
-			int d = direction;
-			boolean dontStop=true;
-			switch(d)
-			{
-			case FireScreen.UP:
-				dontStop = destinationPanel.setViewPortPosition(vpX,vpY-stepChange);
-				break;
-			case FireScreen.DOWN:
-				dontStop = destinationPanel.setViewPortPosition(vpX,vpY+stepChange);
-				break;
-			case FireScreen.LEFT:
-				dontStop = destinationPanel.setViewPortPosition(vpX-stepChange,vpY);
-				break;
-			case FireScreen.RIGHT:
-				dontStop = destinationPanel.setViewPortPosition(vpX+stepChange,vpY);
-				break;
-			}
+			destinationPanel.setViewPortPosition(vpX+stepHChange,vpY+stepVChange);
 			
-			if(dontStop==false)
-			{
+			int nvpX = destinationPanel.getViewPortPositionX();
+			int nvpY = destinationPanel.getViewPortPositionY();
+			if(nvpX==vpX && nvpY==vpY)
+			{ // stop
 				stop();
-				return false;
+				return false;				
 			}
 			return true;
 		}
 		return false;
 	}
 	
-	public void forceComplete()
-	{
-		stepChange = stepChange*(SCROLL_FRAMES-frameCount);
-		lastFrame=0;
-		step();
-	}
-
 	/* (non-Javadoc)
 	 * @see gr.fire.core.Animation#stop()
 	 */
 	public void stop()
 	{
 		frameCount = SCROLL_FRAMES;
-	}
-
-
-	public int getDirection()
-	{
-		return direction;
-	}
-
-
-	public void setDirection(int direction)
-	{
-		this.direction = direction;
+		((Panel)parent).setViewPortPosition(endVpX,endVpY);
 	}
 }

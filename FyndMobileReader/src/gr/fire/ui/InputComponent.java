@@ -60,10 +60,10 @@ public class InputComponent extends Component
 
 	protected String name,value,initialValue,text;
 	protected boolean enabled=true;
-	protected int maxWidth=10;
+	protected int maxWidth=1000;
 
 	private byte type=TEXT;	
-	private int size=20,maxLen=100,rows=1;	
+	private int size=200,maxLen=100,rows=1;	
 	private boolean checked=false;
 	private int textConstraints = TextField.ANY;
 
@@ -86,8 +86,7 @@ public class InputComponent extends Component
 		int []ps= getPrefSize();
 		if(ps==null)
 		{
-			ps= getMinSize();
-			setPrefSize(ps[0],ps[1]);
+			ps = getMinSize();
 		}
 		
 		if(type==TEXT)
@@ -274,8 +273,9 @@ public class InputComponent extends Component
 	{
 		if(formatedText==null)
 		{
-			int[] minSize = getPrefSize();
-			formatedText = StringUtil.format(value,font,minSize[0],minSize[1]);
+			int[] ps = getPrefSize();
+			if(ps==null) ps = getMinSize();
+			formatedText = StringUtil.format(value,font,ps[0],ps[1]);
 		}
 		// create a bordered area with the text inside.
 		int valign = getValign();
@@ -286,8 +286,11 @@ public class InputComponent extends Component
 		int height = getHeight();
 		g.setFont(font);
 		Vector lines = formatedText;
-		
-		g.setColor(theme.getIntProperty("bg.alt2.color"));
+		//g.setColor(theme.getIntProperty("bg.alt2.color"));
+		if(backgroundColor!=Theme.TRANSPARENT)
+			g.setColor(backgroundColor);
+		else
+			g.setColor(theme.getIntProperty("bg.alt2.color"));
 		g.fillRoundRect(2,2,width-4,height-4,6,6);
 		
 		int rowHeight = font.getHeight();
@@ -345,6 +348,7 @@ public class InputComponent extends Component
 		if(isSelected())
 		{
 			g.setColor(theme.getIntProperty("link.active.bg.color"));
+			g.drawRoundRect(1,1,width-2,height-2,8,8);
 		}
 		else
 		{
@@ -357,8 +361,9 @@ public class InputComponent extends Component
 	{
 		if(formatedText==null)
 		{
-			int[] minSize = getPrefSize();
-			formatedText = StringUtil.format(value,font,minSize[0],minSize[1]);
+			int[] ps = getPrefSize();
+			if(ps==null) ps = getMinSize();
+			formatedText = StringUtil.format(value,font,ps[0],ps[1]);
 		}
 		// create a bordered area with the text inside.
 		int valign = getValign();
@@ -437,8 +442,14 @@ public class InputComponent extends Component
 	private void paintRadioOrCheckbox(Graphics g)
 	{
 		Theme theme = FireScreen.getTheme();
-		int width = getWidth();
-		int height = getHeight();
+		int width = 0, height = 0;
+		if(getPrefSize()==null){
+			width = getWidth();
+			height = getHeight();
+		}else{
+			width = getPrefSize()[0];
+			height = getPrefSize()[1];
+		}
 
 		if(type==CHECKBOX)
 		{
@@ -655,10 +666,21 @@ public class InputComponent extends Component
 		if(command!=null && commandListener!=null)
 		{
 			setSelected(!isSelected());
-			if(isSelected())
+			if(isSelected() // component just became selected or  
+					|| type==BUTTON) // if type==button. Do not act as switch, every pointer event on a button must result to an commandAction event. 
+			{
 				commandListener.commandAction(command,this);
+			}
 		}
 		super.pointerReleased(x, y);
+	}
+	
+	private boolean keyPressed = false;
+	//This is needed because some nokia phones have there "Ok" in the middle, which will case
+	//the TextArea to appear again. 
+	protected void keyPressed(int keyCode){
+		keyPressed = true;
+		super.keyPressed(keyCode);
 	}
 	
 	protected void keyReleased(int keyCode)
@@ -668,9 +690,10 @@ public class InputComponent extends Component
 		{
 			setSelected(!isSelected());
 		}
-		else if( command!=null && commandListener!=null && (type==TEXT||key==Canvas.FIRE)) 
+		else if( command!=null && commandListener!=null && (type==TEXT||key==Canvas.FIRE) && keyPressed) 
 			commandListener.commandAction(command,this);
 		super.keyReleased(keyCode);
+		keyPressed = false;
 	}
 	
 	public boolean isEnabled()

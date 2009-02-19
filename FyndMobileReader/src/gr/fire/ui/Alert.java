@@ -28,7 +28,6 @@ import gr.fire.core.FireScreen;
 import gr.fire.core.GridLayout;
 import gr.fire.core.Panel;
 import gr.fire.core.Theme;
-import gr.fire.util.FireConnector;
 import gr.fire.util.Lang;
 import gr.fire.util.Log;
 
@@ -60,8 +59,6 @@ public class Alert extends Container implements CommandListener
 	 */	
 	public static final byte TYPE_YESNOCANCEL=0x05;
 	
-	
-	
 	public static final byte USER_SELECTED_OK=0x01;
 	public static final byte USER_SELECTED_YES=0x02;
 	public static final byte USER_SELECTED_NO=0x03;
@@ -71,16 +68,28 @@ public class Alert extends Container implements CommandListener
 	private Command yes,no,ok,cancel;
 	private byte type=0x00,userSelection=0x00;
 	
-	public Alert(String txt, byte type)
+	private Component selectedButton;
+	private Component lastComponent;
+	
+	/**
+	 * Constructs an Alert
+	 * @param txt The message of the alert 
+	 * @param icon The icon displayed
+	 * @param type The type of the alert (TYPE_INFO, TYPE_WARNING , TYPE_ERROR, TYPE_YESNO, TYPE_YESNOCANCEL)
+	 * @param defaultSelection The preselected button (USER_SELECTED_OK, USER_SELECTED_NO, USER_SELECTED_CANCEL)
+	 * 
+	 */
+	public Alert(String txt,Image icon, byte type, byte defaultSelection)
 	{
 		super(new BoxLayout(BoxLayout.Y_AXIS));
-		
+				
 		if(txt==null) throw new NullPointerException("Alert message cannot be null.");
 		
 		Container buttonCnt=null;
 		
 		this.type=type;
 		FireScreen screen = FireScreen.getScreen();
+		lastComponent = screen.getSelectedComponent();
 		
 		int screenWidth = screen.getWidth();
 		int screenHeight = screen.getHeight();
@@ -89,47 +98,63 @@ public class Alert extends Container implements CommandListener
 		
 		Container messageCnt = new Container(new BoxLayout(BoxLayout.X_AXIS));
 		messageCnt.setBorder(true);
-		Image icon=null;
 		Theme theme = FireScreen.getTheme();
-		String iconPath=null;
 		try{
 			InputComponent button;
 			switch(type)
 			{
 			case TYPE_WARNING:
-				iconPath = theme.getStringProperty("alert.warning.icon");
 				buttonCnt = new Container(new GridLayout(1,1));
 				button= new InputComponent(InputComponent.BUTTON);
 				ok = new Command(Lang.get("Ok"),Command.OK,1);
 				button.setValue(ok.getLabel());
 				button.setMaxWidth(width);
 				button.setCommand(ok);
+				button.setSelected(true);
+				selectedButton = button;
+				
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
 				buttonCnt.setPrefSize(width,button.getMinSize()[1]);
 				break;
 			case TYPE_ERROR:
-				iconPath = theme.getStringProperty("alert.error.icon");
 				buttonCnt = new Container(new GridLayout(1,1));
 				button= new InputComponent(InputComponent.BUTTON);
 				ok = new Command(Lang.get("Ok"),Command.OK,1);
 				button.setValue(ok.getLabel());
 				button.setMaxWidth(width);
 				button.setCommand(ok);
+				button.setSelected(true);
+				selectedButton = button;
+				
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
 				buttonCnt.setPrefSize(width,button.getMinSize()[1]);
 				break;
 			case TYPE_YESNO:
-				iconPath = theme.getStringProperty("alert.yesno.icon");
 				buttonCnt = new Container(new GridLayout(1,2));
 				button= new InputComponent(InputComponent.BUTTON); // yes button
 				yes = new Command(Lang.get("Yes"),Command.OK,1);
 				button.setValue(yes.getLabel());
 				button.setMaxWidth(width/2);
 				button.setCommand(yes);
+				if(defaultSelection==USER_SELECTED_YES)
+				{
+					button.setSelected(true);
+					selectedButton = button;
+				}
+				
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
@@ -138,19 +163,36 @@ public class Alert extends Container implements CommandListener
 				button.setValue(no.getLabel());
 				button.setMaxWidth(width/2);
 				button.setCommand(no);
+				if(defaultSelection==USER_SELECTED_NO)
+				{
+					button.setSelected(true);
+					selectedButton = button;
+				}
+				
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
 				buttonCnt.setPrefSize(width,button.getMinSize()[1]);
 				break;
 			case TYPE_YESNOCANCEL:
-				iconPath = theme.getStringProperty("alert.yesnocancel.icon");
 				buttonCnt = new Container(new GridLayout(1,3));
 				button= new InputComponent(InputComponent.BUTTON); // yes button
 				yes = new Command(Lang.get("Yes"),Command.OK,1);
 				button.setValue(yes.getLabel());
 				button.setMaxWidth(width/2);
 				button.setCommand(yes);
+				if(defaultSelection==USER_SELECTED_YES)
+				{
+					button.setSelected(true);
+					selectedButton = button;
+				}
+
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
@@ -159,6 +201,15 @@ public class Alert extends Container implements CommandListener
 				button.setValue(no.getLabel());
 				button.setMaxWidth(width/2);
 				button.setCommand(no);
+				if(defaultSelection==USER_SELECTED_NO)
+				{
+					button.setSelected(true);
+					selectedButton = button;
+				}
+
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
@@ -167,29 +218,41 @@ public class Alert extends Container implements CommandListener
 				button.setValue(cancel.getLabel());
 				button.setMaxWidth(width/2);
 				button.setCommand(cancel);
+				if(defaultSelection==USER_SELECTED_CANCEL)
+				{
+					button.setSelected(true);
+					selectedButton = button;
+				}
+
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));				
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
 				buttonCnt.setPrefSize(width,button.getMinSize()[1]);
 				break;			
 			default: // default is Information alert.
-				iconPath = theme.getStringProperty("alert.info.icon");
 				buttonCnt = new Container(new GridLayout(1,1));
 				button= new InputComponent(InputComponent.BUTTON);
 				ok = new Command(Lang.get("Ok"),Command.OK,1);
 				button.setValue(ok.getLabel());
 				button.setMaxWidth(width);
 				button.setCommand(ok);
+				button.setSelected(true);
+				selectedButton = button;
+				
+				button.setForegroundColor(FireScreen.getTheme().getIntProperty("alert.fg.color"));
+				button.setBackgroundColor(FireScreen.getTheme().getIntProperty("alert.bg.color"));
+				
 				button.setLayout(FireScreen.CENTER|FireScreen.VCENTER);
 				button.setCommandListener(this);
 				buttonCnt.add(button);
 				buttonCnt.setPrefSize(width,button.getFont().getHeight()*2);
 				break;
 			}
-			if(iconPath!=null)
-				icon = Image.createImage(new FireConnector().openInputStream(iconPath));
 		}catch(Exception e){
-			Log.logWarn("Failed to load Alert icon form: "+iconPath,e);
+			Log.logWarn("Failed to create Alert.",e);
 		}
 		
 		int w = width;
@@ -224,11 +287,7 @@ public class Alert extends Container implements CommandListener
 		add(messagePanel);
 		add(buttonCnt);
 		
-		setX(screenWidth/2-width/2);
-		setY(screenHeight);
-		
-		FlyAnimation anim = new FlyAnimation(getX(),getY(),getX(),screenHeight/2-(height+buttonCnt.getPrefSize()[1])/2);
-		setAnimation(anim);
+		setPrefSize(width,(height+buttonCnt.getPrefSize()[1]));
 	}
 
 	public byte getType()
@@ -256,17 +315,32 @@ public class Alert extends Container implements CommandListener
 		}
 		
 		FireScreen.getScreen().removeComponent(this);
+		
+		if(lastComponent != null){
+			lastComponent.setSelected(true);
+			FireScreen.getScreen().setSelectedComponent(lastComponent);
+		}
+		
 		if(command!=null && commandListener!=null) commandListener.commandAction(command,this); 
 	}
-
+	
 	public void commandAction(javax.microedition.lcdui.Command arg0, Displayable arg1)
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	public byte getUserSelection()
 	{
 		return userSelection;
 	}
+
+	public Component getSelectedButton()
+	{
+		return selectedButton;
+	}
+
+	public void setSelectedButton(Component selectedButton)
+	{
+		this.selectedButton = selectedButton;
+	}
+
 }
