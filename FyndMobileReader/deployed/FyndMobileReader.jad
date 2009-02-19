@@ -1,8 +1,8 @@
 MIDlet-1: FyndMobileReader,,cn.fishtrees.fynd.mobile.MobileReader
-MIDlet-Jar-Size: 173745
+MIDlet-Jar-Size: 174149
 MIDlet-Jar-URL: FyndMobileReader.jar
 MIDlet-Name: FyndMobileReader
 MIDlet-Vendor: www.fishtrees.cn
-MIDlet-Version: 0.1.0
+MIDlet-Version: 1.0.0.22
 MicroEdition-Configuration: CLDC-1.1
 MicroEdition-Profile: MIDP-2.0
