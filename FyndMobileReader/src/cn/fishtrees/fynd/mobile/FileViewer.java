@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cn.fishtrees.fynd.mobile.ui;
+package cn.fishtrees.fynd.mobile;
 
+import cn.fishtrees.fynd.mobile.ui.*;
 import gr.fire.core.Component;
 import gr.fire.core.Container;
 import gr.fire.core.FireScreen;
@@ -14,14 +15,13 @@ import gr.fire.core.PointerListener;
 import gr.fire.ui.TextComponent;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
 import javax.microedition.lcdui.Canvas;
 import javax.microedition.lcdui.Font;
 
-import cn.fishtrees.fynd.mobile.MemoryManager;
+import cn.fishtrees.fynd.mobile.util.MemoryManager;
 import cn.fishtrees.fynd.mobile.io.File;
 import cn.fishtrees.fynd.mobile.io.TextFile;
 
@@ -125,7 +125,7 @@ public class FileViewer extends Container implements KeyListener,
         new Thread(new Runnable() {
 
             public void run() {
-                displayPage(currPageNo + 1);
+                displayPage(currPageNo + 1);                
             }
         }).start();
     }
@@ -200,6 +200,7 @@ public class FileViewer extends Container implements KeyListener,
             this.currentPageNo = pageNum;
             this.setPanelTitle();
             this.setTextContent(pageText);
+            Panel p = (Panel)this.parent;
             Console.WriteLine("FileViewer.displayPage : current page No. is '" + pageNum + "'");
 
         } catch (IOException ioe) {
@@ -275,15 +276,19 @@ public class FileViewer extends Container implements KeyListener,
 
         } else if (absIncreaseX < absIncreaseY) {
             // pointer moved in vertical direction
-            if (increaseY > 0) {
-                this.scrollUp(false);
-            } else if (increaseY < 0) {
-                this.scrollDown(false);
-            }
-
+            this.scrollVertically(increaseY);
         }
     }
-
+    /**
+     * 移动垂直滚动条
+     * @param int px 要移动的像素值，负值向上移动
+     */
+    protected void scrollVertically(int px){
+        if (this.parent != null && this.parent instanceof Panel) {
+            Console.WriteLine("FileViewer.scrollVertically:"+px);
+            ((Panel) this.parent).scrollVertically(0 - px);
+        }
+    }
     /**
      * 代理方法，调用父组件scrollUp向上移动滚动条
      *
@@ -291,7 +296,13 @@ public class FileViewer extends Container implements KeyListener,
      */
     protected void scrollUp(boolean fast) {
         if (this.parent != null && this.parent instanceof Panel) {
-            ((Panel) this.parent).scrollUp(fast);
+            Panel p = (Panel) this.parent;
+            if(fast)
+            {
+                p.scrollVertically(0 - p.getViewPortHeight());
+            }else{
+                p.scrollVertically(0 - p.getViewPortHeight() / 3);
+            }
         }
 
     }
@@ -303,7 +314,13 @@ public class FileViewer extends Container implements KeyListener,
      */
     protected void scrollDown(boolean fast) {
         if (this.parent != null && this.parent instanceof Panel) {
-            ((Panel) this.parent).scrollDown(fast);
+            Panel p = (Panel) this.parent;
+            if(fast)
+            {
+                p.scrollVertically(p.getViewPortHeight());
+            }else{
+                p.scrollVertically(p.getViewPortHeight() / 3);
+            }
         }
 
     }

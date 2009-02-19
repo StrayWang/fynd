@@ -2,8 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package cn.fishtrees.fynd.mobile.ui;
+package cn.fishtrees.fynd.mobile;
 
+import cn.fishtrees.fynd.mobile.ui.*;
+import cn.fishtrees.fynd.mobile.FileViewer;
 import gr.fire.core.CommandListener;
 import gr.fire.core.Component;
 import gr.fire.core.FireScreen;
@@ -17,7 +19,6 @@ import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.Image;
 
-import cn.fishtrees.fynd.mobile.MobileReaderCommands;
 import cn.fishtrees.fynd.mobile.io.FileManager;
 
 /**

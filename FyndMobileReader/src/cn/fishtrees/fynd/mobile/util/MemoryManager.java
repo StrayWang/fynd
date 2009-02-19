@@ -1,4 +1,4 @@
-package cn.fishtrees.fynd.mobile;
+package cn.fishtrees.fynd.mobile.util;
 
 import java.util.Hashtable;
 import java.util.Stack;

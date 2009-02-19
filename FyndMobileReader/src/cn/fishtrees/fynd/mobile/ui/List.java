@@ -45,9 +45,10 @@ public class List extends Container {
 		this.items.removeAllElements();
 	}
 
-	public void remove(Component cmp) {
-		super.remove(cmp);
+	public boolean remove(Component cmp) {
+		boolean success = super.remove(cmp);
 		this.items.removeElement(cmp);
+        return success;
 	}
 
 	public ListItem getSelectedItem() {

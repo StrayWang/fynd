@@ -15,7 +15,6 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.midlet.MIDlet;
 
 import cn.fishtrees.fynd.mobile.ui.Console;
-import cn.fishtrees.fynd.mobile.ui.FileList;
 
 /**
  * @author fishtrees
