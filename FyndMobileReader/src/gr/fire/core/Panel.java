@@ -20,7 +20,6 @@
 package gr.fire.core;
 
 import gr.fire.ui.ScrollAnimation;
-import gr.fire.util.Log;
 
 import java.util.Vector;
 
@@ -30,26 +29,66 @@ import javax.microedition.lcdui.Graphics;
 import javax.microedition.lcdui.Image;
 
 /**
- * A Panel is a special type of Container. It can contain container. 
+ * A Panel is a special type of Container. It can contain at most one container.
+ * If the inner Container is bigger that the Panel's dimensions the Panel can be configured
+ * to display scrollbars.
  * 
+ * The Panel will allow navigation on the Container's components thought its viewport. 
+ * The Panel will scroll to bring the focused component inside the viewport.<br/>
+ * 
+ * The panel can display decorations around its viewport, a navigation bar (navbar) at the bottom and a 
+ * title bar  (titlebar) at the top of the screen. Also a logo image can be displaed on a Theme specific location. 
+ * If the {@link #setShowBackground(boolean)} flag is set, the panel will also paint a theme specific background behing the container.
+ * Note that the container must be transparent in order for the background to be visible.<br/>
+ * 
+ * 
+ * On the navbar the softkey commands (if any) will appear. 
+ * On the titlebar the label of the Panel will be displayed {@link #setLabel(String)}.<br/>
+ * 
+ * On phones with touchscreens a Panel with scrollbars will intercept tap events on the scrollbars and scroll the container.<br/> 
+ * 
+ * @see Container
  * @author padeler
  * 
  */
 public class Panel extends Container
 {
+	/**
+	 * To make the navigation inside the panel easier the Panel will scroll faster when several conditions are met.
+	 * For example it will scroll fast down if there are no hotizontal scrollbars AND the user pressed right to move to the next
+	 * selectable component.<br/>
+	 * 
+	 * This static value defines the percentage of the phones screen on the dimension of the scroll that will be used to 
+	 * calculate the fast scroll.
+	 * 
+	 */
 	public static final int FAST_SCROLL_PERCENT=60;
+	/**
+	 * This static value defines the percentage of the phones screen on the dimension of the scroll that will be used to 
+	 * calculate the normal scroll.
+	 * 
+	 */
 	public static final int NORMAL_SCROLL_PERCENT=35;
 	
 
+	/**
+	 * If set, and the Container inside this Panel has container.height>this.height then vertival scrollbars will be visible.
+	 */
 	public static final int VERTICAL_SCROLLBAR = 0x00000001;
+	/**
+	 * If set, and the Container inside this Panel has container.width>this.width then horizontal scrollbars will be visible.
+	 */
 	public static final int HORIZONTAL_SCROLLBAR = 0x00000100;
+	/**
+	 * Default scrollbar policy.
+	 */
 	public static final int NO_SCROLLBAR = 0x00000000;
 
-	private int scrollBarPolicy = 0x00000000;// no scrollbars
-	private Container container = null;
+	private int scrollBarPolicy = NO_SCROLLBAR;// no scrollbars
 	private boolean showDecorations = false;
 	private int scrollX,scrollY;
 	
+	protected Container container = null;
 	private boolean showBackground=false;
 	
 	
@@ -62,15 +101,21 @@ public class Panel extends Container
 	private String label;
 	private int labelX=0,labelY=0;
 
-	private Image decorTopImage, decorBottomImage,backgroundTexture;
+	private Image titlebarImage, navbarImage,backgroundTexture;
 
-	private Vector focusableComponents = null;
-	
-	private int decorLeft=0,decorTop=0,decorRight,decorBottom;
+	private int decorLeft=0,titlebarSize=0,decorRight=0,navbarSize=0;
 	
 	private int dragX=-1,dragY=-1;
 	private boolean dragScroll=false;
 	
+	private int normalVScrollLength,fastVScrollLength,normalHScrollLength,fastHScrollLength;
+	
+	/**
+	 * Constructs a Panel. 
+	 * @param cnt The container placed inside this panel 
+	 * @param scrollbarPolicy show vertical/horizontal scrollbars or not.
+	 * @param showDecorations display decorations. Decorations are theme specific.
+	 */
 	public Panel(Container cnt, int scrollbarPolicy, boolean showDecorations)
 	{
 		setFocusable(true);
@@ -82,14 +127,21 @@ public class Panel extends Container
 		theme = FireScreen.getTheme();
 	}
 
+	/**
+	 * Constructs a Panel without a container with the given scrollbar policy and with no decorations.
+	 * @param scrollBarPolicy
+	 */
 	public Panel(int scrollBarPolicy)
 	{
 		this(null, scrollBarPolicy, false);
 	}
 
+	/**
+	 * Constructs a Panel with no scrollbars no inner container and no decorations
+	 */
 	public Panel()
 	{
-		this(null, 0x00000000, false);
+		this(null, NO_SCROLLBAR, false);
 	}
 
 	public void paint(Graphics g)
@@ -105,10 +157,8 @@ public class Panel extends Container
 		if (cmp != null) // draw only visible components
 		{
 			if (cmp.valid == false)
-			{ // my component needs validation.
-				if((container instanceof Panel)==false)
-					container.layoutManager.layoutContainer(container); // layout the container.
-				container.validate(); // validate the container
+			{ // validate my component.
+				cmp.validate();
 			}
 			
 			if(showBackground)
@@ -116,34 +166,46 @@ public class Panel extends Container
 				if(backgroundTexture==null)
 					backgroundTexture = theme.getBackgroundTexture(viewPortWidth,viewPortHeight);
 				if(backgroundTexture!=null)
-					g.drawImage(backgroundTexture,decorLeft,decorTop,Graphics.TOP|Graphics.LEFT);
+					g.drawImage(backgroundTexture,decorLeft,titlebarSize,Graphics.TOP|Graphics.LEFT);
 			}
 
-			if (cmp.visible && cmp.intersects(originalClipX, originalClipY, originalClipWidth, originalClipHeight))
+			if (cmp.visible)
 			{
-				if(showDecorations)
-					g.clipRect(decorLeft, decorTop, viewPortWidth, viewPortHeight); // clip to the viewport
-					
-				g.clipRect(cmp.x, cmp.y, cmp.width, cmp.height);
-				g.translate(cmp.x, cmp.y);
 
 				if (cmp.animation == null)
-					cmp.paint(g);
-				else
-					cmp.animation.paint(g);
+				{
+					if(cmp.intersects(originalClipX, originalClipY, originalClipWidth, originalClipHeight))
+					{
+						g.clipRect(cmp.x, cmp.y, cmp.width, cmp.height);
+						g.translate(cmp.x, cmp.y);
+						cmp.paint(g);
+						// return to the coordinates of this component.
+						g.translate(originalTrX - g.getTranslateX(), originalTrY - g.getTranslateY());
+						g.setClip(originalClipX, originalClipY, originalClipWidth, originalClipHeight);
 
-				// return to the coordinates of this component.
-				g.translate(originalTrX - g.getTranslateX(), originalTrY - g.getTranslateY());
-				g.setClip(originalClipX, originalClipY, originalClipWidth, originalClipHeight);
+					}
+				}
+				else 
+				{
+					if(cmp.animation.intersects(originalClipX, originalClipY, originalClipWidth, originalClipHeight))
+					{
+						g.clipRect(cmp.animation.x, cmp.animation.y, cmp.animation.width, cmp.animation.height);
+						g.translate(cmp.animation.x, cmp.animation.y);
+						cmp.animation.paint(g);						
+						// return to the coordinates of this component.
+						g.translate(originalTrX - g.getTranslateX(), originalTrY - g.getTranslateY());
+						g.setClip(originalClipX, originalClipY, originalClipWidth, originalClipHeight);
+					}
+				}
 			}
 		}
 		
 		if (showDecorations) // this panel has decorations
 		{
-			if(originalClipY < decorTop)
-				drawDecorTop(g);
-			if((originalClipY + originalClipHeight) > (height - decorBottom))
-				drawDecorBottom(g);
+			if(originalClipY < titlebarSize)
+				drawTitlebar(g);
+			if((originalClipY + originalClipHeight) > (height - navbarSize))
+				drawNavbar(g);
 			if(originalClipX < decorLeft)
 				drawDecorLeft(g);
 			if((originalClipX + originalClipWidth) > (width - decorRight))
@@ -197,11 +259,22 @@ public class Panel extends Container
 		drawScrollbars(g);
 	}
 	
+	/**
+	 * Returns the label set to this Panel. The label is displayed on the top side of the Panel, on the area of the titlebar.
+	 * The alignment, the font and color of the label are theme specific.
+	 * 
+	 * @return
+	 */
 	public String getLabel()
 	{
 		return label;
 	}
 
+	/** 
+	 * Sets a label for this panel.
+	 * @see #getLabel()
+	 * @param label
+	 */
 	public void setLabel(String label)
 	{
 		this.label=label;
@@ -244,7 +317,7 @@ public class Panel extends Container
 		{
 			if ((scrollBarPolicy & VERTICAL_SCROLLBAR) == VERTICAL_SCROLLBAR && container.height > viewPortHeight)
 			{ // draw vertical scrollbar
-				int rightHeight = height - decorBottom - decorTop;
+				int rightHeight = height - navbarSize - titlebarSize;
 				g.setColor(theme.getIntProperty("scrollbar.color"));
 				int vpPosY = getViewPortPositionY();
 				scrollY = (rightHeight * (100 * (vpPosY + viewPortHeight / 2)) / container.height) / 100;
@@ -254,7 +327,7 @@ public class Panel extends Container
 				else if (scrollY > rightHeight - tl || vpPosY == container.height - viewPortHeight)
 					scrollY = rightHeight - tl;
 		
-				g.fillRect(width - theme.scrollSize + 1, decorTop + scrollY - tl, theme.scrollSize - 1, theme.scrollLenght);
+				g.fillRect(width - theme.scrollSize + 1, titlebarSize + scrollY - tl, theme.scrollSize - 1, theme.scrollLenght);
 			}		
 	
 			if ((scrollBarPolicy & HORIZONTAL_SCROLLBAR) == HORIZONTAL_SCROLLBAR && container.width > viewPortWidth)
@@ -270,33 +343,35 @@ public class Panel extends Container
 				else if (scrollX > bottomWidth - tl || vpPosX == container.width - viewPortWidth)
 					scrollX = bottomWidth - tl;
 	
-				g.fillRect(decorLeft + scrollX - tl, height - decorBottom + 1, theme.scrollLenght, theme.scrollSize - 1);
+				g.fillRect(decorLeft + scrollX - tl, height - navbarSize + 1, theme.scrollLenght, theme.scrollSize - 1);
 			}
 		}
 	}
 
-	private void drawDecorTop(Graphics g)
+	private void drawTitlebar(Graphics g)
 	{
-		if (decorTop == 0)
+		if (titlebarSize == 0)
 			return;
-		if (decorTopImage == null)
+		if (titlebarImage == null)
 		{
-			decorTopImage = theme.getTitlebarTexture(width, decorTop);
+			titlebarImage = theme.getTitlebarTexture(width, titlebarSize);
 		}
-		g.drawImage(decorTopImage, 0, 0, Graphics.TOP | Graphics.LEFT);
+		if(titlebarImage!=null)
+			g.drawImage(titlebarImage, 0, 0, Graphics.TOP | Graphics.LEFT);
 
 	}
 
-	private void drawDecorBottom(Graphics g)
+	private void drawNavbar(Graphics g)
 	{
-		if (decorBottom == 0)
+		if (navbarSize == 0)
 			return;
 
-		if (decorBottomImage == null)
+		if (navbarImage == null)
 		{
-			decorBottomImage = theme.getNavbarTexture(width, decorBottom);
+			navbarImage = theme.getNavbarTexture(width, navbarSize);
 		}
-		g.drawImage(decorBottomImage, 0, height - decorBottom, Graphics.TOP | Graphics.LEFT);
+		if(navbarImage!=null)
+		g.drawImage(navbarImage, 0, height - navbarSize, Graphics.TOP | Graphics.LEFT);
 	}
 
 	private void drawDecorLeft(Graphics g)
@@ -315,21 +390,20 @@ public class Panel extends Container
 		if(showDecorations)
 		{
 			decorLeft = theme.decorLeft;
-			decorTop = theme.decorTop;
-			decorBottom = theme.decorBottom;
+			titlebarSize = theme.decorTop;
+			navbarSize = theme.decorBottom;
 			decorRight = theme.decorRight;
 		}
 		else
 		{
 			decorLeft=0;
-			decorTop=0;
-			decorBottom=0;
+			titlebarSize=0;
+			navbarSize=0;
 			decorRight=0;
 		}
 		
-		focusableComponents=null;
-		decorBottomImage = null;
-		decorTopImage = null;
+		navbarImage = null;
+		titlebarImage = null;
 
 		int[] d = getPrefSize();
 		if (d == null)
@@ -346,59 +420,28 @@ public class Panel extends Container
 			return;
 		}
 		
-		viewPortHeight = height - decorBottom - decorTop;
+		viewPortHeight = height - navbarSize - titlebarSize;
 		viewPortWidth = width - decorLeft - decorRight;
-		container.x = decorLeft;
-		container.y = decorTop;
-
-		if (scrollBarPolicy == NO_SCROLLBAR)
-		{ // no scrollbars, container is bounded on both dimensions
-			container.setPrefSize(viewPortWidth, viewPortHeight);
-			container.layoutManager.layoutContainer(container); // layout the
-																// container.
-			container.validate(); // validate the container
-			valid = true;
-			return;
+		
+		int []ps = container.getPrefSize();
+		if(ps!=null) // a container inside a panel must be atleast the size of the viewport
+		{
+			if(ps[0]<viewPortWidth) ps[0] = viewPortWidth;
+			if(ps[1]<viewPortHeight) ps[1] = viewPortHeight;
+			container.setPrefSize(ps[0],ps[1]);
 		}
-
-		if (container.getPrefSize() == null)
-		{ // let the layout manager calculate the prefSize.
-			container.layoutManager.layoutContainer(container); // layout the
-																// container.
-		}
-
-		int []tmpPs = container.getPrefSize();
-		int []ps = new int[]{tmpPs[0], tmpPs[1]};
-		if (ps[1]< viewPortHeight)
-			ps[1]= viewPortHeight;
-		if (ps[0]< viewPortWidth)
-			ps[0]= viewPortWidth;
-
-		// container.width=viewPortWidth;
-		// container.height=viewPortHeight;
-	
-		if ((scrollBarPolicy & VERTICAL_SCROLLBAR) != VERTICAL_SCROLLBAR) // bounded
-																			// vertically
-		{ // show verticall scrollbars this means that the container has
-			// unbounded height
-			ps[1] = viewPortHeight;
-		}
-
-		if ((scrollBarPolicy & HORIZONTAL_SCROLLBAR) != HORIZONTAL_SCROLLBAR) // bounded
-																				// horizontally
-		{ // show horizontal scrollbars this means that the container has
-			// unbounded width
-			ps[0] = viewPortWidth;
-		}
-		container.setPrefSize(ps[0],ps[1]); // set the new prefered size
-		container.layoutManager.layoutContainer(container); // layout the
-															// container.
+		
 		container.validate(); // validate the container
+
+		container.x = decorLeft;
+		container.y = titlebarSize;
+
+		normalVScrollLength = (NORMAL_SCROLL_PERCENT*viewPortHeight)/100;
+		normalHScrollLength = (NORMAL_SCROLL_PERCENT*viewPortWidth)/100;
+		fastVScrollLength = (FAST_SCROLL_PERCENT*viewPortHeight)/100;
+		fastHScrollLength = (FAST_SCROLL_PERCENT*viewPortWidth)/100;
+		
 		valid = true;
-//
-//		Log.logInfo("My Dimensions: " + width + "," + height);
-//		Log.logInfo("ViewPort Dimensions: " + viewPortWidth + "," + viewPortHeight);
-//		Log.logInfo("Container Dimensions: " + container.width + "," + container.height);
 	}
 
 	/**
@@ -422,8 +465,15 @@ public class Panel extends Container
 		container.parent = this;
 		valid = false;
 	}
-
-	public void remove(Component c)
+	
+	public Component getComponent(int i)
+	{
+		if(i==0)
+			return container;
+		else throw new ArrayIndexOutOfBoundsException("A panel has at most one container on index 0.");
+	}
+	
+	public boolean remove(Component c)
 	{
 		if (container != c)
 		{
@@ -432,9 +482,12 @@ public class Panel extends Container
 		else if(container!=null)
 		{
 			container.parent = null;
+			if(container.animation!=null) FireScreen.getScreen().removeAnimation(container.animation);
 			container = null;
 			valid = false;
+			return true;
 		}
+		return false;
 	}
 	
 	public int countComponents()
@@ -465,7 +518,7 @@ public class Panel extends Container
 			return false;
 
 		int tx = decorLeft - container.x;
-		int ty = decorTop - container.y;
+		int ty = titlebarSize - container.y;
 
 
 		if (x + viewPortWidth > container.width)
@@ -484,11 +537,15 @@ public class Panel extends Container
 		
 		// ok now set the correct offset to the container.
 		container.x = decorLeft - x;
-		container.y = decorTop - y;
+		container.y = titlebarSize - y;
 		repaint();
 		return true; // change in the viewport position was successfull. 
 	}
 
+	/**
+	 * Returns the vertical (X) coordinate of the viewport inside the innner container.
+	 * @return
+	 */
 	public int getViewPortPositionX()
 	{
 		if (container == null)
@@ -497,18 +554,30 @@ public class Panel extends Container
 		return decorLeft - container.x;
 	}
 
+	/**
+	 * Returns the horizontal (Y) coordinate of the viewport inside the inner container.
+	 * @return
+	 */
 	public int getViewPortPositionY()
 	{
 		if (container == null)
 			return 0;
-		return decorTop - container.y;
+		return titlebarSize - container.y;
 	}
 
+	/**
+	 * Returns the width of the viewport of this panel.
+	 * @return
+	 */
 	public int getViewPortWidth()
 	{
 		return viewPortWidth;
 	}
-
+	
+	/**
+	 * Returns the height of the viewport of this panel.
+	 * @return
+	 */
 	public int getViewPortHeight()
 	{
 		return viewPortHeight;
@@ -523,7 +592,7 @@ public class Panel extends Container
 				dragX = x;
 				dragY = y;
 			}
-			else if (x > decorLeft && x < width - decorRight && y > decorTop && y < height - decorBottom)
+			else if (x > decorLeft && x < width - decorRight && y > titlebarSize && y < height - navbarSize)
 			{
 				container.pointerDragged(x - container.x, y - container.y); 
 			}
@@ -535,7 +604,7 @@ public class Panel extends Container
 	{
 		if (container != null)
 		{
-			if (x > decorLeft && x < width - decorRight && y > decorTop && y < height - decorBottom)
+			if (x > decorLeft && x < width - decorRight && y > titlebarSize && y < height - navbarSize)
 			{
 				container.pointerPressed(x - container.x, y - container.y);
 			}
@@ -549,23 +618,27 @@ public class Panel extends Container
 		
 		if(container != null)
 		{
-			if(dragScroll && dragX!=-1 && dragY!=-1)
+			int dx = 0;
+			int dy = 0;
+			if(dragX!=-1 && dragY!=-1){
+				dx = x - dragX;
+				dy = y - dragY;
+			}
+			if(dragScroll && (dx>10 || dx<-10 || dy>10 || dy<-10))
 			{ // drag event.
-				int dx = x - dragX;
-				int dy = y - dragY;
-				
-				Log.logDebug("In Panel.pointerReleased(). DRAG: "+ dragX +","+dragY+" ==> DIFFX / DIFFY "+dx+","+dy);
+				dx = x - dragX;
+				dy = y - dragY;
 				
 				dragX=-1;dragY=-1;
 				if(animation==null)
 				{
-					if(dy<-10) scrollDown(true);
-					else if(dy>10) scrollUp(true);
-					else if(dx<-10) scrollRight(true);
-					else if(dx>10) scrollLeft(true);
+					if(dy<-10) scrollVertically(fastVScrollLength);
+					else if(dy>10) scrollVertically(-fastVScrollLength);
+					else if(dx<-10) scrollHorizontally(fastHScrollLength);
+					else if(dx>10) scrollHorizontally(-fastHScrollLength);
 				}
 			}
-			else
+			else//If there is not a big dx or dy fire the event
 			{
 				int rightMargin = decorRight;
 				if((scrollBarPolicy & VERTICAL_SCROLLBAR) == VERTICAL_SCROLLBAR && rightMargin<2*theme.scrollSize)
@@ -573,38 +646,31 @@ public class Panel extends Container
 					rightMargin = 2*theme.scrollSize;
 				}
 				
-				if (x > decorLeft && x < width - rightMargin && y > decorTop && y < height - decorBottom)
+				if (x > decorLeft && x < width - rightMargin && y > titlebarSize && y < height - navbarSize)
 				{
 					container.pointerReleased(x - container.x, y - container.y);
 				}
 				else
 				{
-					if (((scrollBarPolicy & VERTICAL_SCROLLBAR) == VERTICAL_SCROLLBAR) && x > width - rightMargin && y < height - decorBottom)
+					if (((scrollBarPolicy & VERTICAL_SCROLLBAR) == VERTICAL_SCROLLBAR) && x > width - rightMargin && y < height - navbarSize)
 					{ // check if click is on scrollbar
 						if (y > scrollY ) // scroll down
 						{
-							scrollDown(false);
+							scrollVertically(normalVScrollLength);
 						} else
 							// scroll up
 						{
-							scrollUp(false);
+							scrollVertically(-normalVScrollLength);
 						}
-					} else if (((scrollBarPolicy & HORIZONTAL_SCROLLBAR) == HORIZONTAL_SCROLLBAR) && y > (height - decorBottom-theme.scrollSize) && y < height - decorBottom + theme.scrollSize)
+					} else if (((scrollBarPolicy & HORIZONTAL_SCROLLBAR) == HORIZONTAL_SCROLLBAR) && y > (height - navbarSize-theme.scrollSize) && y < height - navbarSize + theme.scrollSize)
 					{
 						if (x > scrollX)
 						{
-							scrollRight(false);
+							scrollHorizontally(-normalHScrollLength);
 						} else
 						{
-							scrollLeft(false);
+							scrollHorizontally(normalHScrollLength);
 						}
-					}
-					else if(y>height-decorBottom)// click on softkeys.
-					{
-						if(x<width/3)
-							super.keyReleased(FireScreen.leftSoftKey); 
-						else if(x>(width/3)*2)
-							super.keyReleased(FireScreen.rightSoftKey);
 					}
 				}
 			}
@@ -612,63 +678,45 @@ public class Panel extends Container
 		if(pointerListener!=null) pointerListener.pointerReleased(x,y,this);
 	}
 
-	public void scrollDown(boolean fast)
+	/**
+	 * Utility method to move the viewport vertically by the given number of pixels.
+	 * If the number is negative the panel will scroll up, otherwise if will scroll down.
+	 * @param pixels
+	 */
+	public void scrollVertically(int pixels)
 	{
 		if ((scrollBarPolicy & VERTICAL_SCROLLBAR) != VERTICAL_SCROLLBAR)
 			return;
-		ScrollAnimation anim = new ScrollAnimation(this,FireScreen.DOWN,(fast?FAST_SCROLL_PERCENT:NORMAL_SCROLL_PERCENT));
-		if(this.animation!=null)
-		{ // do not scroll with animation if thereis another running.
-			anim.forceComplete();
-		}
-		else
+		int vpx = getViewPortPositionX();
+		int vpy = getViewPortPositionY();
+		setViewPortPosition(vpx,vpy+pixels);
+		
+		FireScreen screen = FireScreen.getScreen();
+		if(this.animation==null && screen.isAnimationsEnabled()) //only animate scroll if there is no other animation running on this panel.
 		{
-			FireScreen.getScreen().registerAnimation(anim);
+			ScrollAnimation anim = new ScrollAnimation(this,vpx,vpy,vpx,vpy+pixels);
+			screen.registerAnimation(anim);			
 		}
 	}
 
-	public void scrollUp(boolean fast)
+	/**
+	 * Utility method to move the viewport horizontally by the given number of pixels.
+	 * If the number is negative the panel will scroll right, otherwise if will scroll left.
+	 * @param pixels
+	 */
+	public void scrollHorizontally(int pixels)
 	{
-		if ((scrollBarPolicy & VERTICAL_SCROLLBAR) != VERTICAL_SCROLLBAR)
+		if ((scrollBarPolicy & HORIZONTAL_SCROLLBAR) != HORIZONTAL_SCROLLBAR)
 			return;
-		ScrollAnimation anim = new ScrollAnimation(this,FireScreen.UP,(fast?FAST_SCROLL_PERCENT:NORMAL_SCROLL_PERCENT));
-		if(this.animation!=null)
-		{ // do not scroll with animation if thereis another running.
-			anim.forceComplete();
-		}
-		else
+		int vpx = getViewPortPositionX();
+		int vpy = getViewPortPositionY();
+		setViewPortPosition(vpx+pixels,vpy);
+		
+		FireScreen screen = FireScreen.getScreen();
+		if(this.animation==null && screen.isAnimationsEnabled()) //only animate scroll if there is no other animation running on this panel.
 		{
-			FireScreen.getScreen().registerAnimation(anim);
-		}
-	}
-
-	public void scrollLeft(boolean fast)
-	{
-		if ((scrollBarPolicy & VERTICAL_SCROLLBAR) != VERTICAL_SCROLLBAR)
-			return;
-		ScrollAnimation anim = new ScrollAnimation(this,FireScreen.LEFT,(fast?FAST_SCROLL_PERCENT:NORMAL_SCROLL_PERCENT));
-		if(this.animation!=null)
-		{ // do not scroll with animation if thereis another running.
-			anim.forceComplete();
-		}
-		else
-		{
-			FireScreen.getScreen().registerAnimation(anim);
-		}
-	}
-
-	public void scrollRight(boolean fast)
-	{
-		if ((scrollBarPolicy & VERTICAL_SCROLLBAR) != VERTICAL_SCROLLBAR)
-			return;
-		ScrollAnimation anim = new ScrollAnimation(this,FireScreen.RIGHT,(fast?FAST_SCROLL_PERCENT:NORMAL_SCROLL_PERCENT));
-		if(this.animation!=null)
-		{ // do not scroll with animation if thereis another running.
-			anim.forceComplete();
-		}
-		else
-		{
-			FireScreen.getScreen().registerAnimation(anim);
+			ScrollAnimation anim = new ScrollAnimation(this,vpx,vpy,vpx+pixels,vpy);
+			screen.registerAnimation(anim);			
 		}
 	}
 
@@ -682,141 +730,255 @@ public class Panel extends Container
 
 	protected void keyReleased(int keyCode)
 	{
-		if (keyCode == FireScreen.leftSoftKey || keyCode == FireScreen.rightSoftKey)
-		{
-			super.keyReleased(keyCode);
-			return;
-		}
-		if (container != null)
-		{
-			FireScreen screen = FireScreen.getScreen();
-			int gameCode = screen.getGameAction(keyCode);
+		FireScreen screen = FireScreen.getScreen();
+		int gameCode = screen.getGameAction(keyCode);
 
+		if (container != null && (gameCode==Canvas.LEFT || gameCode==Canvas.RIGHT || gameCode == Canvas.UP || gameCode == Canvas.DOWN ))
+		{
+			if(container.focusableComponents==null)
+				container.focusableComponents = container.generateListOfFocusableComponents(true);
+
+			Component lastSelected=screen.getSelectedComponent(); // previously selected component (may be outside this panel
+			int index=-1;
+			int focusableComponentsCount = container.focusableComponents.size();
+			if(lastSelected!=null)
+				index = container.focusableComponents.indexOf(lastSelected); // find the index of the lastSelected if it is inside this panel
 			
-			if(gameCode==Canvas.LEFT)
-			{
-				if((scrollBarPolicy&HORIZONTAL_SCROLLBAR)==HORIZONTAL_SCROLLBAR)
-					scrollLeft(false);
-				else scrollUp(true);
-				
-			}
-			else if(gameCode==Canvas.RIGHT)
-			{
-				if((scrollBarPolicy&HORIZONTAL_SCROLLBAR)==HORIZONTAL_SCROLLBAR)
-					scrollRight(false);
-				else scrollDown(true);
-			}
-			else if (gameCode == Canvas.UP || gameCode == Canvas.DOWN )
-			{			
-				// first find the next selectable component.
-				if(focusableComponents==null)
-					focusableComponents = container.generateListOfFocusableComponents(true);
-
-				int step;
-				int index;
-				if (gameCode == Canvas.UP)
+			
+			int vpx = getViewPortPositionX();
+			int vpy = getViewPortPositionY();
+			int vpmx = vpx+viewPortWidth;
+			int vpmy = vpy+viewPortHeight;
+			
+			 
+			// there are no focusable components or focus is already on the first or last. Check if we must move out of this container.
+			if(((gameCode==Canvas.UP || gameCode==Canvas.LEFT) && (index==0 || focusableComponentsCount==0) && vpy==0) ||
+			   ((gameCode==Canvas.DOWN || gameCode==Canvas.RIGHT) && (index==focusableComponentsCount-1 || focusableComponentsCount==0) && vpmy==container.height))
+			{ // user wants to move out of this Panel. 
+				screen.setSelectedComponent(this);
+				// if parent is null i am a top level component, no need to send the event above me.
+				if(parent!=null) parent.keyReleased(keyCode);
+				else // top level component. Cycle the event only if there are selectable components
 				{
-					step = -1; // previous component
-					index=focusableComponents.size()-1;
-				}	
-				else
-				{
-					step = +1; // next component
-					index=0;
+					if(focusableComponentsCount>0)					
+						screen.keyReleased(keyCode);
 				}
-				int vpx = getViewPortPositionX();
-				int vpy = getViewPortPositionY();
-				int vpmx = vpx+viewPortWidth;
-				int vpmy = vpy + viewPortHeight;
-				
-				Component lastSelected = screen.getSelectedComponent();
+				return;
+			}
+			
+			if((gameCode==Canvas.LEFT || gameCode==Canvas.RIGHT) && 
+				(container.layoutManager instanceof GridLayout)==false) // not grid layout
+			{// special case for fast scrolling.
+				if((container.width<=viewPortWidth || (scrollBarPolicy&HORIZONTAL_SCROLLBAR)!=HORIZONTAL_SCROLLBAR)) // no horizontal scrolling)
+				{
+					if(gameCode==Canvas.LEFT)
+					{
+						scrollVertically(-fastVScrollLength);
+					}
+					else if(gameCode==Canvas.RIGHT)
+					{
+						scrollVertically(fastVScrollLength);
+					}					
+				}
+				else // horizontal scrolling
+				{
+					if(gameCode==Canvas.LEFT)
+					{
+						scrollHorizontally(-normalHScrollLength);
+					}
+					else if(gameCode==Canvas.RIGHT)
+					{
+						scrollHorizontally(normalHScrollLength);
+					}
+				}
+			}
+			else if(focusableComponentsCount>0)
+			{
+				// first locate the previously selected component (if any)
+				if(index==-1) // selected component does not belong to this container. Deselect it.
+				{
+					screen.setSelectedComponent(null);
+					lastSelected=null;
+				}
 				
 				if(lastSelected!=null)
 				{
-					int lastPos = focusableComponents.indexOf(lastSelected);
-					if(lastPos>-1)
-					{
-						index = lastPos+step;
+					// check if the component is inside the viewport.		
+					int []coords = getCoordsOfComponentInContainer(lastSelected,container);
+					coords[0] += lastSelected.width/2; // translate coords to center of component
+					coords[1] += lastSelected.height/2;
+					
+					if((coords[0]>= vpx && coords[0]<vpmx) && (coords[1]>= vpy && coords[1]<vpmy))
+					{// component is inside the viewport, send the event to the container to select the next component
+						container.keyReleased(keyCode);
+						// check if newly selected component is outside the viewport
+						Component newSelected = screen.getSelectedComponent();
+						if(newSelected!=null && newSelected!=lastSelected)
+						{
+							coords = getCoordsOfComponentInContainer(newSelected,container);
+							if(coords[0]<vpx || coords[0]+newSelected.width>vpmx || coords[1]<vpy || coords[1]+newSelected.height>vpmy)
+							{// component is partially or completelly outside the viewport, scroll is good.
+								scrollToSelectedComponent(fastHScrollLength,fastVScrollLength);
+							}
+						}
+						else scroll(gameCode, (gameCode==Canvas.LEFT|| gameCode==Canvas.RIGHT)?normalHScrollLength:normalVScrollLength);
 					}
-					if((index<0 || index>focusableComponents.size()-1) && (vpy==0 || vpmy>=container.height)) 
-					{// end of visible components vector. Disselect last selected						
-						screen.setSelectedComponent(null);
-					}		
+					else 
+					{// component is not inside the viewport
+					 // if component is not in the direction of the key press (i.e. it is bellow the bottom of the viewport and the 
+					 // key press is Canvas.UP) We should deselect it. 
+						if((gameCode==Canvas.UP && coords[1]>vpmy) || 
+						   (gameCode==Canvas.DOWN && coords[1]<vpy) ||
+						   (gameCode==Canvas.LEFT && coords[0]>vpmx) ||
+						   (gameCode==Canvas.RIGHT && coords[0]<vpx) )
+						{ // deselect the component
+							screen.setSelectedComponent(null);
+							// send the event again.
+							screen.keyReleased(keyCode);
+							return;
+						}
+						// alternatevly, the movement is towards the component so scroll to the component.
+						// bring the component inside the viewport at once
+						scrollToSelectedComponent(fastHScrollLength,fastVScrollLength); 
+					}
 				}
 				
-				boolean scroll=true;
-				// try to find the first component inside the view port				
-				for(int i=index;i>-1 && i<focusableComponents.size();i +=step)
+				if(lastSelected==null) // find a component inside the viewport and send the event to it.
 				{
-					Component next = (Component)focusableComponents.elementAt(i);
-					// check to see if the component is visible
-					int realx=0,realy=0,fh;
-					Component tmp = next;
-					Font f = next.getFont();
-					if(f==null) f = FireScreen.getTheme().getFontProperty("font");
-					
-					fh = f.getHeight()/2;
-					
-					while(tmp!=null && tmp!=container)
+					int newIndex;
+					if(gameCode==Canvas.DOWN || gameCode==Canvas.RIGHT)
+						newIndex = getFirstFocusableComponentInsideViewport(true);
+					else  // UP or LEFT
+						newIndex = getFirstFocusableComponentInsideViewport(false);
+					if(newIndex==-1) // nothing found just scroll
+						scroll(gameCode, (gameCode==Canvas.LEFT|| gameCode==Canvas.RIGHT)?normalHScrollLength:normalVScrollLength);
+					else
 					{
-						realx+=tmp.x;
-						realy+=tmp.y;
-						tmp = tmp.parent;
+						Component newSelected = (Component)container.focusableComponents.elementAt(newIndex);
+						screen.setSelectedComponent(newSelected);
+						newSelected.keyReleased(keyCode);
 					}
-					if(realx>=vpx && realy>=vpy && realx<(vpmx) && realy<(vpmy-fh))
-					{ // component is visible, send the event to it.						
-						next.keyReleased(keyCode);
-						screen.setSelectedComponent(next);
-						scroll=false;
-						break;
-					}			
 				}
-
-				// no selectable component found. just scroll
-				if(scroll)
-				{// just scroll
-					if(gameCode==Canvas.UP)
-						scrollUp(false);
-					else if(gameCode==Canvas.DOWN)
-						scrollDown(false);
-					else if(gameCode==Canvas.LEFT)
-						scrollUp(true);
-					else if(gameCode==Canvas.RIGHT)
-						scrollDown(true);
-				}				
 			}
+			else scroll(gameCode, (gameCode==Canvas.LEFT|| gameCode==Canvas.RIGHT)?normalHScrollLength:normalVScrollLength); // nothing to select. only scroll
 		}
 		if(keyListener!=null) keyListener.keyReleased(keyCode,this);
 	}
+	
+	/**
+	 * Brings the top left corner and as much of the selected component as possible inside the viewport of this panel.
+	 */
+	public void scrollToSelectedComponent(int maxhscroll,int maxvscroll)
+	{
+		Component cmp = FireScreen.getScreen().getSelectedComponent();
+		if(cmp==null) return;
+		if(cmp.selected==false) cmp.setSelected(true);
 		
+		int coords[] = getCoordsOfComponentInContainer(cmp,container);
+		int vpx = getViewPortPositionX();
+		int vpy = getViewPortPositionY();
+		int diffX = coords[0]-vpx;
+		int diffY = coords[1]-vpy;
+		
+		if(vpx+coords[0]+cmp.width<=viewPortWidth) // no need for horizontal scrolling
+			diffX=0;
+		
+		if(diffY<0 && cmp.height<((25*viewPortHeight)/100)) diffY-= ((20*viewPortHeight)/100);
+		
+		if(maxvscroll>-1) 
+		{
+			if(diffY>0 && diffY>maxvscroll) diffY = maxvscroll;
+			else if(diffY<0 && -diffY>maxvscroll) diffY = -maxvscroll;
+		}
+		if(maxhscroll>-1) 
+		{
+			if(diffX>0 && diffX>maxhscroll) diffX = maxhscroll;
+			else if(diffX<0 && -diffX>maxhscroll) diffX = -maxhscroll;
+		}
+
+		setViewPortPosition(vpx+diffX,vpy+diffY);
+		FireScreen screen = FireScreen.getScreen();
+		if(this.animation==null && screen.isAnimationsEnabled())
+		{ 
+			ScrollAnimation anim = new ScrollAnimation(this,vpx,vpy,vpx+diffX,vpy+diffY);
+			screen.registerAnimation(anim);
+		}
+	}
+	
+	private void scroll(int gameCode, int pixels)
+	{
+		int vpx = getViewPortPositionX();
+		if(gameCode==Canvas.LEFT)
+		{
+			if(container.width>viewPortWidth && vpx>0)
+				scrollHorizontally(-pixels);
+			else scrollVertically(-pixels);				
+		}
+		else if(gameCode==Canvas.RIGHT)
+		{
+			if(container.width>viewPortWidth && (vpx+viewPortWidth)<container.width)
+				scrollHorizontally(pixels);
+			else scrollVertically(pixels);
+		}
+		else if(gameCode==Canvas.UP)
+			scrollVertically(-pixels);
+		else if(gameCode==Canvas.DOWN)
+			scrollVertically(pixels);
+		
+		FireScreen screen = FireScreen.getScreen();
+		Component lastSelected = screen.getSelectedComponent();
+		if(lastSelected!=null && lastSelected.selected==false)  
+			lastSelected.setSelected(true);// set the component as selected again.
+	}
+	
+	/**
+	 * Finds a selectable component inside the container that is visible throuht the viewport. 
+	 * It will return either the first component (top most) or the last (bottom most) inside the 
+	 * viewport, depending on the parameter.
+	 * @param startFromTop
+	 * @return
+	 */
+	private int getFirstFocusableComponentInsideViewport(boolean startFromTop)
+	{
+		int step,index;
+		if(startFromTop)
+		{
+			index=0;
+			step=+1;
+		}
+		else
+		{
+			index = container.focusableComponents.size()-1;
+			step=-1;
+		}
+		
+		int vpx = getViewPortPositionX();
+		int vpy = getViewPortPositionY();
+		int vpmx = vpx+viewPortWidth;
+		int vpmy = vpy + viewPortHeight;
+		
+		int coords[];
+		for(;index>-1 && index<container.focusableComponents.size();index+=step)
+		{
+			Component cmp = (Component)container.focusableComponents.elementAt(index);
+			coords = getCoordsOfComponentInContainer(cmp,container);
+			coords[0] += cmp.width/2; // translate coords to center of component
+			coords[1] += cmp.height/2;
+			
+			if((coords[0]>= vpx && coords[0]<vpmx) && (coords[1]>= vpy && coords[1]<vpmy))
+			{
+				return index;
+			}
+		}
+		// no selectable component inside viewport.
+		return -1;
+	}
+	
+	
 	protected void keyRepeated(int keyCode)
 	{
 		if (container != null)
 		{
-			int gameCode = FireScreen.getScreen().getGameAction(keyCode);
-
-			if(gameCode==Canvas.LEFT)
-			{
-				scrollLeft(false);
-				return;
-			}
-			if(gameCode==Canvas.RIGHT)
-			{
-				scrollRight(false);
-				return;
-			}
-			
-			if(gameCode==Canvas.UP)
-			{
-				scrollUp(false);
-				return;
-			}
-			if(gameCode==Canvas.DOWN)
-			{
-				scrollDown(false);
-				return;
-			}
-			
 			container.keyRepeated(keyCode);
 		}
 		if(keyListener!=null) keyListener.keyRepeated(keyCode,this);
@@ -844,26 +1006,54 @@ public class Panel extends Container
 		return scrollBarPolicy;
 	}
 
+	/**
+	 * A panel can be set to remove itself from the FireScreen when it receives a pointer event that is outside it.
+	 * The firescreen will only send pointer and key events to the top most (relatively to ZINDEX) focusable component or container.
+	 * If a for example a popup window (a Panel) is open which is smaller than the screen size, 
+	 * then it is common behaivior to close the popup when the user taps outside the window.<br/>
+	 * 
+	 * This is the default behaivior of the Panel. 
+	 * 
+	 * @return true if this Panel is set to close when receiving pointer events outside its dimensions (default is true)
+	 */
 	public boolean isCloseOnOutofBoundsPointerEvents()
 	{
 		return closeOnOutofBoundsPointerEvents;
 	}
 
+	/**
+	 * @see #isCloseOnOutofBoundsPointerEvents()
+	 * @param closeOnOutofBoundsPointerEvents
+	 */
 	public void setCloseOnOutofBoundsPointerEvents(boolean closeOnOutofBoundsPointerEvents)
 	{
 		this.closeOnOutofBoundsPointerEvents = closeOnOutofBoundsPointerEvents;
 	}
 
+	/**
+	 * If true, the user can also scroll by draging the container inside the panel. Default is false.
+	 * @return true is dragscroll is enabled (default is false)
+	 */
 	public boolean isDragScroll()
 	{
 		return dragScroll;
 	}
 
+	/**
+	 * @see #setDragScroll(boolean)
+	 * @param dragScroll
+	 */
 	public void setDragScroll(boolean dragScroll)
 	{
 		this.dragScroll = dragScroll;
 	}
 
+	/**
+	 * If showBackground is enabled the Panel will draw a theme specific background behind the Container. 
+	 * The Container or parts of it must be ofcource transparent for the background to be visible. 
+	 * 
+	 * @return true if this Panel is set to show a background. (default is false)
+	 */
 	public boolean isShowBackground()
 	{
 		return showBackground;
@@ -874,13 +1064,31 @@ public class Panel extends Container
 		this.showBackground = showBackground;
 	}
 
+	/**
+	 * If this flag is set then the Panel will display decorations.
+	 * @return true is the decorations are enabled. (default is true)
+	 */
 	public boolean isShowDecorations()
 	{
 		return showDecorations;
 	}
 
+	/**
+	 * @see #isShowDecorations()
+	 * @param showDecorations
+	 */
 	public void setShowDecorations(boolean showDecorations)
 	{
 		this.showDecorations = showDecorations;
+	}
+
+	public Image getBackgroundTexture()
+	{
+		return backgroundTexture;
+	}
+
+	public void setBackgroundTexture(Image backgroundTexture)
+	{
+		this.backgroundTexture = backgroundTexture;
 	}
 }

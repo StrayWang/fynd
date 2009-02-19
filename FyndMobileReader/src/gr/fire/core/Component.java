@@ -27,725 +27,697 @@ import javax.microedition.lcdui.Font;
 import javax.microedition.lcdui.Graphics;
 
 /**
- * UI组件
  * @author padeler
  *
  */
-public class Component {
+public class Component
+{
+	
+	protected Component parent;
+	private String id;
+	
+	
+	/** Constrains for this object, used by the layoutManager */
+	Object constrains=null; 
+	
+	/**
+	 * Location of the component inside its parent container. 
+	 * These coordinates are refer to the top left corner of this component, relative to the 
+	 * top left corder (0,0) of the parent container. 
+	 */
+	int x,y;
+	
+	
+	
+	/** 
+	 * The actual dimensions of this component 
+	 */
+	protected int width,height;
+	
+	/**
+	 * The font used by this component when displaying text.
+	 */
+	protected Font font;
+	
+	/**
+	 * The layout of this Component's contents i.e (FireScreen.TOP|FireScreen.LEFT)
+	 */
+	protected int layout;
+	protected int foregroundColor;
+	protected int backgroundColor;
 
-    /**
-     * 父组件
-     */
-    protected Component parent;
-    /**
-     * 组件ID
-     */
-    private String id;
-    /**
-     * 该组件的约束，被LayoutManager使用
-     * Constrains for this object, used by the layoutManager
-     */
-    Object constrains = null;
-    /**
-     * 组件在父容器中的x坐标，以组件的左上角为基准，相对于父容器(0,0)坐标向左偏移量
-     * Location of the component inside its parent container.
-     * These coordinates are refer to the top left corner of this component, relative to the
-     * top left corder (0,0) of the parent container.
-     */
-    int x;
-    /**
-     * 组件在父容器中的y坐标，以组件的左上角为基准，相对于父容器(0,0)坐标向下偏移量
-     *
-     */
-    int y;
-    /**
-     * 组件实际宽度
-     * The actual dimensions of this component
-     */
-    protected int width;
-    /**
-     * 组件实际高度
-     */
-    protected int height;
-    /**
-     * 组件显示文本时所使用的字体对象
-     * The font used by this component when displaying text.
-     */
-    protected Font font;
-    /**
-     * 组件中所有物件的布局形式，如(FireScreen.TOP|FireScreen.LEFT)
-     * The layout of this Component's contents i.e (FireScreen.TOP|FireScreen.LEFT)
-     */
-    protected int layout;
-    /**
-     * 组件的前景色
-     */
-    protected int foregroundColor;
-    /**
-     * 组件的背景色
-     */
-    protected int backgroundColor;
-    /**
-     * Padding is the distance of this component's border from its content
-     * The Component is responsible for rendering correctly the padding.
-    protected int paddingLeft;
-    protected int paddingTop;
-    protected int paddingRight;
-    protected int paddingBottom;
-    /**
-     * The internal padding between the component's elements
-    protected int paddingVertical;
-    protected int paddingHorizontal;
+	/*
+	 * Padding is the distance of this component's border from its content
+	 * The Component is responsible for rendering correctly the padding.
+	protected int paddingLeft;
+	protected int paddingTop;
+	protected int paddingRight;
+	protected int paddingBottom;
+	/*
+	 * The internal padding between the component's elements 
+	protected int paddingVertical;
+	protected int paddingHorizontal;
+	
+	/*
+	 * The margin is the distance of the component from its neighbors. 
+	 * The parent container is responsible for rendering the margins correctly.
+	protected int marginLeft;
+	protected int marginTop;
+	protected int marginRight;
+	protected int marginBottom;
+	 */
+	
+	protected boolean border=false;
+	
+	
+	
+	/** If the Component is not valid, its characteristics (with,height,etc) need validation */
+	protected boolean valid;
+	/** If it can be focused (traversed) by the user */
+	private boolean focusable;
+	
+	boolean visible=true;
 
-    /**
-     * The margin is the distance of the component from its neighbors.
-     * The parent container is responsible for rendering the margins correctly.
-    protected int marginLeft;
-    protected int marginTop;
-    protected int marginRight;
-    protected int marginBottom;
-     */
-    /**
-     * 组件是否会显示边框
-     */
-    protected boolean border = false;
-    /**
-     * 组件是否已经通过验证，如果否，则所有特征（如高、宽等）需要被验证
-     * If the Component is not valid, its characteristics (with,height,etc) need validation
-     */
-    protected boolean valid;
-    /**
-     * 能否获取焦点，或能被遍历
-     * If it can be focused (traversed) by the user
-     */
-    private boolean focusable;
-    /**
-     * 是否可见
-     */
-    boolean visible = true;
-    /**
-     * 如果组件运行在动画模式下，则这个字段保存对应的动画对象
-     * If this component is in animation mode then the animation is held in this field.
-     */
-    Animation animation = null;
-    /**
-     * 组件当前是否被选中，比如光标在组件上
-     * If the component is currently selected, i.e. the curson is on it
-     */
-    boolean selected;
-    /**
-     * Dimensions of the component that control its layout inside a Container.
-     */
-    private int prefWidth = -1,  prefHeight = -1;
-    protected CommandListener commandListener;
-    protected KeyListener keyListener;
-    protected PointerListener pointerListener;
-    protected Command command;
-    protected Command leftSoftKeyCommand;
-    protected Command rightSoftKeyCommand;
-    /**
-     * 初始化<code>Component<code>实例，并应用主题设置
-     */
-    public Component() {
-        Theme t = FireScreen.getTheme();
-        backgroundColor = t.getIntProperty("bg.color");
-        foregroundColor = t.getIntProperty("fg.color");
-    }
+	
+	/** 
+	 * If this component is in animation mode then the animation is held in this field.
+	 */
+	Animation animation=null;
+	
+	/** If the component is currently selected, i.e. the curson is on it */
+	boolean selected; 
+	
+	/**
+	 * Dimensions of the component that control its layout inside a Container. 
+	 */
+	private int prefWidth=-1,prefHeight=-1;
+	
+	protected CommandListener commandListener;
+	protected KeyListener keyListener;
+	protected PointerListener pointerListener;
+	protected Command command;
+	
+	protected Command leftSoftKeyCommand;
+	protected Command rightSoftKeyCommand;
+	
+	/**
+	 * Component's default constructor.
+	 */
+	public Component() 
+	{
+		Theme t = FireScreen.getTheme();
+		backgroundColor = t.getIntProperty("bg.color");
+		foregroundColor = t.getIntProperty("fg.color");
+	}
+	
+	/**
+	 * Paint is called by the container of the component to allow it to draw itself on Graphics g
+	 * The drawable area on g is (0,0,width,height).
+	 * 
+	 * @param g the area on witch the component will draw it self.
+	 */
+	public void paint(Graphics g)
+	{
+	}
+	
+	/**
+	 * Sets this component on/off selected mode. 
+	 * 
+	 * When a component is selected it should render itself 
+	 * approprietly in order to be easily identified by the user
+	 *  
+	 * @param v
+	 */
+	public void setSelected(boolean v){selected = v;}
+	
+	/**
+	 * @see #setSelected(boolean)
+	 * @return
+	 */
+	public boolean isSelected(){return selected;}
+	
+	/**
+	 * A validate event requests from the component to recalculate its internal properties such as width/height etc.
+	 */
+	public void validate(){valid=true;}
 
-    /**
-     * 组件的容器调用paint方法将组件绘制到Graphics上，参数g对应的可绘制区域是(0,0,width,height)
-     * Paint is called by the container of the component to allow it to draw itself on Graphics g
-     * The drawable area on g is (0,0,width,height).
-     *
-     * @param g the area on witch the component will draw it self.
-     */
-    public void paint(Graphics g) {
-    }
+	/**
+	 * @see #validate()
+	 * @return
+	 */
+	public boolean isValid(){
+		return valid;
+	}
+	
+	/**
+	 * Returns the height of this component
+	 * @return
+	 */
+	public int getHeight()
+	{
+		return height;
+	}
 
-    /**
-     * 设置组件是否打开选择模式
-     * Sets this component on/off selected mode.
-     * @param v
-     */
-    public void setSelected(boolean v) {
-        selected = v;
-    }
+	/**
+	 * Sets the height of this component
+	 * @param height
+	 */
+	public void setHeight(int height)
+	{
+		if(height<0) throw new IllegalArgumentException("Height cannot be negative.");
+		this.height = height;
+	}
 
-    /**
-     * 获取组件是否能被选中
-     * @return
-     */
-    public boolean isSelected() {
-        return selected;
-    }
+	/**
+	 * Returns the width of this component 
+	 * @return
+	 */
+	public int getWidth()
+	{
+		return width;
+	}
 
-    /**
-     * 验证组件，重新计算内部属性值，例如高、宽等。（未完成）
-     * A validate event requests from the component to recalculate its internal properties such as width/height etc.
-     */
-    public void validate() {
-        valid = true;
-    }
+	/**
+	 * Sets the width of this component
+	 * @param width
+	 */
+	public void setWidth(int width)
+	{
+		if(width<0) throw new IllegalArgumentException("Width cannot be negative.");
+		this.width = width;
+	}
+	
+	/**
+	 * set a command to this component. 
+	 * @param c
+	 */
+	public void setCommand(Command c)
+	{
+		command=c;
+		focusable= (focusable||commandListener!=null||keyListener!=null||pointerListener!=null||command!=null);
+	}
+	
+	/**
+	 * Events that have a command assosiated with them 
+	 * {@link #setCommand(Command)}, {@link #setLeftSoftKeyCommand(Command)}, {@link #setRightSoftKeyCommand(Command)}
+	 * will cause this component send the event to the given CommandListener.
+	 * 
+	 * @see CommandListener
+	 * @param listener
+	 */
+	public void setCommandListener(CommandListener listener)
+	{
 
+		this.commandListener=listener;
+		focusable= (focusable||commandListener!=null||keyListener!=null||pointerListener!=null||command!=null);
+	}
+	
+	/**
+	 * Key events received by this components will cause this component to send
+	 * the appropriate key event to the given listener.
+	 * 
+	 * @see KeyListener 
+	 * @param listener
+	 */
+	public void setKeyListener(KeyListener listener)
+	{
+		this.keyListener=listener;
+		focusable= (focusable||commandListener!=null||keyListener!=null||pointerListener!=null||command!=null);
+	}
+	
+	/**
+	 * Pointer events received by this components will cause this component to send
+	 * the appropriate pointer event to the given listener.
+	 * 
+	 * @see PointerListener
+	 * @param listener
+	 */
+	public void setPointerListener(PointerListener listener)
+	{
+		this.pointerListener=listener;
+		focusable= (focusable||commandListener!=null||keyListener!=null||pointerListener!=null||command!=null);
+	}
+	
+	/**
+	 * If this component can receive and handle Key events or pointer events then it is Focusable and should return true
+	 * @see KeyListener
+	 * @see PointerListener  
+	 * @see CommandListener
+	 * @return
+	 */
+	public boolean isFocusable()
+	{
+		return focusable;
+	}
+	
+	
+	/**
+	 * Checks if the point (x,y) is inside this Component. The point must be on the coordinate system of this Component.
+	 * That means that the top left corner of the component is (0,0).
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public boolean contains(int x,int y)
+	{
+		return (x>=0 && y>=0 && x<width && y<height);
+	}
+	
     /**
-     * 获取组件是否已经验证过
-     * @return
-     */
-    public boolean isValid() {
-        return valid;
-    }
+	 * Determines whether or not this <code>Component</code> and the specified
+	 * rectangular area intersect. Two rectangles intersect if their
+	 * intersection is nonempty.
+	 * 
+	 * @return <code>true</code> if the specified area and this
+	 *         <code>Component</code> intersect; <code>false</code>
+	 *         otherwise.
+	 */
+	public boolean intersects(int rx, int ry, int rw, int rh)
+	{
+		int tw = width;
+		int th = height;
+		if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0)
+		{
+			return false;
+		}
+		int tx = x;
+		int ty = y;
+		rw += rx;
+		rh += ry;
+		tw += tx;
+		th += ty;
+		// overflow || intersect
+		return ((rw < rx || rw > tx) && (rh < ry || rh > ty)
+				&& (tw < tx || tw > rx) && (th < ty || th > ry));
+	}
+	
+	/**
+	 * Causes this component only to be repainted on the screen.
+	 */
+	public void repaint()
+	{
+		repaint(0,0, width, height);
+	}
 
-    /**
-     * 获取组件实际高度
-     * @return
-     */
-    public int getHeight() {
-        return height;
-    }
-    /**
-     * 设置组件实际高度,不能为负数
-     * @param height
-     * @exception IllegalArgumentException
-     */
-    public void setHeight(int height) {
-        if (height < 0) {
-            throw new IllegalArgumentException("Height cannot be negative.");
-        }
-        this.height = height;
-    }
+	/**
+	 * Get the X position of this component inside its parent. 
+	 * @return
+	 */
+	public int getX()
+	{
+		return x;
+	}
 
-    /**
-     * 获取组件实际宽度
-     * @return
-     */
-    public int getWidth() {
-        return width;
-    }
-    /**
-     * 设置组件实际宽度
-     * @param width
-     * @exception IllegalArgumentException
-     */
-    public void setWidth(int width) {
-        if (width < 0) {
-            throw new IllegalArgumentException("Width cannot be negative.");
-        }
-        this.width = width;
-    }
+	/**
+	 * Set the X position of this component inside its parent.
+	 * @param x
+	 */
+	public void setX(int x)
+	{
+		this.x = x;
+	}
 
-    /**
-     * 设置组件对应的命令
-     * set a command to this component.
-     * @param c
-     */
-    public void setCommand(Command c) {
-        command = c;
-        focusable = (focusable || commandListener != null || keyListener != null || pointerListener != null || command != null);
-    }
-    /**
-     * 设置命令监听器
-     * @param listener
-     */
-    public void setCommandListener(CommandListener listener) {
+	/**
+	 * Get the Y position of this component inside its parent.
+	 * @return
+	 */
+	public int getY()
+	{
+		return y;
+	}
 
-        this.commandListener = listener;
-        focusable = (focusable || commandListener != null || keyListener != null || pointerListener != null || command != null);
-    }
-    /**
-     * 设置组件键盘事件监听器
-     * @param listener
-     */
-    public void setKeyListener(KeyListener listener) {
-        this.keyListener = listener;
-        focusable = (focusable || commandListener != null || keyListener != null || pointerListener != null || command != null);
-    }
-    /**
-     * 设置屏幕指针时间监听器
-     * @param listener
-     */
-    public void setPointerListener(PointerListener listener) {
-        this.pointerListener = listener;
-        focusable = (focusable || commandListener != null || keyListener != null || pointerListener != null || command != null);
-    }
-
-    /**
-     * 获取组件是否能获取焦点
-     * @return
-     */
-    public boolean isFocusable() {
-        return focusable;
-    }
-
-    /**
-     * 检查坐标是否在组件内部。这个点必须在组件的坐标系统内，也就是说组件的左上角的坐标是(0,0)。
-     * Checks if the point (x,y) is inside this Component. The point must be on the coordinate system of this Component.
-     * That means that the top left corner of the component is (0,0).
-     * @param x
-     * @param y
-     * @return
-     */
-    public boolean contains(int x, int y) {
-        return (x >= 0 && y >= 0 && x < width && y < height);
-    }
-
-    /**
-     * 判断组件是否和指定的矩形区域相交，如果两个矩形的交集不为空，则判定它们相交
-     * Determines whether or not this <code>Component</code> and the specified
-     * rectangular area intersect. Two rectangles intersect if their
-     * intersection is nonempty.
-     *
-     * @return <code>true</code> 如果指定区域与组件是相交的。if the specified area and this
-     *         <code>Component</code> intersect; <code>false</code>
-     *         otherwise.
-     */
-    public boolean intersects(int rx, int ry, int rw, int rh) {
-        int tw = width;
-        int th = height;
-        if (rw <= 0 || rh <= 0 || tw <= 0 || th <= 0) {
-            return false;
-        }
-        int tx = x;
-        int ty = y;
-        rw += rx;
-        rh += ry;
-        tw += tx;
-        th += ty;
-        // overflow || intersect
-        return ((rw < rx || rw > tx) && (rh < ry || rh > ty) && (tw < tx || tw > rx) && (th < ty || th > ry));
-    }
-
-    /**
-     * 重新绘制组件
-     */
-    public void repaint() {
-        repaint(0, 0, width, height);
-    }
-
-    /**
-     * 获取组件在其父组件内的x坐标值
-     * Get the X position of this component inside its parent.
-     * @return
-     */
-    public int getX() {
-        return x;
-    }
-
-    /**
-     * 设置组件中其父容器中的x坐标
-     * Set the X position of this component inside its parent.
-     * @param x
-     */
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    /**
-     * 获取组件在其父组件内的x坐标值
-     * Get the Y position of this component inside its parent.
-     * @return
-     */
-    public int getY() {
-        return y;
-    }
-
-    /**
-     * 设置组件中其父容器内的y坐标
-     * Set the Y position of this component inside its parent.
-     * @param y
-     */
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    /**
-     * 重新绘制组件
-     * @param cx 绘制起点x坐标增量
-     * @param cy 绘制起点y坐标增量
-     * @param cwidth 绘制宽度
-     * @param cheight 绘制高度
-     */
-    void repaint(int cx, int cy, int cwidth, int cheight) {
-
-        if (parent != null) {
+	/**
+	 * Set the Y position of this component inside its parent.
+	 * @param y
+	 */
+	public void setY(int y)
+	{
+		this.y = y;
+	}
+	
+	void repaint(int cx,int cy,int cwidth,int cheight)
+	{
+		
+		if(parent!=null)
+		{
 //			System.out.println("Repaint for "+cx+","+cy);
-            parent.repaint(x + cx, y + cy, cwidth, cheight);
-        } else { // top level component
-            FireScreen.getScreen().repaintScreen(x + cx, y + cy, cwidth, cheight);
-        }
-    }
+			parent.repaint(x+cx, y+cy, cwidth, cheight);
+		}
+		else
+		{ // top level component
+			FireScreen.getScreen().repaintScreen(x+cx,y+cy,cwidth,cheight);
+		}
+	}
 
-    /**
-     * 获取偏好尺寸（优先使用该尺寸）
-     * @return int[]{prefWidth,prefHeight}
-     */
-    public int[] getPrefSize() {
-        if (prefWidth == -1 || prefHeight == -1) {
-            return null;
-        }
-        return new int[]{prefWidth, prefHeight};
-    }
-    /**
-     * 设置组件的偏好（优先）尺寸
-     * @param width
-     * @param height
-     */
-    public void setPrefSize(int width, int height) {
-        if (width < 0 || height < 0) {
-            throw new IllegalArgumentException("Dimensions can not be negative: " + width + "/" + height);
-        }
+	/**
+	 * Returns a int[2] array with the width,height which are preffered by this component.
+	 * If set it is used by the LayoutManager to correctly layout this Component inside its Container
+	 * @return
+	 */
+	public int[] getPrefSize()
+	{
+		if(prefWidth==-1 || prefHeight==-1) return null;
+		return new int[]{prefWidth,prefHeight};
+	}
 
-        prefWidth = width;
-        prefHeight = height;
-    }
+	/**
+	 * @see #getPrefSize()
+	 * @param width
+	 * @param height
+	 */
+	public void setPrefSize(int width,int height)
+	{
+		if (width < 0 || height < 0)
+			throw new IllegalArgumentException("Dimensions can not be negative: "+width+"/"+height);
+		
+		prefWidth = width;
+		prefHeight = height;
+		valid=false;
+	}
+	
+	
+	protected void pointerDragged(int x, int y)
+	{
+		if(pointerListener!=null) pointerListener.pointerDragged(x, y,this);
+	}
 
-    /**
-     * 屏幕指针拖动事件处理函数，需触摸屏
-     * @param x
-     * @param y
-     */
-    protected void pointerDragged(int x, int y) {
-        if (pointerListener != null) {
-            pointerListener.pointerDragged(x, y, this);
-        }
-    }
+	protected void pointerPressed(int x, int y)
+	{
+		if(pointerListener!=null) pointerListener.pointerPressed(x, y,this);
+	}
+	
+	protected void pointerReleased(int x, int y)
+	{
+		if(pointerListener!=null) pointerListener.pointerReleased(x, y,this);
+	}
 
-    /**
-     * 屏幕指针按下事件处理函数，需触摸屏
-     * @param x
-     * @param y
-     */
-    protected void pointerPressed(int x, int y) {
-        if (pointerListener != null) {
-            pointerListener.pointerPressed(x, y, this);
-        }
-    }
+	protected void keyPressed(int keyCode)
+	{
+		if(keyListener!=null) keyListener.keyPressed(keyCode,this);
+	}
+	
+	protected void keyReleased(int keyCode)
+	{
+		if(keyListener!=null) keyListener.keyReleased(keyCode,this);
+	}
+	
+	protected void keyRepeated(int keyCode)
+	{
+		if(keyListener!=null) keyListener.keyRepeated(keyCode,this);
+	}	
 
-    /**
-     * 屏幕指针释放事件处理函数，需触摸屏
-     * @param x
-     * @param y
-     */
-    protected void pointerReleased(int x, int y) {
-        if (pointerListener != null) {
-            pointerListener.pointerReleased(x, y, this);
-        }
-    }
+	public Command getLeftSoftKeyCommand()
+	{
+		return leftSoftKeyCommand;
+	}
 
-    /**
-     * 按键按下事件处理函数
-     * @param keyCode 按键代码
-     */
-    protected void keyPressed(int keyCode) {
-        if (keyListener != null) {
-            keyListener.keyPressed(keyCode, this);
-        }
-    }
+	public void setLeftSoftKeyCommand(Command leftSoftKeyCommand)
+	{
+		this.leftSoftKeyCommand = leftSoftKeyCommand;
+	}
 
-    /**
-     * 按键释放时间处理函数
-     * @param keyCode 按键代码
-     */
-    protected void keyReleased(int keyCode) {
-        if (commandListener != null) {
-            if (keyCode == FireScreen.leftSoftKey && leftSoftKeyCommand != null) {
-                final Component trigger = this;
-                Thread th = new Thread() {
+	public Command getRightSoftKeyCommand()
+	{
+		return rightSoftKeyCommand;
+	}
 
-                    public void run() {
-                        FireScreen.getScreen().animateLeftSoftKey(trigger);
-                        commandListener.commandAction(leftSoftKeyCommand, trigger);
-                    }
-                };
-                th.start();
-            } else if (keyCode == FireScreen.rightSoftKey && rightSoftKeyCommand != null) {
-                final Component trigger = this;
-                Thread th = new Thread() {
+	public void setRightSoftKeyCommand(Command rightSoftKeyCommand)
+	{
+		this.rightSoftKeyCommand = rightSoftKeyCommand;
+	}
+	
+	/**
+	 * If this component is inside another (i.e. a container) then its parent is that container
+	 * If this component is directly added to the FireScreen (i.e. using the FireScreen.addComponent() method) the parent is null
+	 * @see FireScreen#addComponent(Component, int) 
+	 * @return
+	 */
+	public Component getParent()
+	{
+		return parent;
+	}
 
-                    public void run() {
-                        FireScreen.getScreen().animateRightSoftKey(trigger);
-                        commandListener.commandAction(rightSoftKeyCommand, trigger);
-                    }
-                };
-                th.start();
-            }
-        }
+	public int getForegroundColor()
+	{
+		return foregroundColor;
+	}
 
-        if (keyListener != null) {
-            keyListener.keyReleased(keyCode, this);
-        }
-    }
+	public void setForegroundColor(int foregroundColor)
+	{
+		this.foregroundColor = foregroundColor;
+	}
 
-    /**
-     * 按键重复按下事件处理函数，依赖于不同的平台，有些机型不支持连续按键
-     * @param keyCode 按键代码
-     */
-    protected void keyRepeated(int keyCode) {
-        if (keyListener != null) {
-            keyListener.keyRepeated(keyCode, this);
-        }
-    }
+	public int getBackgroundColor()
+	{
+		return backgroundColor;
+	}
 
-    /**
-     * 获取左软键对应的命令
-     * @return
-     */
-    public Command getLeftSoftKeyCommand() {
-        return leftSoftKeyCommand;
-    }
-    /**
-     * 设置左软键命令
-     * @param leftSoftKeyCommand
-     */
-    public void setLeftSoftKeyCommand(Command leftSoftKeyCommand) {
-        this.leftSoftKeyCommand = leftSoftKeyCommand;
-    }
+	public void setBackgroundColor(int backgroundColor)
+	{
+		this.backgroundColor = backgroundColor;
+	}
+	
+	/**
+	 * The minSize is used to calculate the layout of the components inside their container by the LayoutManager.
+	 * The minSize is only used when the prefSize is not set. 
+	 * If the prefSize is set it will be used even if the minSize is bigger than prefSize.
+	 * 
+	 * @return the minSize dimensions of this Component.
+	 */
+	public int[]  getMinSize()
+	{
+		return new int[]{0,0};
+	}
 
-    /**
-     * 获取右软键对应的命令
-     * @return
-     */
-    public Command getRightSoftKeyCommand() {
-        return rightSoftKeyCommand;
-    }
-    /**
-     * 设置组件右软键命令
-     * @param rightSoftKeyCommand
-     */
-    public void setRightSoftKeyCommand(Command rightSoftKeyCommand) {
-        this.rightSoftKeyCommand = rightSoftKeyCommand;
-    }
+	public Font getFont()
+	{
+		return font;
+	}
 
-    /**
-     * 获取父组件对象
-     * @return
-     */
-    public Component getParent() {
-        return parent;
-    }
+	public void setFont(Font font)
+	{
+		this.font = font;
+	}
 
-    /**
-     * 获取前景色
-     * @return
-     */
-    public int getForegroundColor() {
-        return foregroundColor;
-    }
-    /**
-     * 设置前景色
-     * @param foregroundColor
-     */
-    public void setForegroundColor(int foregroundColor) {
-        this.foregroundColor = foregroundColor;
-    }
+	/**
+	 * Returns the layout set to this component. Using the layout the component can 
+	 * decide how to present its content to the screen. 
+	 * Possible layouts are combinations of the following 
+	 * FireScreen.CENTER,FireScreen.LEFT, FireScreen.RIGHT, FireScreen.TOP, FireScreen.BOTTOM , FireScreen.VCENTER
+	 * @see FireScreen#CENTER 
+	 * @return
+	 */
+	public int getLayout()
+	{
+		return layout;
+	}
 
-    /**
-     * 获取当前背景色
-     * @return int
-     */
-    public int getBackgroundColor() {
-        return backgroundColor;
-    }
+	/** 
+	 * @see #getLayout()
+	 * @param layout
+	 */
+	public void setLayout(int layout)
+	{
+		this.layout = layout;
+	}
+	
 
-    /**
-     * 设置背景色
-     * @param backgroundColor
-     */
-    public void setBackgroundColor(int backgroundColor) {
-        this.backgroundColor = backgroundColor;
-    }
+	/**
+	 * Returns the width of the usefull content of this component (i.e. for a TextComponent the width of the text without borders,etc)
+	 * It is used by the LayoutManager and the Browser to determine the best way to display this component
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getContentWidth(){
+		return 0;
+	}
+	/**
+	 * Returns the height of the usefull content of this component (i.e. for a TextComponent the height of the text without borders,etc)
+	 * It is used by the LayoutManager and the Browser to determine the best way to display this component
+	 * 
+	 * @return
+	 */
+	public int getContentHeight()
+	{
+		return 0;
+	}
 
-    /**
-     * minSize用于在容器内计算组件布局位置，只能当prefSize未设置时使用minSize，
-     * 如果已经设置了prefSize，那么就算minSize比prefSize大，也只能使用prefSize
-     * The minSize is used to calculate the layout of the components inside their container by the LayoutManager.
-     * The minSize is only used when the prefSize is not set.
-     * If the prefSize is set it will be used even if the minSize is bigger than prefSize.
-     *
-     * @return the minSize dimensions of this Component.
-     */
-    public int[] getMinSize() {
-        return new int[]{0, 0};
-    }
+	/**
+	 * Sets this component to be able to receive key and pointer events
+	 * @param focusable
+	 */
+	public void setFocusable(boolean focusable)
+	{
+		this.focusable = focusable;
+	}
+	
+	
+	/**
+	 * @see #getId()
+	 * @param id
+	 */
+	public void setId(String id)
+	{
+		this.id = id;
+	}
+	
+	/**
+	 * Every Fire Component can have an Id string assosiated with it. 
+	 *  
+	 * @return
+	 */
+	public String getId()
+	{
+		return id;
+	}
+	
+	public String toString()
+	{
+		return super.toString() + ((id!=null)?" ["+id+"]":"");
+	}
+	
+	/**
+	 * Utility method to easily retrieve 
+	 * the vertical layout information of this component 
+	 * 
+	 * @see #setLayout(int) 
+	 * @return
+	 */
+	public int getValign()
+	{
+		int valign = FireScreen.TOP;
+		
+		if ((layout&FireScreen.VCENTER)==FireScreen.VCENTER)
+		{
+			valign = FireScreen.VCENTER;
+		}
+		else if ((layout&FireScreen.TOP) == FireScreen.TOP)
+		{
+			valign = FireScreen.TOP;
+		}
+		else if ((layout&FireScreen.BOTTOM) == FireScreen.BOTTOM)
+		{
+			valign = FireScreen.BOTTOM;
+		}
+		
+		return valign;		
+	}
 
-    /**
-     * 获取当前是使用的字体
-     * @return
-     */
-    public Font getFont() {
-        return font;
-    }
-    /**
-     * 设置组件显示文本时使用的字体
-     * @param font
-     */
-    public void setFont(Font font) {
-        this.font = font;
-    }
+	/**
+	 * Utility method to easily retrieve 
+	 * the horizontal layout information of this component 
+	 * 
+	 * @see #setLayout(int) 
+	 * @return
+	 */
+	public int getHalign()
+	{
+		int halign = FireScreen.LEFT;
+		
+		if ((layout&FireScreen.CENTER)==FireScreen.CENTER) // hcenter
+		{
+			halign = FireScreen.CENTER;
+		}
+		else if ((layout&FireScreen.LEFT)==FireScreen.LEFT)
+		{
+			halign = FireScreen.LEFT;
+		}
+		else if ((layout&FireScreen.RIGHT)==FireScreen.RIGHT)
+		{
+			halign = FireScreen.RIGHT;
+		}
+		return halign;
+	}
 
-    /**
-     * 获取组件布局方式，如FireScreen.LEFT
-     * @return
-     */
-    public int getLayout() {
-        return layout;
-    }
-    /**
-     * 设置组件的布局方式
-     * @param layout
-     */
-    public void setLayout(int layout) {
-        this.layout = layout;
-    }
+	/**
+	 * A component can have a border. This method returns true if the border flag is set.<br/>
+	 * Note: It is up to the component implementation to support and display borders. 
+	 * @return
+	 */
+	public boolean isBorder()
+	{
+		return border;
+	}
 
-    /**
-     * 获取内容宽度（目前只能返回零）
-     * @return
-     */
-    public int getContentWidth() {
-        return 0;
-    }
+	/**
+	 * @see #isBorder()
+	 * @param border
+	 */
+	public void setBorder(boolean border)
+	{
+		this.border = border;
+	}
 
-    /**
-     * 获取内容高度（目前只能返回零）
-     * @return
-     */
-    public int getContentHeight() {
-        return 0;
-    }
-    /**
-     * 设置组件是否能获取焦点
-     * @param focusable
-     */
-    public void setFocusable(boolean focusable) {
-        this.focusable = focusable;
-    }
-    /**
-     * 设置组件ID
-     * @param id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
+	/**
+	 * If a component is visivle (default) then it will be drawn by the firescreen or its parent component
+	 * @return
+	 */
+	public boolean isVisible()
+	{
+		return visible;
+	}
 
-    /**
-     * 获取组件ID
-     * @return
-     */
-    public String getId() {
-        return id;
-    }
-    /**
-     * @return 父类的toString方法返回值 + ID
-     */
-    public String toString() {
-        return super.toString() + ((id != null) ? " [" + id + "]" : "");
-    }
+	/**
+	 * @see #isVisible()
+	 * @param visible
+	 */
+	public void setVisible(boolean visible)
+	{
+		this.visible = visible;
+	}
+	
 
-    /**
-     * 获取垂直对齐方式，如FireScreen.TOP
-     * @return
-     */
-    public int getValign() {
-        int valign = FireScreen.TOP;
+	/**
+	 * Utility method to easili translate the component inside its parent by (dx,dy)
+	 * @see #setPosition(int, int)
+	 * @param dx
+	 * @param dy
+	 */
+	public void move(int dx, int dy)
+	{
+		repaint();
+		this.x+=dx;
+		this.y+=dy;
+	}
+	
+	/**
+	 * Sets the position of this component relative to its parent top left corner.
+	 * If the component does not have a parent (its a top level component of the FireScreen) the
+	 * position is relative to the top,left of the FireScreen
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void setPosition(int x,int y)
+	{
+		repaint();
+		this.x=x;
+		this.y=y;
+	}
 
-        if ((layout & FireScreen.VCENTER) == FireScreen.VCENTER) {
-            valign = FireScreen.VCENTER;
-        } else if ((layout & FireScreen.TOP) == FireScreen.TOP) {
-            valign = FireScreen.TOP;
-        } else if ((layout & FireScreen.BOTTOM) == FireScreen.BOTTOM) {
-            valign = FireScreen.BOTTOM;
-        }
+	/**
+	 * This method returns the animation (if any) associated with this component.
+	 * A component can have at most one animation. When a component has an animation
+	 * it is considered its parent (this==animation.parent && this.animation==animation) 
+	 * @return
+	 */
+	public Animation getAnimation()
+	{
+		return animation;
+	}
 
-        return valign;
-    }
-
-    /**
-     * 获取水平对齐方式，由FireScreen常量表示，如FireScreen.LEFT
-     * @return
-     */
-    public int getHalign() {
-        int halign = FireScreen.LEFT;
-
-        if ((layout & FireScreen.CENTER) == FireScreen.CENTER) // hcenter
-        {
-            halign = FireScreen.CENTER;
-        } else if ((layout & FireScreen.LEFT) == FireScreen.LEFT) {
-            halign = FireScreen.LEFT;
-        } else if ((layout & FireScreen.RIGHT) == FireScreen.RIGHT) {
-            halign = FireScreen.RIGHT;
-        }
-        return halign;
-    }
-
-    /**
-     * 获取组件是否会显示边框
-     * @return
-     */
-    public boolean isBorder() {
-        return border;
-    }
-
-    /**
-     * 设置组件是否会显示边框
-     * @param border
-     */
-    public void setBorder(boolean border) {
-        this.border = border;
-    }
-
-    /**
-     * 获取组件是否可见
-     * @return
-     */
-    public boolean isVisible() {
-        return visible;
-    }
-    /**
-     * 设置组件是否可见
-     * @param visible
-     */
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
-    /**
-     * 将组件移动指定的坐标增量
-     * @param dx x坐标
-     * @param dy y坐标
-     */
-    public void move(int dx, int dy) {
-        repaint();
-        this.x += dx;
-        this.y += dy;
-    }
-    /**
-     * 设置组件左上角的位置
-     * @param x x坐标
-     * @param y y坐标
-     */
-    public void setPosition(int x, int y) {
-        repaint();
-        this.x = x;
-        this.y = y;
-    }
-
-    /**
-     * 获取组件对应的动画对象
-     * @return Animation
-     */
-    public Animation getAnimation() {
-        return animation;
-    }
-
-    /**
-     * 设置组件要使用的动画对象
-     * @param animation
-     */
-    public void setAnimation(Animation animation) {
-        if (animation.parent != null) {
-            animation.parent.animation = null;
-        }
-        animation.parent = this;
-        this.animation = animation;
-    }
+	/**
+	 * @see #setAnimation(Animation)
+	 * @param animation
+	 */
+	public void setAnimation(Animation animation)
+	{
+		if(animation.parent!=null)
+		{
+			animation.parent.animation=null;
+		}
+		animation.parent=this;
+		this.animation = animation;
+	}	
 }

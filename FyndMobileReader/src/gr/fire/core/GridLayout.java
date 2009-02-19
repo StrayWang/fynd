@@ -22,11 +22,11 @@ public class GridLayout implements LayoutManager
 	
 	private int rows,columns;
 	private int hgap,vgap;
-	
+	private int cellWidth=-1,cellHeight=-1;
 	
 	public GridLayout()
 	{
-		this(1,1,0,0);
+		this(1,1);
 	}
 	
 	public GridLayout(int rows,int columns)
@@ -36,12 +36,20 @@ public class GridLayout implements LayoutManager
 	
 	public GridLayout(int rows,int columns,int hgap,int vgap)
 	{
+		this(rows,columns,hgap,vgap,-1,-1);
+	}
+	
+	public GridLayout(int rows,int columns,int hgap,int vgap,int cellWidth,int cellHeight)
+	{
 		if(rows<1 || columns<1 || hgap<0 || vgap<0) throw new IllegalArgumentException("Illegal arguments on GridLayout manager");
 		this.rows=rows;
 		this.columns=columns;
 		this.hgap=hgap;
 		this.vgap=vgap;
+		this.cellWidth = cellWidth;
+		this.cellHeight = cellHeight;
 	}
+
 
 	/**
 	 * @see gr.fire.core.LayoutManager#layoutContainer(gr.fire.core.Container)
@@ -55,25 +63,56 @@ public class GridLayout implements LayoutManager
 		
 		int []d = parent.getPrefSize();
 		
-		if(parent.parent==null) // top level component.
+		if(d==null)
 		{
-			FireScreen sc = FireScreen.getScreen();
-			w=sc.getWidth();
-			h=sc.getHeight();
+			d = parent.getMinSize();
 		}
-		else 			
-		{
-			w=d[0];
-			h=d[1];
-		}
+
+		w=d[0];
+		h=d[1];
+
 		parent.width=w;
 		parent.height=h;
 	
 
-
-		int slotW = (w-hgap*(columns-1))/columns;
-		int slotH = (h-vgap*(rows-1))/rows;
+		int slotW,slotH;
 		
+		if(cellWidth==-1)
+			slotW = (w-hgap*(columns-1))/columns;
+		else slotW = cellWidth;
+		
+		if(cellHeight==-1)
+			slotH = (h-vgap*(rows-1))/rows;
+		else slotH = cellHeight;
+		
+		//decide if we need to center the contained containers. 
+		// If we do, then offsetX and offsetY will be used to position the elements accordingly. 
+		int allWidth = (columns * slotW) + ((columns-1) * hgap); 
+		int allHeight = rows * (slotH + vgap); 
+		int offsetX = 0, offsetY = 0; 
+		int layout = parent.getLayout();
+		if ((layout & FireScreen.TOP) == FireScreen.TOP)
+		{
+			offsetY = 0;
+		} else if ((layout & FireScreen.VCENTER) == FireScreen.VCENTER)
+		{
+			offsetY = parent.height / 2 - allHeight / 2;
+		} else if ((layout & FireScreen.BOTTOM) == FireScreen.BOTTOM)
+		{
+			offsetY = parent.height - allHeight;
+		}
+
+		if ((layout & FireScreen.LEFT) == FireScreen.LEFT)
+		{
+			offsetX = 0;
+		} else if ((layout & FireScreen.CENTER) == FireScreen.CENTER)
+		{
+			offsetX = (parent.width - allWidth) / 2;
+		} else if ((layout & FireScreen.RIGHT) == FireScreen.RIGHT)
+		{
+			offsetX = parent.width - allWidth;
+		}
+
 		Vector components = parent.components;
 		// now set the components positions and sizes.
 		for(int r=0;r<rows;++r)
@@ -83,19 +122,19 @@ public class GridLayout implements LayoutManager
 				// get component
 				int elementId = r*columns + c;
 				if(elementId>=components.size()) break;
-				
+
 				Component cmp = (Component)components.elementAt(elementId);
 				// layout the component.
 				cmp.width=slotW;
 				cmp.height=slotH;
-				cmp.x = c*(slotW+hgap);
-				cmp.y = r*(slotH+vgap);
+				cmp.x = c*(slotW+hgap) + offsetX;
+				cmp.y = r*(slotH+vgap) + offsetY;
 			}
-		}	
+		}
 	}
 	
 	
-	private void layoutChildren(Container cnt)
+	private int[] layoutChildren(Container cnt)
 	{
 		// if prefSize is null we must calculate it based on the childred of cnt.
 		int maxW = 0,maxH=0;
@@ -108,6 +147,7 @@ public class GridLayout implements LayoutManager
 				childCnt.layoutManager.layoutContainer(childCnt);
 			}
 			int []ps=c.getPrefSize();
+			if(ps==null) ps = c.getMinSize();
 			if(ps!=null)
 			{
 				if(ps[0]>maxW) maxW = ps[0];
@@ -116,10 +156,9 @@ public class GridLayout implements LayoutManager
 
 		}
 		
-		if(cnt.getPrefSize()==null)
-		{			
-			cnt.setPrefSize(maxW*columns,maxH*rows);			
-		}
+		int []d = cnt.getPrefSize();
+		
+		return d!=null?d:new int[]{maxW*columns,maxH*rows};
 	}
 
 	public int getRows()

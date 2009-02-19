@@ -22,7 +22,10 @@
  */
 package gr.fire.core;
 
+
+
 import javax.microedition.lcdui.Command;
+
 
 /**
  * All command events on the FireEngine components are passed to CommandListeners. 
@@ -31,12 +34,13 @@ import javax.microedition.lcdui.Command;
  * @author padeler
  *
  */
-public interface CommandListener extends javax.microedition.lcdui.CommandListener {
-
-    /**
-     * Informs the listener about a Command Action.
-     * @param cmd the command that was fired
-     * @param c the component that fired the command
-     */
-    public void commandAction(Command cmd, Component c);
+public interface CommandListener extends javax.microedition.lcdui.CommandListener
+{
+	
+	/**
+	 * Informs the listener about a Command Action.
+	 * @param cmd the command that was fired 
+	 * @param c the component that fired the command
+	 */
+	public void commandAction(Command cmd, Component c);
 }

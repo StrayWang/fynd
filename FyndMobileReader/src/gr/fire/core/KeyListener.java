@@ -20,8 +20,29 @@
 
 package gr.fire.core;
 
-public interface KeyListener {
+/**
+ * A KeyListener is notified when a key is pressed, released or repeated on a Component.
+ * @author padeler
+ *
+ */
+public interface KeyListener 
+{
+	/**
+	 * The key with keycode=code was pressed while the focus was in component src
+	 * @param code
+	 * @param src
+	 */
 	public void keyPressed(int code, Component src);
+	/**
+	 * The key with keycode=code was released while the focus was in component src
+	 * @param code
+	 * @param src
+	 */
 	public void keyReleased(int code, Component src);
+	/**
+	 * The key with keycode=code was repeated while the focus was in component src
+	 * @param code
+	 * @param src
+	 */
 	public void keyRepeated(int code, Component src);
 }

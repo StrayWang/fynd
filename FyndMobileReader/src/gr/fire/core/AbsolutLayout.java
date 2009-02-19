@@ -31,7 +31,6 @@ public class AbsolutLayout implements LayoutManager
 	public static final AbsolutLayout defaultLayout= new AbsolutLayout();
 	
 	/**
-     * 布局Container内的所有Component
 	 * @see gr.fire.core.LayoutManager#layoutContainer(gr.fire.core.Container)
 	 */
 	public void layoutContainer(Container parent)
@@ -52,10 +51,7 @@ public class AbsolutLayout implements LayoutManager
 			}
 			int []prefSize = cmp.getPrefSize();
 //			System.out.println("LAYOUT OF CMP "+cmp+":"+ prefSize);
-			if(prefSize==null){
-                prefSize = cmp.getMinSize();
-                cmp.setPrefSize(prefSize[0],prefSize[1]);
-            }
+			if(prefSize==null){ prefSize = cmp.getMinSize();}
 			
 			if (prefSize != null)
 			{
@@ -74,11 +70,15 @@ public class AbsolutLayout implements LayoutManager
 		int []d = parent.getPrefSize();
 		if(d==null)
 		{
-			d = new int[]{maxW, maxH};
-			parent.setPrefSize(maxW,maxH);			
+			d = parent.getMinSize();
+			
+			parent.width = d[0]>maxW?d[0]:maxW;
+			parent.height = d[1]>maxH?d[1]:maxH;
 		}
-
-		parent.width=d[0];
-		parent.height=d[1];
+		else
+		{
+			parent.width=d[0];
+			parent.height=d[1];
+		}
 	}
 }

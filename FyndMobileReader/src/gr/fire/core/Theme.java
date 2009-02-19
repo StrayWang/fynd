@@ -33,6 +33,9 @@ import javax.microedition.lcdui.Image;
  */
 public class Theme
 {
+	/**
+	 * Value for completly TRANSPARENT "color" value 
+	 */
 	public static final int TRANSPARENT = 0xFF000000;
 		
 	/**
@@ -48,12 +51,43 @@ public class Theme
 	
 	public Theme()
 	{
+		Integer black = new Integer(0x00000000);
+		Integer gray = new Integer(0x00707070);
+		Integer white = new Integer(0x00FFFFFF);
+		Integer blue = new Integer(0x000000FF);
+		
+		themeProperties=new Hashtable();
+		themeProperties.put("bg.color",new Integer(TRANSPARENT));
+		themeProperties.put("fg.color",black);
+		themeProperties.put("bg.alt1.color",gray);
+		themeProperties.put("bg.alt2.color",gray);
+		themeProperties.put("border.color",black);
+		themeProperties.put("link.active.fg.color",white);
+		themeProperties.put("link.active.bg.color",blue);
+		
+		themeProperties.put("navbar.bg.color",black);
+		themeProperties.put("navbar.fg.color",white);
+		
+		Font font = Font.getDefaultFont();
+		themeProperties.put("font",font);
+		themeProperties.put("label.font",font);
+		themeProperties.put("navbar.font",font);
+		themeProperties.put("titlebar.font",font);
+
 	}
 	
 
+	/**
+	 * This method creates an array of colors that are the gradient from the given starting color to the given end color. 
+	 *  
+	 * @param start
+	 * @param end
+	 * @param length The length of the resulting gradient array
+	 * @return
+	 */
 	public static int[] createGradient(int start, int end, int length)
 	{
-		if(length<=2) throw new IllegalArgumentException("Length of the gradient must be greater than one.");
+		if(length<=2) throw new IllegalArgumentException("Length of the gradient must be greater than two.");
 		
 		int []result = new int[length];
 		
@@ -70,7 +104,7 @@ public class Theme
 		
 		// the first color is the start
 		result[0] = start;
-		// number of colors undtil the end:
+		// number of colors until the end:
 		int count = length-1;
 		
 
@@ -96,8 +130,11 @@ public class Theme
 		return result;
 	}
 	
+	/**
+	 * Returns the logo (if any) set for this theme.
+	 * @return
+	 */
 	public Image getLogo(){ return null;}
-	
 	public Image getBackgroundTexture(int width,int height){ return null;}
 	public Image getTitlebarTexture(int width,int height){ return null;}
 	public Image getNavbarTexture(int width,int height){ return null;}
@@ -125,4 +162,5 @@ public class Theme
 	}
 	
 	public boolean getBooleanProperty(String key) {return ((Boolean)themeProperties.get(key)).booleanValue();}
+	
 }
