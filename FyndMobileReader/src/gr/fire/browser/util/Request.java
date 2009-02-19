@@ -29,7 +29,12 @@ import java.io.InputStream;
 
 import javax.microedition.io.HttpConnection;
 
+
 /**
+ * 
+ * This method wraps a request made with the HttpClient. It can handle both requests to local files (in recordstore or the jar file) 
+ * as well as requests to external resource via http.
+ * 
  * @author padeler
  *
  */
@@ -93,6 +98,10 @@ public class Request
 				else encoding = defaultEncoding;
 			}
 			else encoding = defaultEncoding;
+		}
+		else if(encoding.toUpperCase().equals("UTF_8")) 
+		{// UTF_8 with underscore is not supported by all phones but is sent by some http servers.
+			encoding = defaultEncoding; // set it to UTF-8 (replace underscore with minus)
 		}
 	}
 	
@@ -161,13 +170,14 @@ public class Request
 		return connection;
 	}
 	
-	public void close()
+	public void close() throws IOException
 	{
 		try{
 			if(in!=null) in.close();
 			if(connection!=null) connection.close();
-		}catch(Exception e){
+		}catch(IOException e){
 			Log.logWarn("Failed to close connection "+getBaseURL());
+			throw e;
 		}
 	}	
 }

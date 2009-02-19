@@ -34,6 +34,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 /**
+ * A utility class that represents a cookie. 
  * @author padeler
  *
  */
@@ -57,6 +58,11 @@ public class Cookie
 	{
 	}
 	
+	/**
+	 * Creates a cookie instance from the given cookie string returned by an http request to the given host
+	 * @param cookieStr the cookie string
+	 * @param host the host that returned the cookie string
+	 */
 	public Cookie(String cookieStr,String host) 
 	{
 		Vector avpairs = StringUtil.split(cookieStr,";");
@@ -155,6 +161,7 @@ public class Cookie
 		}
 	}
 	
+	
 	public boolean equals(Object obj)
 	{
 		if(obj instanceof Cookie)
@@ -165,10 +172,17 @@ public class Cookie
 		return false;
 	}
 	
+	/**
+	 * From a string that contains one or more cookies this method creates a Vector with Cookie instances.<br/>
+	 * 
+	 * The string can have the following form:
+	 * COOKIE1_NAME=COOKIE1_VALUE;ATTR1=ATTR1_VAL;ATTR2=ATTR2_VAL, COOKIE2_NAME=COOKIE2_VALUE;ATTR1=ATTR1_VAL;ATTR2=ATTR2_VAL
+	 * 
+	 * @param cookieStr
+	 * @return
+	 */
 	public static Vector splitCookies(String cookieStr)
 	{
-		// The string can have the following form:
-		// COOKIE1_NAME=COOKIE1_VALUE;ATTR1=ATTR1_VAL;ATTR2=ATTR2_VAL, COOKIE2_NAME=COOKIE2_VALUE;ATTR1=ATTR1_VAL;ATTR2=ATTR2_VAL
 		Vector res = new Vector();
 		
 		// remove all day strings from the string
@@ -199,6 +213,12 @@ public class Cookie
 		return res;
 	}
 	
+	/**
+	 * Writes the given cookie to the supplied data output stream.
+	 * @param c
+	 * @param out
+	 * @throws IOException
+	 */
 	public static void serialize(Cookie c,DataOutputStream out) throws IOException
 	{
 		out.writeUTF(c.name);
@@ -212,6 +232,14 @@ public class Cookie
 		out.writeBoolean(c.secure);
 	}
 	
+	/**
+	 * Reads a serialized Cookie from the supplied DataInputStream, and returns a new instance of that Cookie.
+	 * The serialized cookie must have been serialized using the {@link #serialize(Cookie, DataOutputStream)}.
+	 *  
+	 * @param in
+	 * @return
+	 * @throws IOException
+	 */
 	public static Cookie deSerialize(DataInputStream in) throws IOException
 	{
 		Cookie c = new Cookie();
@@ -226,6 +254,12 @@ public class Cookie
 		return c;
 	}
 	
+	/**
+	 * Checks if this Cookie mathes the given domain and path.
+	 * @param withDomain
+	 * @param withPath
+	 * @return
+	 */
 	public boolean match(String withDomain,String withPath)
 	{
 		return (withDomain.endsWith(domain) && withPath.startsWith(path));

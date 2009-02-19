@@ -219,8 +219,12 @@ public class BlockTag extends Tag
 		else if(TAG_TITLE.equals(name))
 		{
 			try{
-				parser.next();
-				page.setPageTitle(parser.getText());
+				int type = parser.next();
+				if(type==KXmlParser.TEXT)
+				{
+					page.setPageTitle(parser.getText());
+					parser.next(); // progress the parsing once more since TEXT was handled here.
+				}
 			}catch(Exception e){
 				Log.logWarn("Failed to parse page title.",e);
 			}
@@ -373,7 +377,7 @@ public class BlockTag extends Tag
 		int lastLineWidth = el.getLastLineWidth();
 		int contentHeight = el.getContentHeight();
 
-		el.setPrefSize(vw,contentHeight);
+//		el.setPrefSize(vw,contentHeight);
 		elementContainer.add(el);
 		
 		if(lineCount==1)
@@ -462,6 +466,7 @@ public class BlockTag extends Tag
 					int lastLineExtraHeight = tp.getLastLineExtraHeight() + diff;
 					tp.setLastLineExtraHeight(lastLineExtraHeight);
 					int []d = tp.getPrefSize();
+					if(d==null) d = tp.getMinSize();
 					tp.setPrefSize(d[0],d[1]+diff);
 					tp.validate();
 				}

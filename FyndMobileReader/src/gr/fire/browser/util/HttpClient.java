@@ -22,6 +22,7 @@
  */
 package gr.fire.browser.util;
 
+import gr.fire.browser.Browser;
 import gr.fire.util.FireConnector;
 import gr.fire.util.Log;
 import gr.fire.util.StringUtil;
@@ -42,16 +43,28 @@ import javax.microedition.io.HttpConnection;
 import javax.microedition.io.HttpsConnection;
 
 /**
+ * This class implements the Http functionality for the Browser module. 
+ * It makes http requests using the supplied FireConnector instance and handles 
+ * cookies and redirects approprietly. 
+ * 
+ * It also supports local file urls (starting with file://)
+ * 
+ * The HttpClient instance can remember the previous request made and can handle appropriatelly 
+ * relative URLs based on that information.
+ * 
+ * @see FireConnector
+ * @see Browser
+ * 
  * @author padeler
  *
  */
 public class HttpClient
 {
-	public static final String[][] header = new String[][] {
-         {"User-Agent","Fire v2.0Beta Mozilla/4.0 (compatible; MSIE 6.0)"},
-		 {"Accept","text/xml, application/xhtml+xml, text/css, multipart/mixed"},
+	private String[][] defaultHeaderValues = new String[][] {
+         {"User-Agent","Fire v2.0 Mozilla/4.0 (compatible; MSIE 6.0)"},
+		 {"Accept","text/xml, application/xhtml+xml, text/css, multipart/mixed, ,*/*;q=0.8"},
 		 {"Accept-Language","en-us,en;q=0.5"},
-		 {"Accept-Charset","ISO-8859-1,utf-8;q=0.7,*;q=0.7"}
+		 {"Accept-Charset","utf-8, ISO-8859-1;q=0.8, *;q=0.7"}
 	   };
 	
 	
@@ -60,12 +73,26 @@ public class HttpClient
 	private Vector savedCookies=new Vector();
 	private Request currentPage=null;
 
-	
+	/**
+	 * Constructor for the HttpClient. The new instance uses the supplied FireConnector instance 
+	 * to open input/output streams to the requested resource.   
+	 * @param connector
+	 */
 	public HttpClient(FireConnector connector)
 	{
 		this.connector = connector;
 	}
 	
+	/**
+	 * Makes a http request to URL using the set method (HttpConnection.GET or HttpConnection.POST) and the supplied request parameters.
+	 *  
+	 * @param url
+	 * @param requestMethod
+	 * @param requestProperties User supplied Http request header parameters. 
+	 * @param data if method is POST then the post data are in this array. 
+	 * @param updateCurrentPage if set to true the HttpClient will remember the URL of this request in order to handle feature relative path requests
+	 * @return
+	 */
 	public Request requestResource(String url, String requestMethod, Hashtable requestProperties, byte[]data,boolean updateCurrentPage)
 	{
 		if(url==null) throw new IllegalArgumentException("Request for resource to null url?");
@@ -147,9 +174,9 @@ public class HttpClient
 
 			conn = (HttpConnection)connector.open(url,mode,true);
 			conn.setRequestMethod(requestMethod);
-			for(int i=0;i<header.length;++i)
+			for(int i=0;i<defaultHeaderValues.length;++i)
 			{
-				conn.setRequestProperty(header[i][0], header[i][1]);
+				conn.setRequestProperty(defaultHeaderValues[i][0], defaultHeaderValues[i][1]);
 			}
             
 			if(requestProperties!=null)
@@ -187,10 +214,10 @@ public class HttpClient
 				Log.logDebug("Post data["+data.length+"] sent.");
 				Log.logDebug("["+new String(data)+"]");
 			}
-			
+			Log.logDebug("Attempting to retrieve response code..");
 			int code = conn.getResponseCode();
 			
-			Log.logInfo("Responce "+code+" "+conn.getResponseMessage());
+			Log.logInfo("Response "+code+" "+conn.getResponseMessage());
 			
 			for(int i=0;i<100;++i)
 			{
@@ -211,6 +238,8 @@ public class HttpClient
 			
 			if(code==HttpConnection.HTTP_MOVED_PERM) // 301
 			{ 				
+				if(updateCurrentPage)
+					currentPage = new Request(conn);
 				String redirect = conn.getHeaderField("location");
 				Log.logInfo("Redirect "+code+" to location: " +redirect);
 				conn.close();
@@ -218,6 +247,8 @@ public class HttpClient
 			}
 			else if(code==HttpConnection.HTTP_MOVED_TEMP || code==HttpConnection.HTTP_SEE_OTHER)
 			{// must redirect using the GET method (see protocol)
+				if(updateCurrentPage)
+					currentPage = new Request(conn);
 				String redirect = conn.getHeaderField("location");
 				Log.logInfo("Redirect "+code+" to location: " +redirect);
 				conn.close();
@@ -232,7 +263,7 @@ public class HttpClient
 
 				return result;
 			}
-		}catch(Throwable ex)
+		}catch(Exception ex)
 		{
 			Log.logError("Request to "+url+" failed.",ex);
 			if(conn!=null){
@@ -288,8 +319,12 @@ public class HttpClient
 		return res;
 	}
 	
+
 	/**
 	 * Stores the cookies currently saved in memory, to the record store.
+	 * 
+	 * @param cookiesStorage the name of the record store to hold the cookies.
+	 * @throws IOException
 	 */
 	public void storeCookies(String cookiesStorage) throws IOException
 	{
@@ -324,6 +359,11 @@ public class HttpClient
 		Log.logInfo("Stored "+savedCookies.size()+" to record store: "+cookiesStorage);
 	}
 	
+	/**
+	 * Load the cookies previously stored in the specified recordstore using the {@link #storeCookies(String)} method.
+	 * @param cookiesStorage
+	 * @throws IOException
+	 */
 	public void loadCookies(String cookiesStorage) throws IOException
 	{
 		try{
@@ -346,8 +386,23 @@ public class HttpClient
 		}
 	}
 	
+	/**
+	 * If a call to the {@link #requestResource(String, String, Hashtable, byte[], boolean)} was made earlies with the updateCurrentPage==true 
+	 * then this method will return that URL.
+	 * @return
+	 */
 	public String getCurrentURL()
 	{
 		return (currentPage!=null)?currentPage.getURL():null;
+	}
+
+	public String[][] getDefaultHeaderValues()
+	{
+		return defaultHeaderValues;
+	}
+
+	public void setDefaultHeaderValues(String[][] defaultHeaderValues)
+	{
+		this.defaultHeaderValues = defaultHeaderValues;
 	}
 }

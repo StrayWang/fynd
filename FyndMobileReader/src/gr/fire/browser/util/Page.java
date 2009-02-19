@@ -19,6 +19,7 @@
 
 package gr.fire.browser.util;
 
+import gr.fire.browser.Browser;
 import gr.fire.core.Container;
 import gr.fire.ui.ImageComponent;
 import gr.fire.util.Log;
@@ -32,9 +33,26 @@ import javax.microedition.lcdui.Image;
 
 import org.kxml2.io.KXmlParser;
 
+/**
+ * A Page is the result of a request on a URL containing an html document. 
+ * The Page is produced by the Browser instance and contains the Container with the rendered document
+ * as well as metadata about the document such as info on the meta and title tags. 
+ * 
+ * For all the images in the document the Page instance keeps a cache. For every image that appears in the document, 
+ * the Browser will first look in the Page cache for it, before requesting it from its url.  
+ * 
+ * If the Browser has image loading policy #{@link gr.fire.browser.Browser#LOAD_IMAGES_ASYNC} then the Page will also hold 
+ * the vector with the pending images.
+ *   
+ * @see Browser#loadPage(java.io.InputStream, String)
+ * 
+ * @author padeler
+ *
+ */
 public class Page
 {
-	private String url;
+	private String url;  // holds the requested url (may be relative or absolut)
+	private String absolutUrl; // holds the absolut url of the request.
 	
 	private String refresh;
 	private int refreshSeconds;
@@ -52,6 +70,7 @@ public class Page
 	
 	public Page(String url)
 	{
+		Log.logInfo("Page["+url+"]");
 		this.url=url;
 	}
 	
@@ -104,27 +123,33 @@ public class Page
 	public void startAsyncImageLoad(final HttpClient client)
 	{
 		if(asyncImageLoadList==null) return; // another job well done :)
-		final String pageUrl = url;
+		final String pageUrl = client.getCurrentURL();
 		Thread th = new Thread(){
 			public void run()
 			{
-				for(int i=0;i<asyncImageLoadList.size();++i)
-				{
-					Object[] pair = (Object[])asyncImageLoadList.elementAt(i);
-					ImageComponent cmp = (ImageComponent)pair[0];
-					String url = (String)pair[1];
-					Image img = getCachedImage(url);
-					if(img==null)
-						img = loadImage(client,url);
-					
-					if(img!=null)
-						cmp.setImage(img);
-					
-					if(pageUrl!=null && pageUrl.equals(client.getCurrentURL())==false) 
-					{// browser changed page. stop loading images for this page.
-						Log.logInfo("Stoping asynchronous loading of page images.");
-						break;
+				try{
+					for(int i=0;i<asyncImageLoadList.size();++i)
+					{
+						Object[] pair = (Object[])asyncImageLoadList.elementAt(i);
+						ImageComponent cmp = (ImageComponent)pair[0];
+						String url = (String)pair[1];
+						Image img = getCachedImage(url);
+						if(img==null)
+							img = loadImage(client,url);
+						
+						if(img!=null)
+							cmp.setImage(img);
+						
+						Log.logInfo("AsyncImageLoad["+pageUrl+"]=> "+client.getCurrentURL());
+						if(pageUrl!=null && pageUrl.equals(client.getCurrentURL())==false) 
+						{// browser changed page. stop loading images for this page.
+							Log.logInfo("Stoping asynchronous loading of page images.");
+							break;
+						}
 					}
+				}catch (OutOfMemoryError e){
+					Log.logWarn("Out of memory error!", e);
+					System.gc();
 				}
 				asyncImageLoadList=null; // done
 			}
@@ -227,5 +252,15 @@ public class Page
 	public void setOpenForm(Form openForm)
 	{
 		this.openForm = openForm;
+	}
+
+	public String getAbsolutUrl()
+	{
+		return absolutUrl;
+	}
+
+	public void setAbsolutUrl(String absolutUrl)
+	{
+		this.absolutUrl = absolutUrl;
 	}
 }

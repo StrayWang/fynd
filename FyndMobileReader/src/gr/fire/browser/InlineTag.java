@@ -265,17 +265,20 @@ public class InlineTag extends Tag
 			
 			// get the text of the option element
 			int type;
+			String text= "";
 			try
 			{
 				type = parser.next();
+				if(type==KXmlParser.TEXT) // text of option element
+				{
+					text = parser.getText();
+					parser.next(); //progress the parsing once more since TEXT was handled here.
+				}
 			} catch (Exception e)
 			{
 				Log.logWarn("Failed to get text for tag "+name+".",e);
 				return;
 			}
-			String text= "";
-			if(type==KXmlParser.TEXT) // text of option element
-				text = parser.getText();
 
 			InputComponent option = new InputComponent(InputComponent.SWITCH);
 			option.setLayout(FireScreen.VCENTER|FireScreen.CENTER);
@@ -313,17 +316,20 @@ public class InlineTag extends Tag
 			
 			// get the text of this area
 			int type;
+			String value= "";
 			try
 			{
 				type = parser.next();
+				if(type==KXmlParser.TEXT) // text of text area
+				{
+					value = StringUtil.proccessUrl(parser.getText(),true);
+					parser.next(); //progress the parsing once more since TEXT was handled here.
+				}
 			} catch (Exception e)
 			{
 				Log.logWarn("Failed to get text for tag "+name+".",e);
 				return;
 			}
-			String value= "";
-			if(type==KXmlParser.TEXT) // text of text area
-				value = StringUtil.proccessUrl(parser.getText(),true);
 			
 			// now add the textarea to the container.
 			InputComponent textarea = new InputComponent(InputComponent.TEXT);

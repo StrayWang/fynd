@@ -20,7 +20,12 @@
 
 package gr.fire.browser.util;
 
-
+/**
+ * This class extends the standard j2me Command class, with some extra fields for use with the Fire Browser component.
+ * 
+ * @author padeler
+ *
+ */
 public class Command extends javax.microedition.lcdui.Command
 {
 	private String url;
@@ -48,6 +53,7 @@ public class Command extends javax.microedition.lcdui.Command
 	{
 		super(label, longLabel, commandType, priority);
 	}
+	
 	
 	public Command(String label,int commandType, int priority, String url)
 	{
