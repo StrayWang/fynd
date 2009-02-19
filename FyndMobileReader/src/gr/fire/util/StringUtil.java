@@ -195,19 +195,28 @@ public final class StringUtil
 	{
 		StringBuffer buf = new StringBuffer();
 		byte c;
-		byte []utfBuf = str.getBytes();
+		byte[] utfBuf;
+		try
+		{
+			utfBuf = str.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e)
+		{
+			Log.logWarn("URLEncode: Failed to get UTF-8 bytes from string.",e);
+			utfBuf = str.getBytes();
+		}
 		for(int i = 0; i < utfBuf.length; i++)
 		{ 
 			c = utfBuf[i];
 			if ((c >= '0' && c <= '9')||
 				(c >= 'A' && c <= 'Z')||
-				(c >= 'a' && c <= 'z'))
+				(c >= 'a' && c <= 'z')||
+				(c=='.' || c=='-' || c=='*' || c=='_'))
 			{
 				buf.append((char)c);
 			}
 			else
-			{			
-				buf.append("%").append(Integer.toHexString((0x000000FF&c)));
+			{	
+				buf.append("%").append(Integer.toHexString((0x000000FF&c)));	
 			}
 		}
 		return buf.toString();

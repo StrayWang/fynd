@@ -19,8 +19,25 @@
 
 package gr.fire.util;
 
+/**
+ * Utility class for easily logging on fire application.
+ * 
+ * It writes the messages sent to it using the Log.logInfo, Log.logWarn, Log.logError and Log.logDebug 
+ * methods to one or more predefined Loggers.
+ * 
+ * The default logger is standard output. The developer can add more loggers or set a different (remove standard out) logger.
+ *  
+ * @see #setLogDestination(Logger)
+ * @see #addLogDestination(Logger)
+ * @see Logger
+ * @author padeler
+ *
+ */
 public final class Log
 {
+	/**
+	 * Flag to enable or disable debuging information. If false the calls to Log.logDebug will not produce any output.
+	 */
 	public static boolean showDebug=false;
 	
 	private static Logger[] out;
@@ -39,11 +56,19 @@ public final class Log
 	{
 	}
 	
+	/**
+	 * Sets the only logger to be the given.
+	 * @param l the new logger. All previous loggers are removed.
+	 */
 	public static void setLogDestination(Logger l)
 	{
 		Log.out= new Logger[]{l};
 	}
-	
+	/**
+	 * Adds the given logger to the loggers list. 
+	 * All loggers will receive the output.
+	 * @param o
+	 */
 	public static void addLogDestination(Logger o)
 	{
 		if(o==null) return;
@@ -116,6 +141,10 @@ public final class Log
 		}
 	}
 	
+	/**
+	 * Writes str to all the registed loggers only is the flag {@link #showDebug} is set to true.
+	 * @param str
+	 */
 	public static void logDebug(String str)
 	{
 		if(showDebug && out!=null)

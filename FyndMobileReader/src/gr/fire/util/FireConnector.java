@@ -36,12 +36,17 @@ import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.RecordStoreException;
+import javax.microedition.rms.RecordStoreFullException;
 import javax.microedition.rms.RecordStoreNotFoundException;
 
 /**
- * FireIO is a utility class containing a set of I/O supporting methods.
- * It also acts as a cache for loaded images. If an image is loaded once and is later requested again, the old instance will be returned.
- * This minimizes the memory requirements of an application GUI, without extra efford on the developer side.  
+ * FireConnector is a utility class containing a set of I/O supporting methods.
+ * This implementation is a wrapper for Connector and also an easy way to access the 
+ * RecordStore.
+ * 
+ * All methods starting with "rms" have RecordStore related functionallity. 
+ * 
  * @author padeler
  *
  */
@@ -55,7 +60,7 @@ public class FireConnector
 	 * 
 	 * Lists all record stores of this middlet.
 	 *  
-	 * @return
+	 * @return A vector of Strings with the names of the record stores.
 	 * 
 	 */
 	public Vector rmslist()  
@@ -78,12 +83,24 @@ public class FireConnector
 		return res;
 	}
 	
-	public void rmsDelete(String file) throws Exception
+	/**
+	 * Deletes the record store with the given name 
+	 * @param file
+	 * @throws RecordStoreNotFoundException
+	 * @throws RecordStoreException
+	 */
+	public void rmsDelete(String file) throws RecordStoreNotFoundException, RecordStoreException 
 	{
 		RecordStore.deleteRecordStore(file);
 	}
 	
-	
+	/**
+	 * Returns an int[2] where the first value is the size of the record store
+	 * and the second is the size available.
+	 * @param name the name of the record store to check for.
+	 * 
+	 * @return if the record store exists returns an int[2] with the size/free. If it does not returns {0,0}
+	 */
 	public int[] rmsSize(String name)
 	{
 		RecordStore rs =null;
@@ -99,6 +116,10 @@ public class FireConnector
 		return new int[]{0,0};
 	}
 	
+	/**
+	 * Returns the total space used by all record stores.
+	 * @return
+	 */
 	public int rmsUsedSpace()
 	{
 		String recordStores[] = RecordStore.listRecordStores();
@@ -115,6 +136,10 @@ public class FireConnector
 	}
 
 	
+	/**
+	 * Returns the available space in the phone's memory for recordstores.
+	 * @return
+	 */
 	public int rmsFree()
 	{
 		String recordStores[] = RecordStore.listRecordStores();
@@ -125,8 +150,16 @@ public class FireConnector
 		return 0;
 	}
 		
-	
-	public void rmsWrite(String file,byte[] buffer) throws Exception
+	/**
+	 * Creates a new recordstore or ovewrites an old one with the same name and stores the bytes in buffer to it.
+	 * @param file the name of the recordstore
+	 * @param buffer the data of the recordstore
+	 * @throws RecordStoreException 
+	 * @throws RecordStoreNotFoundException 
+	 * @throws RecordStoreFullException 
+	 * @throws Exception
+	 */
+	public void rmsWrite(String file,byte[] buffer) throws RecordStoreFullException, RecordStoreNotFoundException, RecordStoreException 
 	{
 		RecordStore fr=null;
 		try{
@@ -143,6 +176,18 @@ public class FireConnector
 		}
 	}
 
+	/**
+	 * If the given URL starts with "file://" this method open a stream to the local file (inside the jar) or if that 
+	 * does not exist it will try to find a recordstore with the same name (without the "file:/" prefix).
+	 * Note that the name of the recordstore searched will start with a "/". 
+	 * 
+	 * If it does not start with "file://" it will use Connector.openInputStream(url) to try and return an InputStream 
+	 * to the url using the platform's capabilities. 
+	 * 
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public InputStream openInputStream(String url) throws IOException
 	{
 		if(url.startsWith("file://"))
@@ -158,31 +203,68 @@ public class FireConnector
 		return Connector.openInputStream(url);
 	}
 	
+	/**
+	 * 
+	 * @see #openInputStream(String)
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public DataInputStream openDataInputStream(String url) throws IOException
 	{
 		return new DataInputStream(openInputStream(url));
 	}
 	
+	/**
+	 * Wrapper for Connector.openOutputStream(url)
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public OutputStream openOutputStream(String url) throws IOException
 	{
 		return Connector.openOutputStream(url);
 	}
 	
+	/**
+	 * Wrapper for Connector.openDataOutputStream(url)
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public DataOutputStream openDataOutputStream(String url) throws IOException
 	{
 		return Connector.openDataOutputStream(url);
 	}
 	
+	/**
+	 * Wrapper for Connector.open(url)
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */
 	public Connection open(String url) throws IOException
 	{
 		return Connector.open(url);
 	}
-	
+
+	/**
+	 * Wrapper for Connector.open()
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */	
 	public Connection open(String url,int mode) throws IOException
 	{
 		return Connector.open(url,mode);
 	}
 	
+	/**
+	 * Wrapper for Connector.open()
+	 * @param url
+	 * @return
+	 * @throws IOException
+	 */	
 	public Connection open(String url,int mode,boolean timeouts) throws IOException
 	{
 		return Connector.open(url,mode,timeouts);

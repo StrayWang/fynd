@@ -35,13 +35,21 @@ import java.util.Hashtable;
  * The class can load files with "key=value" pairs of strings on each line. 
  * The bundles can be loaded (using the FireIO class) either from a file inside the jar, or from a remote location 
  * or from a record in the midlets record store.
- *   
+ * 
+ * The only requirement for a language file to be valid is to contain a key=value pair of the form
+ * language_key=IT
+ * 
+ * For example if a language bundle is the translations to Greek, it should contain one key=value pair of the form
+ * language_key=GR
+ * 
+ * The value part of the pair is not required to be anything specific, it is just an identifier for the given language bundle.
+ * 
  * @author padeler
  *
  */
 public final class Lang
 {
-	public static final String defaultLang = "en";
+	public static final String defaultLang = "EN";
 	
 	private static final String languageFile = "language_file";
 	private static final String languageKey = "language_key";
@@ -77,7 +85,7 @@ public final class Lang
 	public static void setBundle(InputStream resource) throws Exception
 	{
 		FireConnector connector = new FireConnector();
-		if(lang==null)
+		if(resource==null)
 		{ // delete current bundle
 			try{
 				connector.rmsDelete(languageFile);
@@ -87,8 +95,7 @@ public final class Lang
 			return;
 		}
 		
-		if(resource==null) return;
-		bundle = StringUtil.loadProperties(resource,'=',"UTF-8");
+		Hashtable bundle = StringUtil.loadProperties(resource,'=',"UTF-8");
 		String lang = (String)bundle.get(languageKey);
 		if(lang==null) // resource does not contain language indentifier.
 		{
@@ -97,6 +104,7 @@ public final class Lang
 			throw e;
 		}		
 		Lang.lang = lang;
+		Lang.bundle = bundle;
 		connector.rmsWrite(languageFile,StringUtil.serializeProperties(bundle,'=',"UTF-8"));
 	}
 	
