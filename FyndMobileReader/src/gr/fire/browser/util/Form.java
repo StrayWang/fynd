@@ -32,7 +32,6 @@ import gr.fire.core.KeyListener;
 import gr.fire.core.Panel;
 import gr.fire.ui.InputComponent;
 import gr.fire.ui.TextArea;
-import gr.fire.ui.TransitionAnimation;
 import gr.fire.util.Log;
 import gr.fire.util.StringUtil;
 
@@ -229,8 +228,8 @@ public class Form implements CommandListener,KeyListener
 			}
 			if(type==InputComponent.SUBMIT)
 			{
-				if(formListener==null || formListener==this) submit(src);
-				else formListener.commandAction(cmd,src);
+				if(formListener!=null) formListener.commandAction(cmd,src);
+				else submit(src);
 				return;
 			}
 			if(type==InputComponent.RESET)
@@ -323,7 +322,9 @@ public class Form implements CommandListener,KeyListener
 		for(int i=0;i<paramsVector.size();++i)
 		{
 			String []nameVal = (String[])paramsVector.elementAt(i);
-			paramsBuf.append(StringUtil.urlEncode(nameVal[0])+"="+StringUtil.urlEncode(nameVal[1]) + "&");
+			String pair = StringUtil.urlEncode(nameVal[0])+"="+StringUtil.urlEncode(nameVal[1]) + "&";
+			paramsBuf.append(pair);
+			Log.logDebug("Form-Field: "+nameVal[0]+"="+nameVal[1] +" ==> "+ pair);
 		}
 		
 		if(paramsBuf.length()>0) 
@@ -348,16 +349,8 @@ public class Form implements CommandListener,KeyListener
 		
 		
 		Log.logInfo("Submit of Form ["+method+"]: "+action);
-		Component current = FireScreen.getScreen().getCurrent();
-		javax.microedition.lcdui.Command left=null,right=null;
-		if(current!=null)
-		{
-			left = current.getLeftSoftKeyCommand();
-			right = current.getRightSoftKeyCommand();
-			
-		}
 		// ok now send the request to the browser.
-		browser.displayPage(action,method,reqParams,data,left,right,Panel.VERTICAL_SCROLLBAR|Panel.HORIZONTAL_SCROLLBAR,TransitionAnimation.TRANSITION_SCROLL|TransitionAnimation.TRANSITION_LEFT);
+		browser.loadPageAsync(action,method,reqParams,data);
 	}
 
 	public String getMethod()
@@ -384,5 +377,7 @@ public class Form implements CommandListener,KeyListener
 	{
 		this.formListener = formListener;
 	}
+	
+
 
 }
