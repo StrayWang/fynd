@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CPPPrimerStudy", "CPPPrimerStudy\CPPPrimerStudy.vcproj", "{A2BF13DA-2068-4C17-B321-B018A63411B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2BF13DA-2068-4C17-B321-B018A63411B8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A2BF13DA-2068-4C17-B321-B018A63411B8}.Debug|Win32.Build.0 = Debug|Win32
+		{A2BF13DA-2068-4C17-B321-B018A63411B8}.Release|Win32.ActiveCfg = Release|Win32
+		{A2BF13DA-2068-4C17-B321-B018A63411B8}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		VisualSVNWorkingCopyRoot = 
+	EndGlobalSection
+EndGlobal
