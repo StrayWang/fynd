@@ -45,7 +45,7 @@ class Fynd_Log
      *
      * @param string $msg
      */
-    public function logError ($msg)
+    public function logError($msg)
     {
         $this->_writer->write($this->_createLogMessage($msg, Fynd_Log::LOG_ERROR));
     }
@@ -54,7 +54,7 @@ class Fynd_Log
      *
      * @param string $msg
      */
-    public function logWarn ($msg)
+    public function logWarn($msg)
     {
         $this->_writer->write($this->_createLogMessage($msg, Fynd_Log::LOG_WARN));
     }
@@ -63,7 +63,7 @@ class Fynd_Log
      *
      * @param string $msg
      */
-    public function logInfo ($msg)
+    public function logInfo($msg)
     {
         $this->_writer->write($this->_createLogMessage($msg, Fynd_Log::LOG_INFO));
     }
@@ -74,10 +74,10 @@ class Fynd_Log
      * @param int $level
      * @return string
      */
-    protected function _createLogMessage ($msg, $level)
+    protected function _createLogMessage($msg, $level)
     {
         $message = $this->_format;
-        switch ($level)
+        switch($level)
         {
             case Fynd_Log::LOG_INFO:
                 $message = str_replace('{msg_type}', 'INFO', $message);
@@ -94,6 +94,14 @@ class Fynd_Log
         }
         $message = str_replace('{time}', date('Y-m-d H:m:s'), $message);
         $message = str_replace('{logger_name}', $this->_name, $message);
+        if(! is_scalar($msg))
+        {
+            $msg = var_export($msg, true);
+        }
+//        else if(is_string($msg))
+//        {
+//            $msg = utf8_encode($msg);
+//        }
         $message = str_replace('{msg}', $msg, $message);
         return $message;
     }
@@ -103,22 +111,29 @@ class Fynd_Log
      * @param string $name
      * @param Fynd_Log_IWriter $writer
      */
-    public function __construct ($name, Fynd_Log_IWriter $writer)
+    public function __construct($name, Fynd_Log_IWriter $writer)
     {
         if(empty($name))
         {
-            throw new Exception('$name can not be null or empty');
+            Fynd_Object::throwException("Fynd_Log_Exception", '$name can not be null or empty');
         }
-        $this->_name = $name;
+        if($name instanceof Fynd_Type)
+        {
+            $this->_name = $name->getClassName();
+        }
+        else
+        {
+            $this->_name = $name;
+        }
         $this->_writer = $writer;
     }
     /**
      * do some work like close writer
      *
      */
-    public function __destruct ()
+    public function __destruct()
     {
-        if (! is_null($this->_writer))
+        if(! is_null($this->_writer))
         {
             $this->_writer->close();
         }
@@ -129,9 +144,9 @@ class Fynd_Log
      * @param string $msg
      * @param int $level
      */
-    public function log ($msg, $level)
+    public function log($msg, $level)
     {
-        switch ($level)
+        switch($level)
         {
             case Fynd_Log::LOG_INFO:
                 $this->logInfo($msg);

@@ -1,9 +1,10 @@
 <?php
-require_once 'src/Fynd/Util.php';
 require_once 'Fynd/Object.php';
-require_once 'Fynd/Config/ConfigManager.php';
-require_once 'Fynd/Config/ConfigType.php';
-require_once 'Fynd/RequestHandler.php';
+require_once 'Fynd/Env.php';
+require_once 'Fynd/StringUtil.php';
+require_once 'Fynd/Config/Manager.php';
+require_once 'Fynd/Config/Type.php';
+require_once 'Fynd/Request.php';
 require_once 'Fynd/Log.php';
 require_once 'Fynd/Log/StreamWriter.php';
 /**
@@ -17,7 +18,7 @@ require_once 'Fynd/Log/StreamWriter.php';
  * <?php
  * require 'Fynd/Application.php';
  * //Simply,run your application like this:
- * Fynd_Application::getInstance()->run();
+ * Fynd_Application::getInstance()->start();
  *
  * //Get Log like this:
  * $logger = Fynd_Application::getLogger('root');
@@ -31,44 +32,6 @@ require_once 'Fynd/Log/StreamWriter.php';
 class Fynd_Application extends Fynd_Object
 {
     private static $_sessionStarted = false;
-    /**
-     * The path of controllers,
-     * accessed by $CtrlPath property of Fynd_Application instance, or getCtrlPath static method
-     * can be used in include sentence etc.
-     *
-     * @var string
-     */
-    protected $_ctrlPath = '';
-    /**
-     * The path of views,
-     * accessed by $ViewPath property of Fynd_Application instance or getViewPath static method
-     * can be used in include sentence etc.
-     *
-     * @var string
-     */
-    protected $_viewPath = '';
-    /**
-     * The path of models,
-     * accessed by $ModelPath property of Fynd_Application instance, or getModelPath static method
-     * can be used in include sentence etc.
-     *
-     * @var string
-     */
-    protected $_modelPath = '';
-    /**
-     * The path of configures,
-     * accessed by $ConfigPath property of Fynd_Application instance,or getConfigPath static method
-     * can be used in include sentence etc.
-     *
-     * @var string
-     */
-    protected $_configPath = '';
-    /**
-     * The path of php script startup.
-     *
-     * @var string
-     */
-    protected $_workPath = '';
     /**
      * The logger, it is used by Fynd_Application instance only.
      *
@@ -94,57 +57,9 @@ class Fynd_Application extends Fynd_Object
         }
         return self::$_instance;
     }
-    /**
-     * Get the path of application's controllers.
-     *
-     * @return string
-     */
-    public static function getCtrlPath ()
-    {
-        return self::getInstance()->CtrlPath;
-    }
-    /**
-     * Get the path of application's models.
-     *
-     * @return string
-     */
-    public static function getModelPath ()
-    {
-        return self::getInstance()->ModelPath;
-    }
-    /**
-     * Get the path of application's views.
-     *
-     * @return string
-     */
-    public static function getViewPath ()
-    {
-        return self::getInstance()->ViewPath;
-    }
-    /**
-     * Get the path of application's configures.
-     *
-     * @return string
-     */
-    public static function getConfigPath ()
-    {
-        return self::getInstance()->ConfigPath;
-    }
+    
     private function __construct ()
     {}
-    /**
-     * Get directory which application work in,end with '/'
-     *
-     * @return string
-     */
-    public function getAppWorkPath ()
-    {
-        if (empty($this->_workPath))
-        {
-            $this->_workPath = realpath('../');
-        }
-        return $this->_workPath;
-    }
     /**
      * Initialize application's execution environment,
      * reading global configures etc.
@@ -152,22 +67,16 @@ class Fynd_Application extends Fynd_Object
      */
     public function init ()
     {
-        $this->_ctrlPath = $this->getAppWorkPath() . 'app/controllers/';
-        $this->_modelPath = $this->getAppWorkPath() . 'app/models/';
-        $this->_viewPath = $this->getAppWorkPath() . 'app/views/';
-        $this->_configPath = $this->getAppWorkPath() . 'app/configs/';
-        try
-        {
-            //TODO:Read log configure use LogConfig object
-            $logFile = $this->getAppWorkPath() . "log/system.log";
-            $writer = new Fynd_Log_StreamWriter($logFile);
-            $this->_log = new Fynd_Log($this->getType(), $writer);
-            $this->_log->logInfo('Application started');
-        }
-        catch (Exception $e)
-        {
-            return $e;
-        }
+        Fynd_Env::init();
+        Fynd_Cache::init();
+        self::startSession();
+        
+        $logFile = Fynd_Env::getLogPath() . "system.log";
+        $writer = new Fynd_Log_StreamWriter($logFile);
+        $this->_log = new Fynd_Log($this->getType(), $writer);
+        $this->_log->logInfo('Application initialized');
+        
+        
     }
     /**
      * Go go go!
@@ -175,33 +84,59 @@ class Fynd_Application extends Fynd_Object
      * and output the result.
      *
      */
-    public function run ()
-    {
-        $this->_registerAutoLoad();
-        self::startSession();
-        $ctrl = Fynd_RequestHandler::GetControllerName();
-        $action = Fynd_RequestHandler::GetControllerAction();
-        $ctrl .= 'Ctrl';
-        $action .= 'Act';
-        include ($this->_ctrlPath . $ctrl . '.php');
-        $ctrlInstance = new $ctrl();
-        $ctrlInstance->$action($_REQUEST);
-        $this->_stop();
+    public function start ()
+    {        
+        $request = new Fynd_Request($_GET,$_POST);
+        $ctrlName = $request->getControllerName();
+        $actionName = $request->getActionName();
+
+        $ctrlType = new Fynd_Type($ctrlName);
+        $ctrlInstance = $ctrlType->createInstance();
+        
+        try
+        {
+            $ctrlInstance->$actionName($request);
+        }
+        catch(Exception $e)
+        {
+            header("HTTP/1.1 500");
+            echo $e->getMessage();
+            echo str_replace("#","\n#",$e->getTraceAsString());
+            //throw $e;
+        }
+        $this->stop(false);
     }
-    private function _stop ()
+    /**
+     * Force stop the php application running.
+     *
+     * @param bool $force If FALSE passed,it is not really call exit() to stop executing,
+     * then if you want to the application run correctly,init() method must be called agin.
+     */
+    public function stop ($force = true)
     {
         if ($this->_log)
         {
-            $this->_log->log("Script end!!!", Fynd_Log::LOG_INFO);
+            $this->_log->log("Script end.", Fynd_Log::LOG_INFO);
             $this->_log = null;
         }
+        if(true === $force)
+        {
+            exit();
+        }
     }
+    /**
+     * Start the http session records.
+     *
+     */
     public static function startSession ()
     {
         if (! self::$_sessionStarted)
         {
-            @session_start();
-            self::$_sessionStarted = true;
+            $fail = @session_start();
+            if(false !== $fail)
+            {
+                self::$_sessionStarted = true;
+            }
         }
     }
     /**
@@ -209,7 +144,7 @@ class Fynd_Application extends Fynd_Object
      *
      * @return bool
      */
-    public static function getIsSessionStarted ()
+    public static function getSessionStarted ()
     {
         return self::$_sessionStarted;
     }
@@ -223,76 +158,10 @@ class Fynd_Application extends Fynd_Object
      */
     public static function getLogger ($loggerName)
     {
-        //TODO:Use a reader object to read configure string from configure files.
-        $configXml = file_get_contents(self::getConfigPath() . 'LogConfig.xml');
-        $logConfig = Fynd_Config_ConfigManager::getConfig(Fynd_Config_ConfigType::LogConfig, $configXml);
+        $logConfig = Fynd_Config_Manager::getConfig(Fynd_Config_Type::LOG_CONFIG);
         $writer = new Fynd_Log_StreamWriter($logConfig->getDefaultLogFile());
         $logger = new Fynd_Log($loggerName, $writer);
         return $logger;
-    }
-    /**
-     * Load class defintion file from $class parameter
-     *
-     * @param string $class which class will be loaded
-     */
-    public function loadClass ($class)
-    {
-        if (! Fynd_Util::startWith($class, 'Fynd_') && Fynd_Util::endWith($class, "Ctrl"))
-        {
-            @include_once self::getCtrlPath() . $class . ".php";
-        }
-        else if (! Fynd_Util::startWith($class, 'Fynd_') && Fynd_Util::endWith($class, "View"))
-        {
-            @include_once self::getViewPath() . $class . ".php";
-        }
-        else if (! Fynd_Util::startWith($class, 'Fynd_') && Fynd_Util::endWith($class, "Model"))
-        {
-            @include_once self::getModelPath() . $class . ".php";
-        }
-        else
-        {
-            $file = str_replace('Fynd_', '', $class);
-            $parts = split('_', $file);
-            if (is_array($parts) && count($parts) > 1)
-            {
-                $file = "";
-                for ($i = 0; $i < count($parts) - 1; $i ++)
-                {
-                    $file .= $parts[$i] . '/';
-                }
-                $file .= $parts[count($parts) - 1] . '.php';
-            }
-            else
-            {
-                $file = $file . '.php';
-            }
-            @include_once $file;
-        }
-        if (! class_exists($class))
-        {
-            throw new Exception($class . '\'s definition file can not be loaded,it is ' . $file);
-        }
-    }
-    /**
-     * Used by PHP autoload functionality
-     *
-     * @param string $class
-     */
-    public static function autoload ($class)
-    {
-        self::getInstance()->loadClass($class);
-    }
-    /**
-     * Register spl_autoload function
-     *
-     */
-    private function _registerAutoLoad ()
-    {
-        if (! function_exists('spl_autoload_register'))
-        {
-            throw new Exception('spl_autoload does not exist in this PHP installation');
-        }
-        spl_autoload_register(array('Fynd_Application' , 'autoload'));
     }
 }
 ?>

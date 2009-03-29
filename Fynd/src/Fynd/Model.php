@@ -1,366 +1,247 @@
 <?php
-require_once 'PublicPropertyClass.php';
-require_once 'Model/ModelStatus.php';
-require_once 'Db.php';
-require_once 'Model/ModelEntry.php';
-require_once 'Db/DbParameter.php';
-abstract class Fynd_Model 
-    extends Fynd_PublicPropertyClass 
-    implements IteratorAggregate
+require_once 'Fynd/Object.php';
+require_once 'Fynd/Model/State.php';
+require_once 'Fynd/Model/Entity.php';
+require_once 'Fynd/Model/Delete.php';
+require_once 'Fynd/Model/Insertion.php';
+require_once 'Fynd/Model/Updating.php';
+require_once 'Fynd/Db/Parameter.php';
+abstract class Fynd_Model extends Fynd_Object implements IteratorAggregate,Serializable
 {
-    protected $_fyndStatus;
-    protected $_fyndInitializing = false;
-    protected $_fyndModelEntryCollection;
-    protected $_fyndTableName;
-    protected $_fyndPrimaryProperty;
-    public function __construct ()
-    {
-        $this->_fyndStatus = Fynd_Model_ModelStatus::None;
-        $this->_loadMapXml();
-    }
-    public function beginInitializtion()
-    {
-        $this->_fyndInitializing = true;
-    }
-    public function endInitializtion()
-    {
-        $this->_fyndInitializing = false;
-    }
-    public function getStatus ()
-    {
-        return $this->_fyndStatus;
-    }
-    public function setStatus ($status)
-    {
-        if ($status != Fynd_Model_ModelStatus::Added || $status != Fynd_Model_ModelStatus::Deleted || $status != Fynd_Model_ModelStatus::Modified || $status != Fynd_Model_ModelStatus::None)
-        {
-            throw new Exception('$status参数不是有效值');
-        }
-        $this->_fyndStatus = $status;
-    }
     /**
-     * Save model data to database
-     *
+     * @var Fynd_Log
      */
-    public function save ()
+    private static $_log = null;
+    /**
+     * Model entity collection
+     *
+     * @var Fynd_Dictionary
+     */
+    private $_entities;
+    /**
+     * The meta data of model
+     *
+     * @var Fynd_Model_Meta
+     */
+    private $_meta;
+    
+    public function __construct()
     {
-        $primary = $this->_fyndPrimaryProperty;
-        $primaryValue = $this->$primary;
-        if (empty($primaryValue))
+        $this->_entities = new Fynd_Dictionary();
+        if(is_null(self::$_log))
         {
-            $this->_acceptAdded();
-        }
-        else
-        {
-            $this->_acceptModified();
+            self::$_log = Fynd_Application::getLogger('Fynd_Model');
         }
     }
     /**
-     * Delete model data from database
+     * Get the entities of the model
      *
+     * @return Fynd_Dictionary
      */
-    public function delete()
+    public function getEntites()
     {
-        $primaryProperty = $this->_fyndPrimaryProperty;
-        $entry = $this->_fyndModelEntryCollection[$primaryProperty];
-        $p = new Fynd_DbParameter();
-        $p->Name = ':v_'.$entry->Property;
-        $p->Value = $this->$primaryProperty;
-        if($entry->DataType == 'number')
-        {
-            $p->DbDataType = PDO::PARAM_INT;
-        }
-        else 
-        {
-            $p->DbDataType = PDO::PARAM_STR;
-        }
-        $sql = "Delete From `".$this->_fyndTableName."` Where ".$entry->Field." = ".$p->Name;
-        $db = Fynd_Db::getInstance();
-        $db->open();
-        $db->excute($sql,array($p));
-        $db->close();
+        return $this->_entities;
     }
     /**
-     * 根据过滤条件获取Model或Model集合
-     *
-     * @param Fynd_Model_ModelSelection | array $condition
-     * @param bool 是否只求符合条件的Model数量
-     * @return Fynd_Model | array
+     * @return Fynd_Model_Meta
      */
-    public function select ($condition, $isCount = false)
+    public function getMeta()
     {
-        $fetchMode = PDO::FETCH_CLASS;
-        if ($isCount)
-        {
-            $sql = 'Select Count(*) From `' . $this->_fyndTableName . '` ';
-            $fetchMode = PDO::FETCH_ASSOC;
-        }
-        else
-        {
-            $sql = 'Select * From `' . $this->_fyndTableName .'` ';
-        }
-        $params = array();
-        if (is_array($condition) && count($condition) > 0)
-        {
-            $sql .= ' Where ';
-            foreach ($condition as $mc)
-            {
-                $whereClause = $this->_getWhereClause($mc);
-                if (! empty($whereClause))
-                {
-                    $sql .= $whereClause;
-                    if (!is_array($mc->ConditionValue))
-                    {
-                        $p = new Fynd_DbParameter();
-                        $entry = $this->_fyndModelEntryCollection[$mc->Property];
-                        $p->Name = ':v_'.$entry->Property;
-                        $p->Value = $mc->ConditionValue;
-                        if($entry->DataType != 'number')
-                        {
-                            $p->DbDataType = PDO::PARAM_STR;
-                        }
-                        else 
-                        {
-                            $p->DbDataType = PDO::PARAM_INT;
-                        }
-                        $params[] = $p;
-                    }
-                }
-            }
-        }
-        else if($condition instanceof Fynd_Model_ModelSelection )
-        {
-            $sql .= ' Where ' . $this->_getWhereClause($condition);
-            if (!is_array($condition->ConditionValue))
-            {
-                $p = new Fynd_DbParameter();
-                $entry = $this->_fyndModelEntryCollection[$condition->Property];
-                $p->Name = ':v_'.$entry->Property;
-                $p->Value = $condition->ConditionValue;
-                if($entry->DataType != 'number')
-                {
-                    $p->DbDataType = PDO::PARAM_STR;
-                }
-                else 
-                {
-                    $p->DbDataType = PDO::PARAM_INT;
-                }
-                $params[] = $p;
-            }
-        }
-
-        $db = Fynd_Db::getInstance();
-        $db->open();
-        $db->setFetchMode($fetchMode);
-        $models = $db->query($sql, $params, $this->getType()->getName());
-        $db->close();
-
-        return $models;
+        return $this->_meta;
     }
-    protected function _getWhereClause (Fynd_Model_ModelSelection $mc)
+    /**
+     * Sets the model meta info.
+     *
+     * @param Fynd_Model_Meta $meta
+     */
+    public function setMeta(Fynd_Model_Meta $meta)
     {
-        $entry = $this->_fyndModelEntryCollection[$mc->Property];
-        $sql = '';
-        if (! empty($mc->LeftBrackets))
-        {
-            $sql .= ' ' . $mc->LeftBrackets;
-        }
-        $sql .= $entry->Field;
-        if (is_array($mc->ConditionValue))
-        {
-            $sql .= 'In (';
-            foreach ($mc->ConditionValue as $value)
-            {
-                if ($entry->DataType == 'string')
-                {
-                    $sql .= "'" . $value . "',";
-                }
-                else
-                {
-                    $sql .= $value . ",";
-                }
-            }
-            $sql = Fynd_Util::stringRemoveEnd($sql, 1);
-            $sql .= ')';
-        }
-        else
-        {
-            $sql .= $mc->Operation . ":v_" . $mc->Property;           
-        }
-        if (! empty($mc->NextLogicOperater))
-        {
-            $sql .= ' ' . $mc->NextLogicOperater;
-        }
-        else if (! empty($mc->RightBrackets))
-        {
-            $sql .= $mc->RightBrackets;
-        }
-        return $sql;
+        $this->_meta = $meta;
     }
-    protected function _acceptAdded ()
+    /**
+     * Get the model's state
+     *
+     * @return int
+     */
+    public function getState()
     {
-        $properties = $this->getIterator();
-        $sql = "Insert Into " . $this->_fyndTableName . ' (';
-        $params = array();
-        $db = Fynd_Db::getInstance();
-        foreach ($properties as $name => $value)
-        {
-            $entry = $this->_fyndModelEntryCollection[$name];
-            $p = new Fynd_DbParameter();
-            $p->Name = ':v_' . $name;
-            if($name == $this->_fyndPrimaryProperty)
-            {
-               $p->Value = $db->getNextId($entry->Field); 
-            }
-            else 
-            {
-                $p->Value = $value;
-            }
-            $fields .= '`' . $entry->Field . '`,';
-            $values .= $p->Name . ",";
-            if ($entry->DataType != 'number')
-            {
-                $p->DbDataType = PDO::PARAM_STR;
-            }
-            else
-            {
-                $p->DbDataType = PDO::PARAM_INT;
-            }
-            $params[] = $p;
-        }
-        $fields = Fynd_Util::stringRemoveEnd($fields, 1);
-        $values = Fynd_Util::stringRemoveEnd($values, 1);
-        $sql .= $fields . ') Values (' . $values . ')';
-        
-        $db->open();
-        $db->excute($sql, $params);
-        $db->close();
+        return $this->_meta->get_state();
     }
-    protected function _acceptModified()
+    /**
+     * Set the model's state
+     *
+     * @param int $state
+     */
+    public function setState($state)
     {
-        $properties = $this->getIterator();
-        $sql = "Update `" . $this->_fyndTableName . '` As t Set ';
-        $params = array();
-        $db = Fynd_Db::getInstance();
-        foreach ($properties as $name => $value)
-        {
-            $entry = $this->_fyndModelEntryCollection[$name];
-            $p = new Fynd_DbParameter();
-            $p->Name = ':v_' . $name;
-            if($name == $this->_fyndPrimaryProperty)
-            {
-               $where = " Where t.".$entry->Field." = ".$p->Name;
-               $p->Value = $value;
-            }
-            else 
-            {
-                $set .= "t.".$entry->Field." = ".$p->Name.",";
-                $p->Value = $value;
-            }
-            
-            if ($entry->DataType != 'number')
-            {
-                $p->DbDataType = PDO::PARAM_STR;
-                echo $entry->DataType."\n";
-            }
-            else
-            {
-                $p->DbDataType = PDO::PARAM_INT;
-                echo $entry->DataType."\n";
-            }
-            $params[] = $p;
-        }
-        $set = Fynd_Util::stringRemoveEnd($set,1);
-        $sql .= $set . $where;
-        
-        $db->open();
-        $db->excute($sql,$params);
-        $db->close();
+        $this->_meta->setState($state);
     }
-    protected function _setModelStatus ()
+    public function addEntity(Fynd_Model_Entity $entity)
     {
-        if ($this->_fyndStatus == Fynd_Model_ModelStatus::None)
-        {
-            $primary = $this->_fyndPrimaryProperty;
-            if (! empty($this->$primary))
-            {
-                $this->_fyndStatus = Fynd_Model_ModelStatus::Modified;
-            }
-            else
-            {
-                $this->_fyndStatus = Fynd_Model_ModelStatus::Added;
-            }
-        }
-    }
-    protected function _loadMapXml ()
-    {
-        $ref = new ReflectionObject($this);
-        $filename = str_replace('.php', '.xml', $ref->getFileName());
-        //忽略错误，比如无法找到映射XML文件之类
-        $xml = @simplexml_load_file($filename);
-        $this->_fyndTableName = (string) $xml['Table'];
-        $this->_fyndPrimaryProperty = (string) $xml['PrimaryProperty'];
-        $this->_fyndModelEntryCollection = array();
-        if($xml)
-        {
-            foreach ($xml as $node)
-            {
-                $entry = new Fynd_Model_ModelEntry();
-                $entry->Property = (string) $node->Property;
-                $entry->Field = (string) $node->Field;
-                $entry->DataType = (string) $node->DataType;
-                $entry->DataLength = (string) $node->DataLength;
-                $this->_fyndModelEntryCollection[$entry->Property] = $entry;
-            }
-        }
-    }
-    public function __set ($key, $value)
-    {
-        if($this->_fyndInitializing)
-        {
-            //For Db
-            $parts = split('_', $key);
-            for($i=1;$i<count($parts);$i++)
-            {
-                $parts[$i] = Fynd_Util::upperCaseFirstChar($parts[$i]);
-            }
-            $privateVar = implode('', $parts);
-            $privateVar = '_'.$privateVar;
-            if(!$this->getType()->getProperty($privateVar))
-            {
-                throw new Exception("Property '".$privateVar."' does not exist");
-            }
-            $this->$privateVar = $value;
-        }
-        else 
-        {
-            parent::__set($key, $value);
-        }
+        $this->_entities->add($entity->getProperty(), $entity);
     }
     /**
      * IteratorAggregate接口实现
      * @return ArrayObject
      *
      */
-    public function getIterator ()
+    public function getIterator()
     {
-        $type = $this->getType();
-        $propertis = $type->getProperties();
         $modelPropertis = array();
-        foreach ($propertis as $p)
+        foreach($this->_entities as $entity)
         {
-            $propertyName = $p->name;
-            if (Fynd_Util::startWith($propertyName, '_fynd'))
-            {
-                continue;
-            }
-            if(Fynd_Util::startWith($propertyName,'_'))
-                $propertyName = str_replace('_','',$propertyName);
-            $propertyName = Fynd_Util::upperCaseFirstChar($propertyName);                
-            $modelPropertis[$propertyName] = $this->$propertyName;
+            $property = $entity->getProperty();
+            $modelPropertis[$property] = $this->_evalProperty($property);
         }
         return new ArrayObject($modelPropertis);
     }
-
+    /**
+     * Get value of model property
+     *
+     * @param string $name
+     * @return mixed
+     */
+    public function getPropertyValue($name)
+    {
+        return $this->_evalProperty($name);
+    }
+    /**
+     * Get the primary property(primary key)'s value
+     *
+     * @return scalar
+     */
+    public function getPrimaryPropertyValue()
+    {
+        return $this->_evalProperty($this->_meta->getPrimaryProperty());
+    }
+    public function setPropertyValue($name, $value)
+    {
+        $this->_assignProperty($name, $value);
+    }
+    protected function _evalProperty($name)
+    {
+        $getterName = "get" . $name;
+        try
+        {
+            return $this->$getterName();
+        }
+        catch (Exception $e)
+        {}
+        return null;
+    }
+    protected function _assignProperty($name, $value)
+    {
+        $setterName = "set" . $name;
+        try
+        {
+            $this->$setterName($value);
+        }
+        catch (Exception $e)
+        {
+            
+        }
+    }
+    /**
+     * Create the insert sql from the model
+     * 
+     * @param 	scalar 		$primaryKeyValue
+     * @param 	Fynd_List 	$params Out the parameters in the sql
+     * @return string
+     */
+    public function createInsertSQL($primaryKeyValue, Fynd_List $params = null)
+    {
+        $exisitPrimaryValue = $this->getPrimaryPropertyValue();
+        if(! empty($exisitPrimaryValue))
+        {
+            throw new Fynd_Model_Exception("The model already have a primary value,can not be inserted.");
+        }
+        $insertion = new Fynd_Model_Insertion($this);
+        $sql = $insertion->createSQL();
+        if($params != null)
+        {
+            $primaryProperty = $this->_meta->getPrimaryProperty();
+            foreach($this->_entities as $property => $entity)
+            {
+                $param = new Fynd_Db_Parameter();
+                $field = $entity->getField();
+                if($field == $primaryProperty)
+                {
+                    $this->_assignProperty($primaryProperty, $primaryKeyValue);
+                    $param->Value = $primaryProperty;
+                }
+                else
+                {
+                    $param->Value = $this->_evalProperty($property);
+                }
+                $param->dataType = $entity->getDataType();
+                $param->Name = "p_" . $field;
+                $params->add($param);
+            }
+        }
+        return $sql;
+    }
+    /**
+     * Create the update sql from the model,
+     * return a sql when the model contains one or more entites that have been modified,
+     * otherwise,it return a empty string
+     * 
+     * @param 	Fynd_List $params Out the parameters in the sql
+     * @return	string
+     */
+    public function createUpdateSQL(Fynd_List $params = null)
+    {
+        $update = new Fynd_Model_Updating($this);
+        $sql = $update->createSQL();
+        if(empty($sql))
+        {
+            return "";
+        }
+        
+        $primaryProperty = $this->_meta->getPrimaryProperty();
+        foreach($this->_entities as $property => $entity)
+        {
+            //ignore the non-modified fields and primary key
+            if($entity->getState() != Fynd_Model_State::Modified || $property == $primaryProperty)
+            {
+                continue;
+            }
+            $param = new Fynd_Db_Parameter();
+            $param->dataType = $entity->getDataType();
+            $param->Name = "p_" . $entity->getField();
+            $param->Value = $this->_evalProperty($property);
+            $params->add($param);
+        }
+        //Add the primary key parameter in where clause
+        $primaryEntity = $this->_entities[$primaryProperty];
+        $param = new Fynd_Db_Parameter();
+        $param->dataType = $primaryEntity->getDataType();
+        $param->Name = "p_" . $primaryEntity->getField();
+        $param->Value = $this->_evalProperty($primaryProperty);
+        $params->add($param);
+        
+        return $sql;
+    }
+    /**
+     * Create the delete sql from the model
+     * 
+     * @param Fynd_List $params Out the parameters in the sql
+     * @return   string
+     */
+    public function createSelectSQL(Fynd_List $params = null)
+    {
+        $delete = new Fynd_Model_Delete($this);
+        $sql = $delete->createSQL();
+        
+        //Add the primary key parameter in where clause
+        $primaryProperty = $this->_meta->getPrimaryProperty();
+        $primaryEntity = $this->_entities[$primaryProperty];
+        $param = new Fynd_Db_Parameter();
+        $param->dataType = $primaryEntity->getDataType();
+        $param->Name = "p_" . $primaryEntity->getField();
+        $param->Value = $this->_evalProperty($primaryProperty);
+        $params->add($param);
+        
+        return $sql;
+    }
 }
 ?>
