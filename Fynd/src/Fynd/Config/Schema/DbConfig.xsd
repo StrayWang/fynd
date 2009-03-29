@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="FyndConfig">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="DbConfig">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="DefaultConnection" type="xs:string" />
+                            <xs:element name="Connections">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element maxOccurs="unbounded" name="Connection">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element minOccurs="0" name="DataBaseFilePath" type="xs:string" />
+                                                    <xs:element minOccurs="0" name="Server" type="xs:string" />
+                                                    <xs:element minOccurs="0" name="Port" type="xs:unsignedShort" />
+                                                    <xs:element minOccurs="0" name="SID" type="xs:string" />
+                                                    <xs:element minOccurs="0" name="DataBase" type="xs:string" />
+                                                    <xs:element minOccurs="0" name="User" type="xs:string" />
+                                                    <xs:element minOccurs="0" name="Password" type="xs:string" />
+                                                </xs:sequence>
+                                                <xs:attribute name="Name" type="xs:string" use="required" />
+                                                <xs:attribute name="Type" type="xs:string" use="required" />
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

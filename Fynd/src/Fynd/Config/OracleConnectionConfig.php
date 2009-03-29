@@ -11,12 +11,12 @@
 // | obtain it through the world-wide-web, please send a note to            |
 // | license@php.net so we can mail you a copy immediately.                 |
 // +------------------------------------------------------------------------+
-// | Author:fishtrees                                                               |
+// | Author:fishtrees                                                       |
 // +------------------------------------------------------------------------+
 //
 // $Id: OracleConnectionConfig.php,v 1.1 2008/05/13 15:47:22 administrator Exp $
 //
-require_once('DbConnectionConfig.php');
+require_once('Fynd/Config/DbConnectionConfig.php');
 
 /**
 * 针对Oracle数据库的详细配置

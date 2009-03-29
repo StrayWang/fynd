@@ -128,7 +128,7 @@ class Fynd_Config_DbConnectionConfig
 
 	/**
     * 获取数据库服务器类型，
-    * MySQL，Oracle，SQLite，MSSQL
+    * Described by Fynd_Db_Type
     * @return   string
     */
 	public function getDbType()

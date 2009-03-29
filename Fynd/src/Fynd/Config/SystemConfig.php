@@ -1,4 +1,5 @@
 <?php
+require_once 'Fynd/Config/AbstractConfig.php';
 /**
  * 系统配置,该类型用于描述Fynd系统使用的基础配置
  *
@@ -9,7 +10,7 @@ class Fynd_Config_SystemConfig extends Fynd_Config_AbstractConfig
 	 * 默认的配置文件路径
 	 *
 	 */
-	const DefaultConfigFile = "SystemConfig.xml";
+	public static $defaultConfigFile = "SystemConfig.xml";
 	/**
 	 * 创建系统配置
 	 *
@@ -19,7 +20,7 @@ class Fynd_Config_SystemConfig extends Fynd_Config_AbstractConfig
 	{
 		if(empty($filePath))
 		{
-			$filePath = DefaultConfigFile;
+			$filePath = self::$defaultConfigFile;
 		}
 		parent::__construct($filePath);
 	}

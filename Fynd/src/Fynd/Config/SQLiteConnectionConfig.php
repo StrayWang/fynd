@@ -16,7 +16,7 @@
 //
 // $Id: SQLiteConnectionConfig.php,v 1.1 2008/05/13 15:47:22 administrator Exp $
 //
-require_once('DbConnectionConfig.php');
+require_once('Fynd/Config/DbConnectionConfig.php');
 
 /**
 * 针对SQLite数据库的详细配置，只有getDataBaseFilePath方法能获取值，其他的方法均返回空值
