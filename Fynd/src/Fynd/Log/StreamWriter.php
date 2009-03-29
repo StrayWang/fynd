@@ -1,11 +1,11 @@
 <?php
-require_once 'Fynd/PublicPropertyClass.php';
+require_once 'Fynd/Object.php';
 require_once 'IWriter.php';
 /**
  * Stream writer of log object,write the log message to stream
  *
  */
-class Fynd_Log_StreamWriter extends Fynd_PublicPropertyClass implements Fynd_Log_IWriter 
+class Fynd_Log_StreamWriter extends Fynd_Object implements Fynd_Log_IWriter 
 {
     protected $_stream = null;
     /**
@@ -24,13 +24,13 @@ class Fynd_Log_StreamWriter extends Fynd_PublicPropertyClass implements Fynd_Log
             $this->_stream = @fopen($streamOrFile,'a',false);
             if($this->_stream === false)
             {
-                throw new Exception('Can not open log stream,$streamOrFile = '.$streamOrFile);
+                Fynd_Object::throwException("Fynd_Log_Exception",'Can not open log stream,$streamOrFile = '.$streamOrFile);
             }
         }
         
         if(get_resource_type($this->_stream) != 'stream')
         {
-            throw new Exception('Resource is not a stream');
+            Fynd_Object::throwException("Fynd_Log_Exception",'Resource is not a stream');
         }
     }
     /**
@@ -64,12 +64,12 @@ class Fynd_Log_StreamWriter extends Fynd_PublicPropertyClass implements Fynd_Log
             $byteCount = @fwrite($this->_stream,$msg);
             if($byteCount === false)
             {
-                throw new Exception('Unable to write to the stream');
+                Fynd_Object::throwException("Fynd_Log_Exception",'Unable to write to the stream');
             }
         }
         else
         {
-            throw new Exception('Unable to write to the stream,maybe it was closed.'.var_export($this->_stream,true));
+            Fynd_Object::throwException("Fynd_Log_Exception",'Unable to write to the stream,maybe it was closed.'.var_export($this->_stream,true));
         }
     }
 
