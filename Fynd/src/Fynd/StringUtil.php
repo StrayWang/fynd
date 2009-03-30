@@ -19,6 +19,20 @@ class Fynd_StringUtil extends Fynd_Object
         return $r;
     }
     /**
+     * Cancel capitalize the string,the inverse function of capitalize.
+     *
+     * @param string $str
+     * @return string
+     */
+    public static function cancelCapitalize($str)
+    {
+        $part1 = substr($str, 0, 1);
+        $part1 = strtolower($part1);
+        $part2 = substr($str, 1);
+        $r = $part1 . $part2;
+        return $r;
+    }
+    /**
      * Remove $count chars at the end of the string
      *
      * @param string $str
