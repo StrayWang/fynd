@@ -8,20 +8,20 @@ abstract class Fynd_View extends Fynd_Object implements Fynd_IView
     
     protected $_headers = array();
 
-    public function setMimeType($mime)
+    public function setMimeType($mime,$overwrite = true)
     {
-        $this->setHttpHeader('Content-Type',$mime);
+        $this->setHttpHeader('Content-Type',$mime,$overwrite);
     }
-    public function setHttpHeader($key,$value)
+    public function setHttpHeader($key,$value,$overwrite = true)
     {
         //TODO:create a response object to decribe the http response.
         if(!empty($key) && !empty($value))
         { 
-            header($key . ':' . $value,true);
+            header($key . ':' . $value,$overwrite);
         }
     }
     /**
-     * @see Fynd_IView::Render()
+     * @see Fynd_IView::render()
      *
      */
     public function render()
