@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root Class="DatabaseModel" PrimaryProperty="Host" Table="database">
+  <Entry>
+    <Property>Host</Property>
+    <Field>host</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+  <Entry>
+    <Property>User</Property>
+    <Field>user</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+  <Entry>
+    <Property>Password</Property>
+    <Field>password</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+  <Entry>
+    <Property>DatabaseName</Property>
+    <Field>database_name</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+  <Entry>
+    <Property>Port</Property>
+    <Field>port</Field>
+    <DataType>int</DataType>
+    <DataLength/>
+  </Entry>
+  <Entry>
+    <Property>DatabaseType</Property>
+    <Field>database_type</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+</Root>

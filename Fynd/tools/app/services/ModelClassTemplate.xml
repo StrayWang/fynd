@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ModelClassTemplate>
+	<IncludeDefinition>
+		<Include>
+		<![CDATA[
+<?php
+require_once '{IncludeFilePath}';
+		]]>
+		</Include>
+	</IncludeDefinition>
+	<ClassDefinition>
+		<Comment><![CDATA[
+/**
+ * {CreationTool}
+ */
+		]]>
+		</Comment>
+		<Class>
+		<![CDATA[
+class {ClassName} extends Fynd_Model
+{
+    {PrivateProperties}
+    
+    {Methods}
+}
+?>
+		]]>
+		</Class>
+	</ClassDefinition>
+	<GetterDefinition>
+		<Comment><![CDATA[
+    /**
+     * @return {ReturnType}
+     */
+		]]>
+		</Comment>
+		<Getter>
+		<![CDATA[
+    public function get{Property}()
+    {
+        return $this->_{PrivateProperty};
+    }
+		]]>
+		</Getter>
+	</GetterDefinition>
+	<SetterDefinition>
+		<Comment>
+		<![CDATA[
+    /**
+     * @param {ParamemterType}
+     */
+		]]>
+		</Comment>
+		<Setter>
+		<![CDATA[
+    public function set{Property}($_{PrivateProperty})
+    {
+        $this->_{PrivateProperty} = $_{PrivateProperty};
+    }
+		]]>
+		</Setter>
+	</SetterDefinition>
+	<PrivatePropertyDefinition>
+		<Comment></Comment>
+		<PrivateProperty>
+		<![CDATA[
+    private $_{PrivateProperty};
+		]]>
+		</PrivateProperty>
+	</PrivatePropertyDefinition>
+</ModelClassTemplate>

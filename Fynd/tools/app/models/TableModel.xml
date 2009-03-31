@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root Class="TableModel" PrimaryProperty="TableName" Table="database">
+  <Entry>
+    <Property>TableName</Property>
+    <Field>table_name</Field>
+    <DataType>string</DataType>
+    <DataLength/>
+  </Entry>
+</Root>
