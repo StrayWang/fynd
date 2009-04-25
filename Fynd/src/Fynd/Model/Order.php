@@ -12,20 +12,48 @@ class Fynd_Model_Order extends Fynd_Dictionary implements Fynd_Db_ISQLBuilder
 {
     private $_sql;
     /**
+     * @var Fynd_Model
+     */
+    protected $_model;
+    
+    public function __construct(Fynd_Model $model,array $array = null)
+    {
+        if(!is_null($array))
+        {
+            parent::__construct($array);
+        }
+        $this->_model = $model;
+    }
+    /**
      * @see Fynd_Db_ISQLBuilder::CreateSQL()
      *
      * @return string
      */
     public function createSQL()
-    {    
+    {
         if(empty($this->_sql))
         {
-            foreach($this->_items as $item)
+            $this->_sql = " ORDER BY ";
+            foreach($this->_items as $orderby => $dir)
             {
-                $$this->_sql .= $item->createSQL();
+                $field = '';
+                if(!is_null($this->_model))
+                {
+                    $entities = $this->_model->getEntites();
+                    $field = $entities[$orderby]->getField();
+                }
+                else
+                {
+                    $field = $orderby;
+                }
+                $this->_sql .= $field . ' ' . $dir . ',';
+            }
+            if(Fynd_StringUtil::endWith($this->_sql,','))
+            {
+                $this->_sql = Fynd_StringUtil::removeEnd($this->_sql);
             }
         }
-        return $$this->_sql;
+        return $this->_sql;
     }
 }
 ?>
