@@ -37,19 +37,19 @@ final class Fynd_Type extends Fynd_Object
     {
         if(! Fynd_StringUtil::StartWith($this->_className, 'Fynd_') && Fynd_StringUtil::endWith($this->_className, "Ctrl"))
         {
-            include_once Fynd_Env::getCtrlPath() . $this->_className . ".php";
+            @include_once Fynd_Env::getCtrlPath() . $this->_className . ".php";
         }
         else if(! Fynd_StringUtil::StartWith($this->_className, 'Fynd_') && Fynd_StringUtil::endWith($this->_className, "View"))
         {
-            include_once Fynd_Env::getViewPath() . $this->_className . ".php";
+            @include_once Fynd_Env::getViewPath() . $this->_className . ".php";
         }
         else if(! Fynd_StringUtil::StartWith($this->_className, 'Fynd_') && Fynd_StringUtil::endWith($this->_className, "Model"))
         {
-            include_once Fynd_Env::getModelPath() . $this->_className . ".php";
+            @include_once Fynd_Env::getModelPath() . $this->_className . ".php";
         }
         else if(! Fynd_StringUtil::StartWith($this->_className, 'Fynd_') && Fynd_StringUtil::endWith($this->_className, "Service"))
         {
-            include_once Fynd_Env::getServicePath() . $this->_className . ".php";
+            @include_once Fynd_Env::getServicePath() . $this->_className . ".php";
         }
         else
         {
@@ -69,11 +69,11 @@ final class Fynd_Type extends Fynd_Object
             }
             if(empty($searchPath))
             {
-                include_once ($file);
+                @include_once ($file);
             }
             else
             {
-                include_once ($searchPath . $file);
+                @include_once ($searchPath . $file);
             }
         }
         if(! class_exists($this->_className))
@@ -90,6 +90,27 @@ final class Fynd_Type extends Fynd_Object
     {
         $ref = new ReflectionClass($this->_className);
         return $ref;
+    }
+    /**
+     * Checks the given type existent or not
+     *
+     * @param string $typeName
+     * @return bool
+     */
+    public static function isTypeExistent($typeName)
+    {
+        $existent = false;
+        $type = new Fynd_Type($typeName);
+        try 
+        {
+            $type->includeTypeDefinition();
+            $existent = true;
+        }
+        catch (Exception $e)
+        {
+            
+        }
+        return $existent;
     }
 }
 ?>
