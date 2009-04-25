@@ -6,6 +6,8 @@ require_once 'Fynd/Object.php';
  */
 class Fynd_Controller extends Fynd_Object
 {
+    public function __construct()
+    {}
     /**
      * Redirect to anothor controller
      *
