@@ -53,9 +53,9 @@ class Fynd_Db_MySQLCommand extends Fynd_Object implements Fynd_Db_ICommand
     public function executeScalar()
     {
         $res = $this->_conn->excute($this->_cmdText, $this->_params->ToArray());
-        if(count($res) > 0)
+        if(count($res) > 0 && count($res[0]) > 0)
         {
-            return array_shift($res);
+            return array_shift($res[0]);
         }
         return null;
     }
