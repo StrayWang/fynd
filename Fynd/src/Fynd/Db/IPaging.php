@@ -15,17 +15,17 @@ interface Fynd_Db_IPaging extends Fynd_Db_ISQLBuilder
      */
     public function setPageSize($pageSize);
     /**
-     * Get the current page NO.
+     * Gets the start offset in the result set.
      *
      * @return int
      */
-    public function getPageNo();
+    public function getStartOffset();
     /**
-     * Set the current page NO.
+     * Sets the start offset in the result set.
      *
-     * @param int $pageNo
+     * @param int $offset
      */
-    public function setPageNo($pageNo);
+    public function setStartOffset($offset);
     /**
      * Get the database connection object's type
      * 
