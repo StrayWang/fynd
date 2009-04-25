@@ -1,0 +1,49 @@
+<div class="yui-skin-sam">
+<div id="{:Id}"></div>
+</div>
+<script type="text/javascript">
+YAHOO.util.Event.addListener(window, "load", function() {
+    var Fynd_UI_List = function() {
+        var myColumnDefs = {:ColumDefinitions};
+        var myDataSource = new YAHOO.util.DataSource({:YuiTableDataSource});
+        myDataSource.responseType = {:YuiTableResponseType};
+        myDataSource.responseSchema = {
+                resultsList : "records",
+                metaFields  : {
+                    totalRecords : "totalRecords" // Access to value in the server response
+                }
+            };
+       //DataTable configuration
+       var myConfigs = {
+            initialRequest  : "startIndex=0&results=20",
+            dynamicData	    : {:YuiTableDynamicData},
+            paginator       : new YAHOO.widget.Paginator({ rowsPerPage:20 }),
+            generateRequest : function(oState, oSelf){
+                oState = oState || { pagination:null, sortedBy:null };
+                var sort = (oState.sortedBy) ? oState.sortedBy.key : '';
+                var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
+                var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
+                var results = (oState.pagination) ? oState.pagination.rowsPerPage : null;
+                // Build the request
+                return  ((sort == '') ? '' : "sort=" + sort + "&dir=" + dir + "&") +
+                        "startIndex=" + startIndex +
+                        ((results !== null) ? "&results=" + results : "");
+            }
+        };
+       
+        // DataTable instance
+        var myDataTable = new YAHOO.widget.DataTable("{:Id}", myColumnDefs, myDataSource, myConfigs);
+        // Update totalRecords on the fly with value from server
+        myDataTable.handleDataReturnPayload = function(oRequest, oResponse, oPayload) {
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            return oPayload;
+        }
+        
+        return {
+            oDS: myDataSource,
+            oDT: myDataTable
+        };
+    }();
+});
+
+</script>

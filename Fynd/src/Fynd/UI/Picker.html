@@ -1,0 +1,21 @@
+<span id="{:Id}-open" class="{:Class}" style="{:Style}" title="{:Title}">
+	<a href="javascript:Fynd.UI.ComponentStack.find('Picker{:Id}Dialog').open();">{:Text}</a>
+</span>
+<div id="Picker{:Id}Dialog">
+</div>
+<script type="text/javascript">
+function initPicker{:Id}()
+{
+	var pickerId = 'Picker{:Id}Dialog';
+	var pickerConfig = {};
+	pickerConfig['tableId'] = '{:TableId}';
+	pickerConfig['tableIdKey'] = '{:TableIdKey}';
+	pickerConfig['tableLabelKey'] = '{:TableLabelKey}';
+	pickerConfig['multiSelection'] = {:MultiSelection};
+	pickerConfig['href'] = '{:Href}';
+	
+	var picker = new Fynd.UI.Picker(pickerId,pickerConfig);
+	Fynd.UI.ComponentStack.register(pickerId,picker);
+}
+YAHOO.util.Event.onDOMReady(initPicker{:Id});
+</script>

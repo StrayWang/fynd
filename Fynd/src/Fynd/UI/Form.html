@@ -1,0 +1,42 @@
+{:html}
+<script type="text/javascript">
+var formFieldIds{:formId} = {:formFieldIds};
+function on{:formId}Submit(e)
+{
+	YAHOO.util.Event.preventDefault(e);
+	var dataObj = {};
+	for(var i=0;i<formFieldIds{:formId}.length;i++)
+	{
+		var obj = document.getElementById(formFieldIds{:formId}[i]);
+		if(obj)
+		{
+			dataObj[obj.name] = obj.value;
+		}
+	}
+	var postData = "data=" + YAHOO.lang.JSON.stringify(dataObj);
+	var responseHandler = function handleResponse(p)
+    {
+		alert(p.responseText);
+    };
+    var callback = 
+    {
+        success  : responseHandler,
+        failure  : responseHandler,
+        argument : []
+    }
+    YAHOO.util.Connect.asyncRequest("POST",e.target.action,callback,postData);
+}
+function initForm{:formId}()
+{
+	var form = document.getElementById('{:formId}');
+	if(form)
+	{
+		YAHOO.util.Event.addListener(form,'submit',on{:formId}Submit);
+	}
+	else
+	{
+		alert('Form with id:{:formId} does not exsit');
+	}
+}
+YAHOO.util.Event.onDOMReady(initForm{:formId});
+</script>
