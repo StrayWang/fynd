@@ -1,10 +1,11 @@
 <?php
+require_once 'Fynd/Db/IPaging.php';
 require_once ('Fynd/Db/ISQLBuilder.php');
 require_once ('Fynd/Object.php');
 class Fynd_Db_Paging extends Fynd_Object implements Fynd_Db_IPaging
 {
     private $_pageSize;
-    private $_pageNo;
+    private $_startOffset;
     private $_orginSQL;
     /**
      * @var Fynd_Type
@@ -13,9 +14,9 @@ class Fynd_Db_Paging extends Fynd_Object implements Fynd_Db_IPaging
     /**
      * 
      */
-    public function __construct($pageNo = 1, $pageSize = 100, Fynd_Type $connType = null)
+    public function __construct($startOffset = 0, $pageSize = 20, Fynd_Type $connType = null)
     {
-        $this->_pageNo = $pageNo;
+        $this->_startOffset = $startOffset;
         $this->_pageSize = $pageSize;
         $this->_connType = $connType;
     }
@@ -33,9 +34,9 @@ class Fynd_Db_Paging extends Fynd_Object implements Fynd_Db_IPaging
      *
      * @return int
      */
-    public function getPageNo()
+    public function getStartOffset()
     {
-        return $this->_pageNo;
+        return $this->_startOffset;
     }
     /**
      * @see Fynd_Db_IPaging::getPageSize()
@@ -51,22 +52,22 @@ class Fynd_Db_Paging extends Fynd_Object implements Fynd_Db_IPaging
      *
      * @param Fynd_Type $type
      */
-    public function setConnectionObjectType($type)
+    public function setConnectionObjectType(Fynd_Type $type)
     {
         $this->_connType = $type;
     }
     /**
      * @see Fynd_Db_IPaging::setPageNo()
      *
-     * @param int $pageNo
+     * @param int $offset
      */
-    public function setPageNo($pageNo)
+    public function setStartOffset($offset)
     {
-        if($pageNo < 1)
+        if($offset < 0)
         {
-            Fynd_Object::throwException("Fynd_Db_Exception", "The page NO. can not be less than 1.");
+            Fynd_Object::throwException("Fynd_Db_Exception", "The page NO. can not be less than zero.");
         }
-        $this->_pageNo = $pageNo;
+        $this->_startOffset = $offset;
     }
     /**
      * @see Fynd_Db_IPaging::setPageSize()
@@ -106,19 +107,19 @@ class Fynd_Db_Paging extends Fynd_Object implements Fynd_Db_IPaging
      */
     public function createSQL()
     {
-        $type = new Fynd_Type("Fynd_DB_MySQLConnection");
-        if($this->_connType->equls($type))
-        {
-            return $this->_createMySQLPagingSQL();
-        }
-        return "";
+        return $this->_createMySQLPagingSQL();
+        //$type = new Fynd_Type("Fynd_DB_MySQLConnection");
+//        if($this->_connType->getClassName() == 'Fynd_DB_MySQLConnection')
+//        {
+//            return $this->_createMySQLPagingSQL();
+//        }
+//        return "";
     }
     private function _createMySQLPagingSQL()
     {
         $sql = $this->_orginSQL . " LIMIT ";
-        $offset = $this->_pageNo * $this->_pageSize - $this->_pageSize;
         $length = $this->_pageSize;
-        $sql .= $offset . "," . $length;
+        $sql .= $this->_startOffset . "," . $length;
         return $sql;
     }
 }
