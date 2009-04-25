@@ -15,7 +15,7 @@ class Fynd_Model_List extends Fynd_List
      * @param int $offset
      * @param Fynd_Model $value
      */
-    protected function offsetSet($offset, Fynd_Model $value)
+    public function offsetSet($offset, $value)
     {
         $this->_items[$offset] = $value;
     }
@@ -24,7 +24,7 @@ class Fynd_Model_List extends Fynd_List
      *
      * @param Fynd_Model $item
      */
-    public function add(Fynd_Model $item)
+    public function add($item)
     {
         array_push(&$this->_items, $item);
     }
