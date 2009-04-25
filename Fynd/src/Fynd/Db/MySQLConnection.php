@@ -143,7 +143,7 @@ class Fynd_Db_MySQLConnection extends Fynd_Object implements Fynd_Db_IConnection
         }
         if(! $stmt->Execute())
         {
-            Fynd_Object::throwException("Fynd_Db_Exception", $stmt->errorInfo(), $stmt->errorCode());
+            Fynd_Object::throwException("Fynd_Db_Exception", var_export($stmt->errorInfo(),true), $stmt->errorCode());
         }
         $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $result = $stmt->fetchAll();
@@ -167,11 +167,13 @@ class Fynd_Db_MySQLConnection extends Fynd_Object implements Fynd_Db_IConnection
                 	   ';port='  . $this->_config->getPort()    . 
                 	   ';dbname='. $this->_config->getDatabase();
                 
-                $this->_pdo = new PDO($dsn, $this->_config->getUser(), $this->_config->getPassword());
+                $this->_pdo = new PDO($dsn, 
+                    $this->_config->getUser(), 
+                    $this->_config->getPassword(),
+                    array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
                 
                 $this->_pdo->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
                 $this->_pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
-                
                 $open = true;
             }
             catch(Exception $e)
