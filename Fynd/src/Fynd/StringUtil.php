@@ -1,6 +1,5 @@
 <?php
-require_once ('Fynd/Object.php');
-class Fynd_StringUtil extends Fynd_Object
+class Fynd_StringUtil
 {
     private function __construct()
     {}
