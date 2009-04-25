@@ -4,6 +4,10 @@ require_once 'Fynd/Db/ISQLBuilder.php';
 class Fynd_Model_Selection extends Fynd_Object implements Fynd_Db_ISQLBuilder
 {
     /**
+     * @var string
+     */
+    private $_sql;
+    /**
      * The joins in this model selection. 
      *
      * @var array
@@ -52,7 +56,6 @@ class Fynd_Model_Selection extends Fynd_Object implements Fynd_Db_ISQLBuilder
      * @var Fynd_Model_Group
      */
     private $_group;
-    
     /**
      * @param string $_alias
      */
@@ -95,8 +98,6 @@ class Fynd_Model_Selection extends Fynd_Object implements Fynd_Db_ISQLBuilder
     {
         $this->_where = $where;
     }
-
-    
     /**
      * Add a new select-expr to the selection object
      *
@@ -104,9 +105,9 @@ class Fynd_Model_Selection extends Fynd_Object implements Fynd_Db_ISQLBuilder
      */
     public function addSelectExpression(Fynd_Model_SelectExpr $expr)
     {
-        if(!in_array($expr,$this->_fields))
+        if(! in_array($expr, $this->_fields))
         {
-            array_push(&$this->_fields,$expr);
+            array_push(&$this->_fields, $expr);
         }
     }
     /**
@@ -145,34 +146,62 @@ class Fynd_Model_Selection extends Fynd_Object implements Fynd_Db_ISQLBuilder
             //DISTINCT
             if($this->_isDistinct === true)
             {
-                $this->_sql .= "DISTINCT ";
+                $this->_sql .= " DISTINCT ";
             }
             //SELECT-EXPR
             $tableAliases = array();
             $tableAliasChar = 96;
             $fromTableAlias = $this->_getTableAlias($this->_from, $tableAliases, $tableAliasChar);
-            $sqlFrom = "From " . $this->_from->GetMeta()->getTableName() . " AS " . $fromTableAlias;
-            foreach($this->_fields as $field)
+            $sqlFrom = " FROM " . $this->_from->GetMeta()->getTableName() . " AS " . $fromTableAlias;
+            if(count($this->_fields) > 0)
             {
-                $field->SetOwner($this->_getTableAlias($field->getEntity()->getModel(), $tableAliases, $tableAliasChar));
-                $this->_sql .= $field->createSQL() . ",";
+                foreach($this->_fields as $field)
+                {
+                    if(is_object($field) && $field instanceof Fynd_Db_ISQLBuilder)
+                    {
+                        $entity = $field->getEntity();
+                        if($entity instanceof Fynd_Model_Entity)
+                        {
+                            $field->setOwner($this->_getTableAlias($entity->getModel(), $tableAliases, $tableAliasChar));
+                        }
+                        $this->_sql .= $field->createSQL() . ",";
+                    }
+                    else
+                    {
+                        $this->_sql .= $field . ",";
+                    }
+                }
+            }
+            else
+            {
+                $this->_sql .= ' * ';
+            }
+            if(Fynd_StringUtil::endWith($this->_sql,','))
+            {
+                $this->_sql = Fynd_StringUtil::removeEnd($this->_sql);
             }
             //FROM
             $this->_sql .= $sqlFrom;
             //JOIN
-            foreach ($this->_joins as $join)
+            foreach($this->_joins as $join)
             {
                 $this->_sql .= $join->createSQL();
             }
             //WHERE
-            foreach ($this->_wheres as $where)
+            if($this->_where instanceof Fynd_Model_Where)
             {
-                $this->_sql .= $where->createSQL();
+                $this->_sql .= $this->_where->createSQL();
             }
             //GROUP BY
-            $this->_sql .= $this->_group->createSQL();
+            if($this->_group instanceof Fynd_Model_Group)
+            {
+                $this->_sql .= $this->_group->createSQL();
+            }
             //ORDER BY
-            $this->_sql .= $this->_orderby->createSQL();
+            if($this->_orderby instanceof Fynd_Model_Order)
+            {
+                $this->_sql .= $this->_orderby->createSQL();
+            }
         }
         return $this->_sql;
     }
