@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszDishModel" Table="csz_dish" PrimaryProperty="DishId">
+  <Entry>
+    <Property>DishId</Property>
+    <Field>dish_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>CookingStyleId</Property>
+    <Field>cooking_style_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>CookingModeId</Property>
+    <Field>cooking_mode_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+</Root>

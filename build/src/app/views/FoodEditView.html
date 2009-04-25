@@ -1,0 +1,36 @@
+<fynd:import Path="~/views/HtmlHeader.html"></fynd:import>
+<div id="content">
+	<fynd:form>
+		<div>
+			<span>食物名称：</span>
+			<span><fynd:input id="textFoodName" name="FoodName"></fynd:input></span>
+		</div>
+		<div>
+			<span>食物类别：</span>
+			<span>
+			</span>
+		</div>
+		<div>
+			<span><fynd:picker id="pickerNutrition" href="?c=Picker&amp;a=nutrition&amp;" text="选择营养元素"
+							   tableId="tableNutrition" callback="" MultiSelection="true" 
+							   TableIdKey="NutritionId" TableLabelKey="NutritionName"></fynd:picker></span>
+		</div>
+		<div>
+			<fynd:table id="tableNutrition">
+				<columns>
+					<TableColumn key="FoodNutritionId"/>
+					<TableColumn key="NutritionId" label="营养元素ID" />
+					<TableColumn key="NutritionName" label="营养元素名称" />
+					<TableColumn key="NutritionValue" label="含量" />
+					<TableColumn key="Unit" label="单位" />
+					<TableColumn key="Operation" label="操作">
+						<OperationItems>
+							<LinkItem text="删除" title="点击删除该营养元素" href="javascript:void(0);" />
+						</OperationItems>
+					</TableColumn>
+				</columns>
+			</fynd:table>
+		</div>
+	</fynd:form>
+</div>
+<fynd:import Path="~/views/HtmlFooter.html"></fynd:import>

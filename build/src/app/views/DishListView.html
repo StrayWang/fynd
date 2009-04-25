@@ -1,0 +1,26 @@
+<Fynd:Import Path="~/views/HtmlHeader.html"></Fynd:Import>
+<div id="content">
+<Fynd:Table ID="Table1" Width="200" JsonDataUrl="?c=Dish&amp;a=pagingList&amp;">
+	<Columns> 
+		<Columns>
+	    <TableColumn Key="Checkbox" Label="" Width="15">
+			<OperationItems>
+				<CheckBoxItem cssClass=""
+							  Tooltip="点击选中"
+							  FormFieldValue="DishId" />
+			</OperationItems>
+		</TableColumn>
+		<TableColumn Key="Operation" Label="操作" Width="50">
+			<OperationItems>
+				<LinkItem Target="_blank" CssClass="" Text="编辑" Tooltip="点击编辑"
+					      Href="?c=Dish&amp;a=edit&amp;id={DishId}" />
+			</OperationItems>
+		</TableColumn>
+		<TableColumn Key="DishId" Label="菜谱ID" Width="50" Resizeable="true" Sortable="true" />
+		<TableColumn Key="DishName" Label="菜谱名称" Width="100" Resizeable="true" Sortable="true" />
+	 </Columns>
+</Fynd:Table>
+</div>
+<div id="tip"></div>
+<div id="operation"></div>
+<Fynd:Import Path="~/views/HtmlFooter.html"></Fynd:Import>

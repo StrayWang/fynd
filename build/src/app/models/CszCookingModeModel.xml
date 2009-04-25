@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszCookingModeModel" Table="csz_cooking_mode" PrimaryProperty="CookingModeId">
+  <Entry>
+    <Property>CookingModeId</Property>
+    <Field>cooking_mode_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+</Root>

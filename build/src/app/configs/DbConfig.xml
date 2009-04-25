@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<FyndConfig>
+	<DbConfig>
+		<DefaultConnection>host1</DefaultConnection>
+		<Connections>
+			<Connection Name="host1" Type="Fynd_Db_Type::MYSQL">
+				<Server>127.0.0.1</Server>
+				<Port>3306</Port>
+				<DataBase>chishazi_cn</DataBase>
+				<User>root</User>
+				<Password>windfir</Password>
+			</Connection>
+		</Connections>
+	</DbConfig>
+</FyndConfig>

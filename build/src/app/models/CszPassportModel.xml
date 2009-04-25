@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszPassportModel" Table="csz_passport" PrimaryProperty="Password">
+  <Entry>
+    <Property>PassportId</Property>
+    <Field>passport_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>UserId</Property>
+    <Field>user_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>Passport</Property>
+    <Field>passport</Field>
+    <DataType>string</DataType>
+    <DataLength>40</DataLength>
+  </Entry>
+  <Entry>
+    <Property>Password</Property>
+    <Field>password</Field>
+    <DataType>string</DataType>
+    <DataLength>20</DataLength>
+  </Entry>
+</Root>

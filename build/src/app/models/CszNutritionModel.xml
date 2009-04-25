@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszNutritionModel" Table="csz_nutrition" PrimaryProperty="NutritionId">
+  <Entry>
+    <Property>NutritionId</Property>
+    <Field>nutrition_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>NutritionCategoryId</Property>
+    <Field>nutrition_category_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>NutritionName</Property>
+    <Field>nutrition_name</Field>
+    <DataType>string</DataType>
+    <DataLength>100</DataLength>
+  </Entry>
+</Root>

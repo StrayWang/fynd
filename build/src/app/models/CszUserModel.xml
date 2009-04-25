@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszUserModel" Table="csz_user" PrimaryProperty="UserId">
+  <Entry>
+    <Property>UserId</Property>
+    <Field>user_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+</Root>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="CszFoodModel" Table="csz_food" PrimaryProperty="FoodId">
+  <Entry>
+    <Property>FoodId</Property>
+    <Field>food_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>FoodCategoryId</Property>
+    <Field>food_category_id</Field>
+    <DataType>number</DataType>
+    <DataLength>11</DataLength>
+  </Entry>
+  <Entry>
+    <Property>FoodName</Property>
+    <Field>food_name</Field>
+    <DataType>string</DataType>
+    <DataLength>100</DataLength>
+  </Entry>
+</Root>

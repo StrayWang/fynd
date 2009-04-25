@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Root Class="SequenceModel" Table="sequence" PrimaryProperty="LastValue">
+  <Entry>
+    <Property>FieldName</Property>
+    <Field>field_name</Field>
+    <DataType>string</DataType>
+    <DataLength>64</DataLength>
+  </Entry>
+  <Entry>
+    <Property>LastValue</Property>
+    <Field>last_value</Field>
+    <DataType>number</DataType>
+    <DataLength>10</DataLength>
+  </Entry>
+</Root>
