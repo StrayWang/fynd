@@ -1,12 +1,11 @@
 <?php
 require_once ('Fynd/Object.php');
 require_once 'Fynd/Db/ISQLBuilder.php';
-class Fynd_Model_SelectExpr extends Fynd_Object implements Fynd_Db_ISQLBuilder 
+class Fynd_Model_SelectExpr extends Fynd_Object implements Fynd_Db_ISQLBuilder
 {
     const SQL_FUN_MAX = "MAX";
     const SQL_FUN_COUNT = "COUNT";
     const SQL_FUN_SUM = "SUM";
-    
     private $_sql;
     /**
      * The owner of selection field,mybe a table name or a table alias.
@@ -123,21 +122,27 @@ class Fynd_Model_SelectExpr extends Fynd_Object implements Fynd_Db_ISQLBuilder
     {
         if(empty($this->_sql))
         {
-            if(!empty($this->_owner))
+            if($this->_entity instanceof Fynd_Model_Entity)
             {
-                $this->_sql .= $this->_owner . ".";
+                if(! empty($this->_owner))
+                {
+                    $this->_sql .= $this->_owner . ".";
+                }
+                if(! empty($this->_function))
+                {
+                    $this->_sql .= $this->_function . "(" . $this->_entity->getField() . ") ";
+                }
+                if(! empty($this->_alias))
+                {
+                    $this->_sql .= " AS " . $this->_alias;
+                }
             }
-            if(!empty($this->_function))
+            else
             {
-                $this->_sql .= $this->_function . "(" . $this->_entity->getField() . ") ";
-            }
-            if(!empty($this->_alias))
-            {
-                $this->_sql .= " AS " . $this->_alias;
+                $this->_sql = $this->_expression;
             }
         }
         return $this->_sql;
     }
-    
 }
 ?>
