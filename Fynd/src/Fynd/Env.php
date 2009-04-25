@@ -18,7 +18,6 @@ final class Fynd_Env
     private static $_servicePath;
     private static $_configPath;
     private static $_logPath;
-    
     /**
      * Gets the path of php script startup,it's usually to be the same as the index.php
      *
@@ -135,7 +134,9 @@ final class Fynd_Env
      */
     public static function init()
     {
+        //TODO:initialize Fynd_Env's log object.
         self::_registerAutoLoad();
+        //set_error_handler(array('Fynd_Env' , 'phpErrorHandler'));
     }
     /**
      * Used by PHP autoload functionality
@@ -146,6 +147,21 @@ final class Fynd_Env
     {
         $type = new Fynd_Type($class);
         $type->includeTypeDefinition();
+    }
+    public static function phpErrorHandler($errorNo, $errorMsg, $errorFile = null, $errorLine = null)
+    {
+        switch($errorNo)
+        {
+            case E_COMPILE_ERROR:
+            case E_CORE_ERROR:
+            case E_ERROR:
+            case E_PARSE:
+            case 0:
+                throw new ErrorException($errorMsg, 0, $errorNo, $errorFile, $errorLine);
+            default:
+                //throw new ErrorException($errorMsg, 0, $errorNo, $errorFile, $errorLine);
+                break;
+        }
     }
     /**
      * Register spl_autoload function
