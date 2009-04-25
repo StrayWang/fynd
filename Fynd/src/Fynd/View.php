@@ -1,5 +1,6 @@
 <?php
 require_once 'Fynd/IView.php';
+require_once 'Fynd/Object.php';
 abstract class Fynd_View extends Fynd_Object implements Fynd_IView 
 {
     public $useTemplateEngine = false;
@@ -7,7 +8,34 @@ abstract class Fynd_View extends Fynd_Object implements Fynd_IView
     protected $_data;
     
     protected $_headers = array();
+    /**
+     * @var Fynd_Dictionary
+     */
+    private $_resources;
 
+    public function __construct()
+    {
+        $this->_resources = new Fynd_Dictionary();
+    }
+    
+    public function addResource($key,$path)
+    {
+        if(!$this->_resources->containsKey($key))
+        {
+            $this->_resources->add($key,$path);
+        }
+    }
+    /**
+     * Gets the resource files's path.
+     *
+     * @return Fynd_Dictionary
+     */
+    public function getResources()
+    {
+        return $this->_resources;
+    }
+    
+    
     public function setMimeType($mime,$overwrite = true)
     {
         $this->setHttpHeader('Content-Type',$mime,$overwrite);
@@ -19,14 +47,6 @@ abstract class Fynd_View extends Fynd_Object implements Fynd_IView
         { 
             header($key . ':' . $value,$overwrite);
         }
-    }
-    /**
-     * @see Fynd_IView::render()
-     *
-     */
-    public function render()
-    {
-        echo $this->_data;
     }
     /**
      * @see Fynd_IView::setData()
