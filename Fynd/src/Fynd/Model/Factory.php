@@ -50,8 +50,7 @@ final class Fynd_Model_Factory extends Fynd_Object
         $meta->setState(Fynd_Model_State::NONE);
         $meta->setPrimaryProperty($primaryProperty);
         $model->setMeta($meta);
-        
-        if(!is_null($xml) && false !== $xml)
+        if(! is_null($xml) && false !== $xml)
         {
             foreach($xml as $node)
             {
@@ -59,73 +58,137 @@ final class Fynd_Model_Factory extends Fynd_Object
                 $entity->setProperty((string)$node->Property);
                 $entity->setField((string)$node->Field);
                 $dataTypeName = (string)$node->DataType;
-                
                 $entity->setDataType(Fynd_Db_DataType::getDataTypeEnum($dataTypeName));
                 $model->addEntity($entity);
                 $field = $entity->getField();
-                if(!is_null($values))
+                if(! is_null($values))
                 {
                     $property = $entity->getProperty();
                     if(is_array($values) && array_key_exists($field, $values))
                     {
-                        $model->setPropertyValue($property,$values[$field]);
+                        $model->setPropertyValue($property, $values[$field]);
                     }
                     else if(is_object($values))
                     {
-                        $model->setPropertyValue($property,$values->$property);
+                        $model->setPropertyValue($property, $values->$property);
                     }
-                    else 
+                    else
                     {
-                        self::_getLogger()->logWarn('property is not exist in $values');    
+                        self::_getLogger()->logWarn('property is not exist in $values');
                     }
                 }
             }
         }
-        
         return $model;
     }
     /**
-     * Search database, get matching records, create models, and return a model list. 
+     * Gets the count of model which matches the filter.
      *
      * @param Fynd_Type $mt
-     * @param string $filterString the filterString will follow the "WHERE" keyword
-     * @param Fynd_List $dbParams
-     * @param int $pageSize use -1 to get the all models
-     * @param int $pageNo
-     * @return Fynd_Model_List
+     * @param string $filter
+     * @return number
      */
-    public static function getModels(Fynd_Type $mt, $filterString = "", Fynd_List $dbParams = null, $pageSize = 10, $pageNo = 1)
+    public static function getModelCount(Fynd_Type $mt,$filter)
     {
         $isOpen = false;
-        $modes = new Fynd_Model_List();
         try
         {
             $db = Fynd_Db_Factory::getConnection();
             $tplModel = self::createModel($mt);
             $sel = new Fynd_Model_Selection();
             $sel->setFromModel($tplModel);
-            if(! empty($filterString))
+            $selExpr = new Fynd_Model_SelectExpr();
+            $selExpr->setExpression('count(*) AS countNum');
+            $sel->addSelectExpression($selExpr);
+            $parameterized = Fynd_Db_Util::toParameterizedSQL($filter);
+            if(! empty($parameterized['sql']))
             {
                 $where = new Fynd_Model_Where($tplModel);
                 $filter = new Fynd_Model_Filter();
-                $filter->setExpression($filterString);
+                $filter->setExpression($parameterized['sql']);
                 $where->addFilter($filter);
                 $sel->setWhereClause($where);
             }
-            $sql = $sel->CreateSQL();
+            
+            $sql = $sel->createSQL();
+            self::_getLogger()->logInfo($sql);
+            
+            $cmd = $db->createCommand($sql);
+            foreach($parameterized['parameters'] as $param)
+            {
+                if($param)
+                {
+                    $cmd->addParameter($param);
+                }
+            }
+            $isOpen = $db->open();
+            $result = intval($cmd->executeScalar());
+            if($isOpen)
+            {
+                $db->close();
+            }
+        }
+        catch(Exception $e)
+        {
+            if($isOpen)
+            {
+                $db->Close();
+            }
+            throw $e;
+        }
+        return $result;
+    }
+    /**
+     * Search database, get matching records, create models, and return a model list. 
+     *
+     * @param Fynd_Type $mt
+     * @param string $filterString the filterString will follow the "WHERE" keyword
+     * @param int $pageSize use -1 to get the all models
+     * @param int $startOffset
+     * @param string $orderby
+     * @param string $orderDirection
+     * @return Fynd_Model_List
+     */
+    public static function getModels(Fynd_Type $mt, $filterString = "", $pageSize = 20, $startOffset = 0 ,$orderby='',$orderDirection = 'asc')
+    {
+        $isOpen = false;
+        $models = new Fynd_Model_List();
+        try
+        {
+            $db = Fynd_Db_Factory::getConnection();
+            $tplModel = self::createModel($mt);
+            $sel = new Fynd_Model_Selection();
+            $sel->setFromModel($tplModel);
+            $parameterized = Fynd_Db_Util::toParameterizedSQL($filterString);
+            if(! empty($parameterized['sql']))
+            {
+                $where = new Fynd_Model_Where($tplModel);
+                $filter = new Fynd_Model_Filter();
+                $filter->setExpression($parameterized['sql']);
+                $where->addFilter($filter);
+                $sel->setWhereClause($where);
+            }
+            if(!empty($orderby))
+            {
+                $order = new Fynd_Model_Order($tplModel);
+                $order->add($orderby,$orderDirection);
+                $sel->setOrderByClause($order);
+            }
+            $sql = $sel->createSQL();
+            self::_getLogger()->logInfo($sql);
             if($pageSize != - 1)
             {
                 $paging = new Fynd_Db_Paging();
                 $paging->setConnectionObjectType($db->getType());
                 $paging->setOrginSQL($sql);
-                $paging->setPageNo($pageNo);
+                $paging->setStartOffset($startOffset);
                 $paging->setPageSize($pageSize);
                 $sql = $paging->createSQL();
             }
             $cmd = $db->createCommand($sql);
-            if(! is_null($dbParams))
+            foreach($parameterized['parameters'] as $param)
             {
-                foreach($dbParams as $param)
+                if($param)
                 {
                     $cmd->addParameter($param);
                 }
@@ -135,7 +198,7 @@ final class Fynd_Model_Factory extends Fynd_Object
             foreach($result as $row)
             {
                 $model = self::createModel($mt, $row);
-                $modes->add($model);
+                $models->add($model);
             }
             if($isOpen)
             {
@@ -148,11 +211,12 @@ final class Fynd_Model_Factory extends Fynd_Object
             {
                 $db->Close();
             }
-            Fynd_Object::throwException("Fynd_Model_Exception",
-            		"Exception thrown when getting models from database:" . $e->getMessage(),
-                    $e->getCode());
+            throw $e;
+            //            Fynd_Object::throwException("Fynd_Model_Exception",
+        //            		"Exception thrown when getting models from database:" . $e->getMessage(),
+        //                    $e->getCode());
         }
-        return models;
+        return $models;
     }
     /**
      * Get a single model which match the filters from the database,
@@ -184,14 +248,12 @@ final class Fynd_Model_Factory extends Fynd_Object
                 $sel->setWhereClause($where);
             }
             $sql = $sel->createSQL();
-
             $paging = new Fynd_Db_Paging();
             $paging->setConnectionObjectType($db->getType());
             $paging->setOrginSQL($sql);
             $paging->setPageNo(1);
             $paging->setPageSize(1);
             $sql = $paging->CreateSQL();
-            
             $cmd = $db->createCommand($sql);
             if(! is_null($dbParams))
             {
@@ -217,9 +279,7 @@ final class Fynd_Model_Factory extends Fynd_Object
             {
                 $db->close();
             }
-            Fynd_Object::ThrowException("Fynd_Model_Exception",
-            		"Exception thrown when getting single model from database:" . $e->getMessage(),
-                    $e->getCode());
+            Fynd_Object::ThrowException("Fynd_Model_Exception", "Exception thrown when getting single model from database:" . $e->getMessage(), $e->getCode());
         }
         return $model;
     }
