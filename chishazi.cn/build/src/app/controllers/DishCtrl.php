@@ -1,5 +1,6 @@
 <?php
 require_once ('Fynd/Controller.php');
+require_once ('Fynd/View/Html.php');
 class DishCtrl extends Fynd_Controller
 {
     private $_dishService;
