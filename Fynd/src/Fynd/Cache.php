@@ -81,7 +81,7 @@ final class Fynd_Cache
     public static function init()
     {
         //TODO:Read cache configure to determine which cache storer will be created.
-        self::$_storer = new Fynd_Cache_APC();
+        self::$_storer = new Fynd_Cache_FileSystem();
         self::$_storer->init();
     }
     private function __construct()
