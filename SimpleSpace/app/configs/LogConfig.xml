@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<FyndConfig>
-    <LogConfig>
-        <DefaultLogFile>log/system.log</DefaultLogFile>
-    </LogConfig>
-</FyndConfig>

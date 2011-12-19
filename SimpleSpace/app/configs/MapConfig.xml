@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<FyndConfig>
-	<MapConfig>
-		<RequestMaps>
-			<Request RequestModule="Index" ProcessorName="Index" />
-			<Request RequestModule="Login" ProcessorName="Login" />
-		</RequestMaps>
-	</MapConfig>
-</FyndConfig>

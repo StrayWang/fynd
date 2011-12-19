@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Root Class="CszEatingHabitModel" Table="csz_eating_habit" PrimaryProperty="EatingHabitId">
-  <Entry>
-    <Property>EatingHabitId</Property>
-    <Field>eating_habit_id</Field>
-    <DataType>number</DataType>
-    <DataLength>11</DataLength>
-  </Entry>
-</Root>
