@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\SynchronizedSortedList.cs" />
     <Compile Include="Common\Checker.cs" />
     <Compile Include="IO\StreamHelper.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />

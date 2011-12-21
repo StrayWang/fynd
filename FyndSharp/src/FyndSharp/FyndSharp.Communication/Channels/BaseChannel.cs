@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FyndSharp.Communication.Common;
 using FyndSharp.Communication.Protocols;
 using FyndSharp.Utilities.Common;
 using System.Net;
 
-namespace FyndSharp.Communication.Messagers
+namespace FyndSharp.Communication.Channels
 {
-    internal abstract class BaseChannel : IMessager
+    internal abstract class BaseChannel : IChannel
     {
         public event EventHandler<MessageEventArgs> MessageReceived;
 
@@ -32,11 +29,11 @@ namespace FyndSharp.Communication.Messagers
             }
         }
 
-        public CommunicationStatus CommunicationState { get; protected set; }
+        public CommunicationStatus Status { get; protected set; }
 
         public BaseChannel()
         {
-            this.CommunicationState = CommunicationStatus.Disconnected;
+            this.Status = CommunicationStatus.Disconnected;
             this.LastReceivedTime = DateTime.MinValue;
             this.LastSentTime = DateTime.MinValue;
         }
@@ -50,6 +47,8 @@ namespace FyndSharp.Communication.Messagers
         {
             Checker.NotNull<IMessage>(aMessage);
             this.SendImpl(aMessage);
+            this.LastSentTime = DateTime.Now;
+            this.OnMessageSent(aMessage);
         }
 
         protected abstract void SendImpl(IMessage aMessage);
@@ -57,22 +56,22 @@ namespace FyndSharp.Communication.Messagers
         public void Start()
         {
             this.StartImpl();
-            this.CommunicationState = CommunicationStatus.Connected;
+            this.Status = CommunicationStatus.Connected;
         }
 
         protected abstract void StartImpl();
 
-        public void Stop()
+        public void Disconnect()
         {
             try
             {
-                this.StopImpl();
+                this.DisconnectImpl();
             }
             catch { }
-            this.CommunicationState = CommunicationStatus.Disconnected;
+            this.Status = CommunicationStatus.Disconnected;
         }
 
-        protected abstract void StopImpl();
+        protected abstract void DisconnectImpl();
 
         protected virtual void OnDisconnected()
         {

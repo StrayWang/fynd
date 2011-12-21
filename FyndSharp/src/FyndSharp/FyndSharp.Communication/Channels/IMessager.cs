@@ -5,7 +5,7 @@ using System.Text;
 using FyndSharp.Communication.Protocols;
 using FyndSharp.Communication.Common;
 
-namespace FyndSharp.Communication.Messagers
+namespace FyndSharp.Communication.Channels
 {
     public interface IMessager
     {

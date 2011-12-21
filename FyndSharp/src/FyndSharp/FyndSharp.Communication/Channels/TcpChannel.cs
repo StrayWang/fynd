@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using FyndSharp.Utilities.Common;
 using System.Net;
 
-namespace FyndSharp.Communication.Messagers
+namespace FyndSharp.Communication.Channels
 {
     internal class TcpChannel : BaseChannel
     {
@@ -29,7 +29,24 @@ namespace FyndSharp.Communication.Messagers
 
         protected override void SendImpl(IMessage aMessage)
         {
-            throw new NotImplementedException();
+            //Send message
+            int totalSent = 0;
+            lock (this._LockObject)
+            {
+                //Create a byte array from message according to current protocol
+                byte[] messageBytes = this.Protocol.GetBytes(aMessage);
+                //Send all bytes to the remote application
+                while (totalSent < messageBytes.Length)
+                {
+                    int sent = this._ClientSocket.Send(messageBytes, totalSent, messageBytes.Length - totalSent, SocketFlags.None);
+                    if (sent <= 0)
+                    {
+                        throw new CommunicationException("Message could not be sent via TCP socket. Only " + totalSent + " bytes of " + messageBytes.Length + " bytes are sent.");
+                    }
+
+                    totalSent += sent;
+                }
+            }
         }
 
         protected override void StartImpl()
@@ -43,9 +60,9 @@ namespace FyndSharp.Communication.Messagers
                 , null);
         }
 
-        protected override void StopImpl()
+        protected override void DisconnectImpl()
         {
-            if (this.CommunicationState != CommunicationStatus.Connected)
+            if (this.Status != CommunicationStatus.Connected)
             {
                 return;
             }
@@ -90,7 +107,7 @@ namespace FyndSharp.Communication.Messagers
                 else
                 {
                     //TODO: 使用特定的异常类型
-                    throw new Exception("Tcp socket is closed");
+                    throw new CommunicationException("Tcp socket is closed");
                 }
 
                 //Read more bytes if still running
@@ -106,7 +123,7 @@ namespace FyndSharp.Communication.Messagers
             }
             catch
             {
-                this.Stop();
+                this.Disconnect();
             }
         }
     }

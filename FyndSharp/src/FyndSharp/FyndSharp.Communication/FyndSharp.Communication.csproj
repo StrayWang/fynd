@@ -39,14 +39,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Channels\IChannel.cs" />
+    <Compile Include="Channels\IListener.cs" />
+    <Compile Include="Common\CommunicationException.cs" />
     <Compile Include="Common\CommunicationStatus.cs" />
     <Compile Include="Common\IMessage.cs" />
-    <Compile Include="Messagers\BaseChannel.cs" />
-    <Compile Include="Messagers\IMessager.cs" />
+    <Compile Include="Channels\BaseChannel.cs" />
+    <Compile Include="Channels\BaseListener.cs" />
+    <Compile Include="Channels\ChannelEventArgs.cs" />
+    <Compile Include="Channels\IMessager.cs" />
     <Compile Include="Common\MessageEventArgs.cs" />
-    <Compile Include="Messagers\TcpChannel.cs" />
+    <Compile Include="Channels\TcpChannel.cs" />
+    <Compile Include="Channels\TcpConnectionListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Protocols\IProtocol.cs" />
+    <Compile Include="Protocols\IProtocolFactory.cs" />
+    <Compile Include="Server\BaseClientDummy.cs" />
+    <Compile Include="Server\BaseServer.cs" />
+    <Compile Include="Server\ClientDummyEventArgs.cs" />
+    <Compile Include="Server\IClientDummy.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FyndSharp.Utilities\FyndSharp.Utilities.csproj">
@@ -54,9 +65,7 @@
       <Name>FyndSharp.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Channels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
