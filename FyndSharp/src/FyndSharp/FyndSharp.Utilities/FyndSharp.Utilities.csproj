@@ -42,6 +42,7 @@
     <Compile Include="Collections\SynchronizedSortedList.cs" />
     <Compile Include="Common\Checker.cs" />
     <Compile Include="IO\StreamHelper.cs" />
+    <Compile Include="Net\Mailer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\LimitedSerializer.cs" />
     <Compile Include="Serialization\ISerializer.cs" />
