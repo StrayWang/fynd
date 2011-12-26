@@ -5,11 +5,11 @@ using System.Text;
 
 namespace FyndSharp.Communication.Protocols
 {
-    internal static class ProtocolManager
+    internal class RawDataProtocolFactory : IProtocolFactory
     {
-        public static IProtocolFactory GetDefaultProtocolFactory()
+        public IProtocol CreateProtocol()
         {
-            return new RawDataProtocolFactory();
+            return new RawDataProtocol();
         }
     }
 }

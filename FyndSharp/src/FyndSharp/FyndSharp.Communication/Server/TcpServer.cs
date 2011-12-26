@@ -4,7 +4,7 @@ using FyndSharp.Utilities.Common;
 
 namespace FyndSharp.Communication.Server
 {
-    public class TcpServer : BaseServer
+    internal class TcpServer : BaseServer
     {
         private readonly IPEndPoint _EndPoint;
 

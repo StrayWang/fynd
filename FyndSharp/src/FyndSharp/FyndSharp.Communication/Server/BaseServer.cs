@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace FyndSharp.Communication.Server
 {
-    public abstract class BaseServer
+    internal abstract class BaseServer : IServer
     {
         /// <summary>
         /// Used to set an auto incremential unique identifier to clients.

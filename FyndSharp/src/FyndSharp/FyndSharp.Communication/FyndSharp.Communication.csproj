@@ -66,10 +66,14 @@
     <Compile Include="Protocols\IProtocol.cs" />
     <Compile Include="Protocols\IProtocolFactory.cs" />
     <Compile Include="Protocols\ProtocolManager.cs" />
+    <Compile Include="Protocols\RawDataProtocol.cs" />
+    <Compile Include="Protocols\RawDataProtocolFactory.cs" />
     <Compile Include="Server\ClientDummy.cs" />
     <Compile Include="Server\BaseServer.cs" />
     <Compile Include="Server\ClientDummyEventArgs.cs" />
+    <Compile Include="Server\IServer.cs" />
     <Compile Include="Server\IClientDummy.cs" />
+    <Compile Include="Server\ServerFactory.cs" />
     <Compile Include="Server\TcpServer.cs" />
   </ItemGroup>
   <ItemGroup>

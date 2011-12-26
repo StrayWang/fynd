@@ -12,7 +12,7 @@ namespace FyndSharp.Communication.ServerDemo
     {
         static void Main(string[] args)
         {
-            TcpServer server = new TcpServer(new System.Net.IPEndPoint(IPAddress.Any, 12345));
+            IServer server = ServerFactory.CreateServer(new System.Net.IPEndPoint(IPAddress.Any, 12345));
             server.ClientDisconnected += new EventHandler<ClientDummyEventArgs>(server_ClientDisconnected);
             server.ClientConnected += new EventHandler<ClientDummyEventArgs>(server_ClientConnected);
             server.Start();
