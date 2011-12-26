@@ -12,6 +12,9 @@ namespace FyndSharp.Utilities.Net
         public string Passport { get; set; }
         public string Password { get; set; }
 
-        public void SendMail(string from, string to, string subject, string body) { }
+        public void SendMail(string from, string to, string subject, string body) 
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
