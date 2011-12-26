@@ -1,27 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FyndSharp.Communication.Channels;
 using FyndSharp.Utilities.Collections;
 using FyndSharp.Communication.Protocols;
+using System.Threading;
 
 namespace FyndSharp.Communication.Server
 {
-    internal abstract class BaseServer
+    public abstract class BaseServer
     {
+        /// <summary>
+        /// Used to set an auto incremential unique identifier to clients.
+        /// </summary>
+        private static long _LastClientId;
+        /// <summary>
+        /// Gets an unique number to be used as idenfitier of a client.
+        /// </summary>
+        /// <returns></returns>
+        public static long GetClientId()
+        {
+            return Interlocked.Increment(ref _LastClientId);
+        }
+
         public event EventHandler<ClientDummyEventArgs> ClientConnected;
         public event EventHandler<ClientDummyEventArgs> ClientDisconnected;
 
         private IListener _Listener;
 
-        public SynchronizedSortedList<long, IClientDummy> ClientChannels { get; private set; }
+        public SynchronizedSortedList<long, IClientDummy> ClientDummies { get; private set; }
         public IProtocolFactory ProtocolFactory { get; set; }
 
         public BaseServer()
         {
-            this.ClientChannels = new SynchronizedSortedList<long, IClientDummy>();
+            this.ClientDummies = new SynchronizedSortedList<long, IClientDummy>();
             //TODO: Set the default protocol factory object
+            this.ProtocolFactory = ProtocolManager.GetDefaultProtocolFactory();
         }
 
         public virtual void Start()
@@ -43,11 +55,20 @@ namespace FyndSharp.Communication.Server
 
         private void Listener_ChannelConnected(object sender, ChannelEventArgs e)
         {
-            //e.Channel.Disconnected += new EventHandler(Channel_Disconnected);
-            //this.ClientChannels[e.Channel.Id] = e.Channel;
-            
-            //OnClientConnected(client);
-            //e.Channel.Start();
+            IClientDummy clientDummy = new ClientDummy(GetClientId(), e.Channel);
+            clientDummy.Protocol = this.ProtocolFactory.CreateProtocol();
+            clientDummy.Disconnected += new EventHandler(Client_Disconnected);
+            this.ClientDummies[clientDummy.Id] = clientDummy;
+
+            FireClientConnectedEvent(clientDummy);
+            e.Channel.Start();
+        }
+
+        private void Client_Disconnected(object sender, EventArgs e)
+        {
+            IClientDummy client = (IClientDummy)sender;
+            ClientDummies.Remove(client.Id);
+            FireClientDisconnectedEvent(client);
         }
 
         private void FireClientConnectedEvent(IClientDummy theClient)
@@ -58,12 +79,14 @@ namespace FyndSharp.Communication.Server
             }
         }
 
-        private void FireClientDisconnected(IClientDummy theClient)
+        private void FireClientDisconnectedEvent(IClientDummy theClient)
         {
             if (null != this.ClientDisconnected)
             {
                 this.ClientDisconnected.Invoke(this, new ClientDummyEventArgs(theClient));
             }
         }
+
+        
     }
 }

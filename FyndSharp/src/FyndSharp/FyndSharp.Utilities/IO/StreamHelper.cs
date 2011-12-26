@@ -35,5 +35,23 @@ namespace FyndSharp.Utilities.IO
             output.Flush();
             return bytesRead;
         }
+
+        public static byte[] ReadBytes(Stream theStream, int theLength)
+        {
+            var buffer = new byte[theLength];
+            var totalRead = 0;
+            while (totalRead < theLength)
+            {
+                var read = theStream.Read(buffer, totalRead, theLength - totalRead);
+                if (read <= 0)
+                {
+                    throw new EndOfStreamException("Can not read from stream! Input stream is closed.");
+                }
+
+                totalRead += read;
+            }
+
+            return buffer;
+        }
     }
 }

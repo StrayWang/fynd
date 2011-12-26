@@ -48,7 +48,7 @@ namespace FyndSharp.Communication.Channels
             Checker.NotNull<IMessage>(aMessage);
             this.SendImpl(aMessage);
             this.LastSentTime = DateTime.Now;
-            this.OnMessageSent(aMessage);
+            this.FireMessageSentEvent(aMessage);
         }
 
         protected abstract void SendImpl(IMessage aMessage);
@@ -73,7 +73,7 @@ namespace FyndSharp.Communication.Channels
 
         protected abstract void DisconnectImpl();
 
-        protected virtual void OnDisconnected()
+        protected virtual void FireDisconnectedEvent()
         {
             if (null != this.Disconnected)
             {
@@ -81,7 +81,7 @@ namespace FyndSharp.Communication.Channels
             }
         }
 
-        protected virtual void OnMessageSent(IMessage theMessage)
+        protected virtual void FireMessageSentEvent(IMessage theMessage)
         {
             if (null != this.MessageSent)
             {
@@ -89,7 +89,7 @@ namespace FyndSharp.Communication.Channels
             }
         }
 
-        protected virtual void OnMessageReceived(IMessage theMessage)
+        protected virtual void FireMessageReceivedEvent(IMessage theMessage)
         {
             if (null != this.MessageReceived)
             {

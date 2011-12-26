@@ -41,8 +41,14 @@
   <ItemGroup>
     <Compile Include="Channels\IChannel.cs" />
     <Compile Include="Channels\IListener.cs" />
+    <Compile Include="Channels\RequestReplyMessenger.cs" />
+    <Compile Include="Channels\SynchronizedMessenger.cs" />
+    <Compile Include="Clients\BaseClient.cs" />
+    <Compile Include="Clients\IClient.cs" />
+    <Compile Include="Clients\TcpClient.cs" />
     <Compile Include="Common\CommunicationException.cs" />
     <Compile Include="Common\CommunicationStatus.cs" />
+    <Compile Include="Common\BaseMessage.cs" />
     <Compile Include="Common\IMessage.cs" />
     <Compile Include="Channels\BaseChannel.cs" />
     <Compile Include="Channels\BaseListener.cs" />
@@ -51,13 +57,20 @@
     <Compile Include="Common\MessageEventArgs.cs" />
     <Compile Include="Channels\TcpChannel.cs" />
     <Compile Include="Channels\TcpConnectionListener.cs" />
+    <Compile Include="Common\PingMessage.cs" />
+    <Compile Include="Common\RawDataMessage.cs" />
+    <Compile Include="Common\TextMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocols\BinarySerializationProtocol.cs" />
+    <Compile Include="Protocols\BinarySerializationProtocolFactory.cs" />
     <Compile Include="Protocols\IProtocol.cs" />
     <Compile Include="Protocols\IProtocolFactory.cs" />
-    <Compile Include="Server\BaseClientDummy.cs" />
+    <Compile Include="Protocols\ProtocolManager.cs" />
+    <Compile Include="Server\ClientDummy.cs" />
     <Compile Include="Server\BaseServer.cs" />
     <Compile Include="Server\ClientDummyEventArgs.cs" />
     <Compile Include="Server\IClientDummy.cs" />
+    <Compile Include="Server\TcpServer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FyndSharp.Utilities\FyndSharp.Utilities.csproj">

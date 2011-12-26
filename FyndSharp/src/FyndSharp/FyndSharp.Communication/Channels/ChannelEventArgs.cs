@@ -8,7 +8,7 @@ namespace FyndSharp.Communication.Channels
     /// <summary>
     /// Stores communication channel information to be used by an event.
     /// </summary>
-    internal class ChannelEventArgs : EventArgs
+    public class ChannelEventArgs : EventArgs
     {
         /// <summary>
         /// Communication channel that is associated with this event.

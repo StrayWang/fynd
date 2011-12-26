@@ -25,6 +25,7 @@ namespace FyndSharp.Communication.Channels
 
             this._ReceivingBuffer = new byte[ReceivingBufferSize];
             this._LockObject = new Object();
+            _ClientSocket = theClientSocket;
         }
 
         protected override void SendImpl(IMessage aMessage)
@@ -101,7 +102,7 @@ namespace FyndSharp.Communication.Channels
                     //Raise MessageReceived event for all received messages
                     foreach (var message in messages)
                     {
-                        OnMessageReceived(message);
+                        FireMessageReceivedEvent(message);
                     }
                 }
                 else
