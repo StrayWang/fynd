@@ -15,7 +15,7 @@ namespace FyndSharp.Communication.Channels
     /// messages by synchronized method calls instead of asynchronous 
     /// MessageReceived event.
     /// </summary>
-    public class SynchronizedMessenger<T> : RequestReplyMessenger<T> where T : IMessager
+    public class SynchronizedMessager<T> : RequestReplyMessager<T> where T : IMessager
     {
         #region Public properties
 
@@ -55,7 +55,7 @@ namespace FyndSharp.Communication.Channels
         /// Creates a new SynchronizedMessenger object.
         ///</summary>
         ///<param name="aMessager">A IMessager object to be used to send/receive messages</param>
-        public SynchronizedMessenger(T aMessager)
+        public SynchronizedMessager(T aMessager)
             : this(aMessager, int.MaxValue)
         {
 
@@ -66,7 +66,7 @@ namespace FyndSharp.Communication.Channels
         ///</summary>
         ///<param name="aMessager">A IMessager object to be used to send/receive messages</param>
         ///<param name="theIncomingMessageQueueCapacity">capacity of the incoming message queue</param>
-        public SynchronizedMessenger(T aMessager, int theIncomingMessageQueueCapacity)
+        public SynchronizedMessager(T aMessager, int theIncomingMessageQueueCapacity)
             : base(aMessager)
         {
             _ReceiveWaitEvent = new ManualResetEvent(false);

@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{06AED773-6A35-4BDE-AB86-6F9596877EF9}</ProjectGuid>
+    <ProjectGuid>{DD42B7C4-B817-48EA-AA87-4EAC50DD5B94}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FyndSharp.Communication.ServerDemo</RootNamespace>
-    <AssemblyName>FyndSharp.Communication.ServerDemo</AssemblyName>
+    <RootNamespace>FyndSharp.Communication.ClientDemo</RootNamespace>
+    <AssemblyName>FyndSharp.Communication.ClientDemo</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -50,9 +50,6 @@
       <Project>{59F4E1A5-8104-4615-87F9-DE3229D2B727}</Project>
       <Name>FyndSharp.Communication</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

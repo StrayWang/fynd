@@ -111,10 +111,16 @@ namespace FyndSharp.Utilities.Threading
             {
                 _CurrentWork.GetResult();
             }
-            catch
+#if TRACE
+            catch(Exception e)
             {
 
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
             }
+#else
+            catch { }
+#endif
         }
 
         /// <summary>

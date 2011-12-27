@@ -41,9 +41,10 @@
   <ItemGroup>
     <Compile Include="Channels\IChannel.cs" />
     <Compile Include="Channels\IListener.cs" />
-    <Compile Include="Channels\RequestReplyMessenger.cs" />
-    <Compile Include="Channels\SynchronizedMessenger.cs" />
+    <Compile Include="Channels\RequestReplyMessager.cs" />
+    <Compile Include="Channels\SynchronizedMessager.cs" />
     <Compile Include="Clients\BaseClient.cs" />
+    <Compile Include="Clients\ClientFactory.cs" />
     <Compile Include="Clients\IClient.cs" />
     <Compile Include="Clients\TcpClient.cs" />
     <Compile Include="Common\CommunicationException.cs" />

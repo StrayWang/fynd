@@ -15,7 +15,7 @@ namespace FyndSharp.Communication.Channels
     /// It also adds queued processing of incoming messages.
     /// </summary>
     /// <typeparam name="T">Type of IMessenger object to use as underlying communication</typeparam>
-    public class RequestReplyMessenger<T> : IMessager, IDisposable where T : IMessager
+    public class RequestReplyMessager<T> : IMessager, IDisposable where T : IMessager
     {
         #region Public events
 
@@ -112,7 +112,7 @@ namespace FyndSharp.Communication.Channels
         /// Creates a new RequestReplyMessenger.
         /// </summary>
         /// <param name="theMessager">IMessenger object to use as underlying communication</param>
-        public RequestReplyMessenger(T theMessager)
+        public RequestReplyMessager(T theMessager)
         {
             Messager = theMessager;
             theMessager.MessageReceived += Messager_MessageReceived;

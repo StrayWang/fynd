@@ -72,7 +72,16 @@ namespace FyndSharp.Communication.Channels
             {
                 this._ListenerSocket.Stop();
             }
+#if TRACE
+            catch (Exception e)
+            {
+
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
             catch { }
+#endif
         }
 
         /// <summary>
@@ -91,8 +100,15 @@ namespace FyndSharp.Communication.Channels
                         this.FireChannelConnectedEvent(new TcpChannel(aClientSocket));
                     }
                 }
+#if TRACE
+                catch(Exception ex1)
+#else
                 catch
+#endif
                 {
+#if TRACE
+                    System.Diagnostics.Trace.WriteLine(ex1.ToString());
+#endif
                     //Disconnect, wait for a while and connect again.
                     this.StopSocket();
                     Thread.Sleep(1000);
@@ -105,7 +121,16 @@ namespace FyndSharp.Communication.Channels
                     {
                         this.StartSocket();
                     }
+#if TRACE
+                    catch (Exception ex2)
+                    {
+
+                        System.Diagnostics.Trace.WriteLine(ex2.ToString());
+
+                    }
+#else
                     catch { }
+#endif
                 }
             }
         }

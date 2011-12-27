@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FyndSharp.Communication.Common;
+using FyndSharp.Communication.Channels;
 
 namespace FyndSharp.Communication.Clients
 {
-    public interface IClient
+    public interface IClient : IMessager, IDisposable
     {
         /// <summary>
         /// This event is raised when client connected to server.

@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace FyndSharp.Communication.Clients
 {
-    public abstract class BaseClient : IClient, IMessager, IDisposable
+    internal abstract class BaseClient : IClient
     {
         /// <summary>
         /// Default timeout value for connecting a server.
@@ -243,7 +243,16 @@ namespace FyndSharp.Communication.Clients
 
                 _CommunicationChannel.Send(new PingMessage());
             }
+#if TRACE
+            catch (Exception e)
+            {
+
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
             catch { }
+#endif
         }
 
 
@@ -303,7 +312,17 @@ namespace FyndSharp.Communication.Clients
             {
                 Dispose(true);
             }
+#if TRACE
+            catch (Exception e)
+            {
+
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
             catch { }
+#endif
+            _IsDisposed = true;
             GC.SuppressFinalize(this);
         }
 

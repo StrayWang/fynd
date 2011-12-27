@@ -9,7 +9,7 @@ namespace FyndSharp.Communication.Protocols
     {
         public static IProtocolFactory GetDefaultProtocolFactory()
         {
-            return new RawDataProtocolFactory();
+            return new BinarySerializationProtocolFactory();
         }
     }
 }

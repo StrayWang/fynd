@@ -73,7 +73,16 @@ namespace FyndSharp.Communication.Channels
             {
                 this._ClientSocket.Close();
             }
+#if TRACE
+            catch (Exception e)
+            {
+
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
             catch { }
+#endif
         }
 
 
@@ -122,10 +131,20 @@ namespace FyndSharp.Communication.Channels
                         , null);
                 }
             }
-            catch
+#if TRACE
+            catch (Exception e)
+            {
+                this.Disconnect();
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
+            catch 
             {
                 this.Disconnect();
             }
+
+#endif
         }
     }
 }

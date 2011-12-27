@@ -66,8 +66,18 @@ namespace FyndSharp.Communication.Channels
             try
             {
                 this.DisconnectImpl();
+                FireDisconnectedEvent();
             }
+#if TRACE
+            catch (Exception e)
+            {
+
+                System.Diagnostics.Trace.WriteLine(e.ToString());
+
+            }
+#else
             catch { }
+#endif
             this.Status = CommunicationStatus.Disconnected;
         }
 

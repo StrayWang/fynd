@@ -5,6 +5,7 @@ using System.Text;
 using FyndSharp.Communication.Server;
 using System.Net;
 using FyndSharp.Communication.Common;
+using System.Threading;
 
 namespace FyndSharp.Communication.ServerDemo
 {
@@ -48,12 +49,12 @@ namespace FyndSharp.Communication.ServerDemo
 
             Console.WriteLine("Client sent a message: " + message.Text +
                               " (Cliend Id = " + client.Id + ")");
-
+            Thread.Sleep(3000);
             //Send reply message to the client
             client.Send(
                 new TextMessage(
-                    "Hello client. I got your message (" + message.Text + ")",
-                    message.Id //Set first message's id as replied message id
+                    message.Id, //Set first message's id as replied message id
+                    "Hello client. I got your message (" + message.Text + ")"
                     ));
         }
     }

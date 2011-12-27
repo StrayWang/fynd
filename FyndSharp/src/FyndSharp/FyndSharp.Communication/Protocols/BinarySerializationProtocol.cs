@@ -35,7 +35,7 @@ namespace FyndSharp.Communication.Protocols
             }
 
             //Create a byte array including the length of the message (4 bytes) and serialized message content
-            MemoryStream theResultStream = new MemoryStream(msgLength + 4);
+            MemoryStream theResultStream = new MemoryStream(new byte[msgLength + 4]);
             BaseTypeSerializer.Int32.Write(msgLength, theResultStream);
             byte[] result = theResultStream.ToArray();
             Array.Copy(msgBytes, 0, result, 4, msgLength);

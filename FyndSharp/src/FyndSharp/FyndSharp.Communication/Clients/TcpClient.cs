@@ -6,7 +6,7 @@ using System.Net.Sockets;
 
 namespace FyndSharp.Communication.Clients
 {
-    public class TcpClient : BaseClient
+    internal class TcpClient : BaseClient
     {
         private readonly IPEndPoint _ServerEndPoint;
 
