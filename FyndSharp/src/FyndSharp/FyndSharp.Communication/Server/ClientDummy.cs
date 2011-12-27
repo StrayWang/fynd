@@ -68,6 +68,9 @@ namespace FyndSharp.Communication.Server
             var theMessage = e.Message;
             if (theMessage is PingMessage)
             {
+#if TRACE
+                System.Diagnostics.Trace.WriteLine("Ping message received from client #" + this.Id);
+#endif
                 this._InternalChannel.Send(new PingMessage(theMessage.Id));
                 return;
             }
