@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("FyndSharp.Communication")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("微软中国")]
+[assembly: AssemblyCompany("fishtrees.cn")]
 [assembly: AssemblyProduct("FyndSharp.Communication")]
-[assembly: AssemblyCopyright("Copyright © 微软中国 2011")]
+[assembly: AssemblyCopyright("Copyright © fishtrees.cn 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
