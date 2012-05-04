@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1ED540AE-77F2-49FD-AD0D-BCF62D46AFB5}</ProjectGuid>
+    <ProjectGuid>{51BDE71B-9D7E-407F-90F5-572E8BF59AED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FyndSharp.Utilities</RootNamespace>
-    <AssemblyName>FyndSharp.Utilities</AssemblyName>
+    <RootNamespace>FyndSharp.Data</RootNamespace>
+    <AssemblyName>FyndSharp.Data</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -25,37 +25,39 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\0.1\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SmartThreadPool">
-      <HintPath>..\Lib\SmartThreadPool.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\Lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Collections\SynchronizedSortedList.cs" />
-    <Compile Include="Common\Checker.cs" />
-    <Compile Include="Common\TypeConvert.cs" />
-    <Compile Include="IO\StreamHelper.cs" />
-    <Compile Include="Net\Mailer.cs" />
-    <Compile Include="Serialization\BinarySerializer.cs" />
-    <Compile Include="Serialization\LimitedSerializer.cs" />
-    <Compile Include="Serialization\ISerializer.cs" />
+    <Compile Include="AdoSessionManager.cs" />
+    <Compile Include="AdoSessionFactory.cs" />
+    <Compile Include="DatabaseConfig.cs" />
+    <Compile Include="DatabaseType.cs" />
+    <Compile Include="FieldCompareResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\BaseTypeSerializer.cs" />
-    <Compile Include="Serialization\VariantNumberSerializer.cs" />
-    <Compile Include="Threading\SequentialItemProcessor.cs" />
+    <Compile Include="AdoSession.cs" />
+    <Compile Include="SqlAdoSession.cs" />
+    <Compile Include="SqliteAdoSession.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FyndSharp.Utilities\FyndSharp.Utilities.csproj">
+      <Project>{1ED540AE-77F2-49FD-AD0D-BCF62D46AFB5}</Project>
+      <Name>FyndSharp.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
