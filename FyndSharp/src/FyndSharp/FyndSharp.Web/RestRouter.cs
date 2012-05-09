@@ -11,40 +11,65 @@ namespace FyndSharp.Web
         public static void Route(IRestHandler handler, HttpContext ctx)
         {
             RestResponse result = null;
-            if (ctx.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
-                || ctx.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                if (ctx.Request.QueryString.AllKeys.Contains<string>("list"))
+                if (ctx.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
+                    || ctx.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = handler.List(ctx);
+                    if (ctx.Request.QueryString.AllKeys.Contains<string>("list"))
+                    {
+                        result = handler.List(ctx);
+                    }
+                    else
+                    {
+                        result = handler.Get(ctx);
+                    }
+                }
+                else if (ctx.Request.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = handler.Add(ctx);
+                }
+                else if (ctx.Request.HttpMethod.Equals("PUT", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = handler.Modify(ctx);
+                }
+                else if (ctx.Request.HttpMethod.Equals("DELETE", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = handler.Delete(ctx);
                 }
                 else
                 {
-                    result = handler.Get(ctx);
+                    ctx.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
+                }
+                if (null != result)
+                {
+                    if (result.Success)
+                    {
+                        if (!String.IsNullOrEmpty(result.MimeType))
+                        {
+                            ctx.Response.ContentType = result.MimeType;
+                        }
+                        if (!String.IsNullOrEmpty(result.Data))
+                        {
+                            ctx.Response.Write(result.Data);
+                        }
+                    }
+                    else
+                    {
+                        ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        ctx.Response.Write(result.ErrorMessage);
+                    }
+                }
+                else
+                {
+                    ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 }
             }
-            else if (ctx.Request.HttpMethod.Equals("POST", StringComparison.OrdinalIgnoreCase))
+            catch (Exception e)
             {
-                result = handler.Add(ctx);
+                ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                ctx.Response.Write(e.Message);
             }
-            else if (ctx.Request.HttpMethod.Equals("PUT", StringComparison.OrdinalIgnoreCase))
-            {
-                result = handler.Modify(ctx);
-            }
-            else if (ctx.Request.HttpMethod.Equals("DELETE", StringComparison.OrdinalIgnoreCase))
-            {
-                result = handler.Delete(ctx);
-            }
-            else
-            {
-                ctx.Response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
-            }
-            if (null != result)
-            {
-                ctx.Response.ContentType = result.MimeType;
-                ctx.Response.Write(result.Data);
-            }
-            
         }
     }
 }

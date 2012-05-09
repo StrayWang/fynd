@@ -226,5 +226,10 @@ namespace FyndSharp.Utilities.Common
             byte[] s = m.ComputeHash(anEncoding.GetBytes(aString));
             return BitConverter.ToString(s).Replace("-", "");
         }
+
+        public static T ToEnum<T>(int value)
+        {
+            return (T)Enum.ToObject(typeof(T), value);
+        }
     }
 }

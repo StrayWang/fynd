@@ -17,6 +17,18 @@ namespace FyndSharp.Data.Orm
         public bool IsPrimary { get; set; }
         public Type ParentType { get; set; }
 
+        public FieldAttribute(string theFieldName, DbType theDataType)
+            : this(theFieldName, theDataType, 0, true, false, null)
+        {
+
+        }
+
+        public FieldAttribute(string theFieldName, DbType theDataType, bool allowNullFlag)
+            : this(theFieldName, theDataType, 0, allowNullFlag, false, null)
+        {
+
+        }
+
         public FieldAttribute(string theFieldName, DbType theDataType, int theDataSize, bool allowNullFlag, bool isPrimaryFlag, Type theParentType)
         {
             Checker.Assert<ArgumentNullException>(!String.IsNullOrEmpty(theFieldName));
@@ -28,6 +40,11 @@ namespace FyndSharp.Data.Orm
             this.AllowNull = allowNullFlag;
             this.IsPrimary = isPrimaryFlag;
             this.ParentType = theParentType;
+
+            if (this.IsPrimary)
+            {
+                this.AllowNull = false;
+            }
         }
 
     }
