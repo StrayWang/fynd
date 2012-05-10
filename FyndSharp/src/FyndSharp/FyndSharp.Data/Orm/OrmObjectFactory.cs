@@ -178,17 +178,20 @@ namespace FyndSharp.Data.Orm
             Checker.Assert<ArgumentNullException>(null != aFeild);
 
             object theFeildValue = aFeild.Property.GetValue(obj, null);
-            Checker.Assert<ArgumentException>(aFeild.FeildAttribute.AllowNull || (!aFeild.FeildAttribute.AllowNull && null != theFeildValue)
-                    , String.Format("The field {0} can not be null.", aFeild.FeildAttribute.FieldName));
             if (aFeild.FeildAttribute.IsPrimary && null == theFeildValue)
             {
                 // 获取主键值
                 theFeildValue = PrimaryValueHandler();
                 Checker.Assert<NotSupportedException>(theFeildValue != null, "Can not set the primary to null.");
             }
-            else if (null == theFeildValue)
+            else
             {
-                theFeildValue = DBNull.Value;
+                Checker.Assert<ArgumentException>(aFeild.FeildAttribute.AllowNull || (!aFeild.FeildAttribute.AllowNull && null != theFeildValue)
+                    , String.Format("The field {0} can not be null.", aFeild.FeildAttribute.FieldName));
+                if (null == theFeildValue)
+                {
+                    theFeildValue = DBNull.Value;
+                }
             }
             return this.DbSession.CreateParameter("@" + aFeild.FeildAttribute.FieldName, aFeild.FeildAttribute.DataType, theFeildValue);
         }

@@ -10,8 +10,8 @@ namespace FyndSharp.Data
     {
         public static AdoSession CreateAdoSession(DatabaseConfig theConfig)
         {
-            Checker.Assert<ArgumentNullException>(null == theConfig);
-            Checker.Assert<ArgumentException>(String.IsNullOrEmpty(theConfig.ConnectionString));
+            Checker.Assert<ArgumentNullException>(null != theConfig);
+            Checker.Assert<ArgumentException>(!String.IsNullOrEmpty(theConfig.ConnectionString));
             switch (theConfig.DatabaseType)
             {
                 case DatabaseType.Sqlite:

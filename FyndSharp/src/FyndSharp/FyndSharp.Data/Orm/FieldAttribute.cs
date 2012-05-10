@@ -32,7 +32,7 @@ namespace FyndSharp.Data.Orm
         public FieldAttribute(string theFieldName, DbType theDataType, int theDataSize, bool allowNullFlag, bool isPrimaryFlag, Type theParentType)
         {
             Checker.Assert<ArgumentNullException>(!String.IsNullOrEmpty(theFieldName));
-            Checker.Assert<ArgumentOutOfRangeException>(theDataSize >= 0);
+            Checker.Assert<ArgumentOutOfRangeException>(theDataSize >= -1);
 
             this.FieldName = theFieldName;
             this.DataSize = theDataSize;
