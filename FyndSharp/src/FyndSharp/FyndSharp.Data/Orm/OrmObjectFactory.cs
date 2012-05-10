@@ -240,18 +240,16 @@ namespace FyndSharp.Data.Orm
             CheckTable(theTableInfo);
 
             StringBuilder builder = new StringBuilder("SELECT ");
-            int i = 0;
+            CheckField(theTableInfo.Primary);
+            builder.Append(theTableInfo.Primary.FeildAttribute.FieldName);
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
-                if (i > 0)
-                {
-                    builder.Append(",");
-                }
+                builder.Append(",");
                 // 检查字段信息是否合法
                 CheckField(aFeild);
                 builder.Append(aFeild.FeildAttribute.FieldName);
-                i++;
             }
+            
             builder.Append(" FROM ");
             builder.Append(theTableInfo.TableAttribute.TableName);
             return builder.ToString();
@@ -274,6 +272,8 @@ namespace FyndSharp.Data.Orm
                 CheckField(aFeild);
                 aFeild.Property.SetValue(obj, data[aFeild.FeildAttribute.FieldName], null);
             }
+            CheckField(theTableInfo.Primary);
+            theTableInfo.Primary.Property.SetValue(obj, data[theTableInfo.Primary.FeildAttribute.FieldName], null);
             return obj;
         }
 

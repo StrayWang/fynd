@@ -16,7 +16,7 @@ namespace FyndSharp.Web
                 if (ctx.Request.HttpMethod.Equals("GET", StringComparison.OrdinalIgnoreCase)
                     || ctx.Request.HttpMethod.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (ctx.Request.QueryString.AllKeys.Contains<string>("list"))
+                    if (ctx.Request.RawUrl.IndexOf("?list", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         result = handler.List(ctx);
                     }
