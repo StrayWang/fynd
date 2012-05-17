@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FyndSharp.Data</name>
+    </assembly>
+    <members>
+        <member name="M:FyndSharp.Data.AdoSession.Open">
+            <summary>
+            建立数据库连接
+            </summary>
+            <returns>如果之前未建立连接，则返回True，反之返回False</returns>
+            <remarks>
+            如果返回True，则调用方负责调用Close关闭该连接。
+            如果返回False，调用方不能关闭该连接，因为可能该连接还在被其他对象使用。
+            遵循谁打开谁关闭的原则。
+            </remarks>
+        </member>
+        <member name="M:FyndSharp.Data.AdoSession.ExecuteReader(System.Data.Common.DbCommand)">
+            <summary>
+            执行SQL命令，返回SqlDataReader，使用该方法必须自己管理数据库连接。
+            </summary>
+            <param name="cmd"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Data.AdoSession.CreateParameter(System.String,System.Data.DbType,System.Object)">
+            <summary>
+            创建SQL Server查询参数
+            </summary>
+            <param name="name">参数名</param>
+            <param name="dataType">参数数据类型</param>
+            <param name="value">参数值</param>
+            <returns></returns>
+        </member>
+        <member name="T:FyndSharp.Data.Orm.OrmObjectFactory">
+            <summary>
+            ORM对象工厂，负责System.Data.Common.DbCommand、System.Data.DataTable和ORM对象之间的转换。
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Data.Orm.OrmObjectFactory.PrimaryValueHandler">
+            <summary>
+            获取下一个有效主键值的代理方法
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.#ctor(FyndSharp.Data.Orm.OrmObjectFactory.NextPrimaryValueHandler,FyndSharp.Data.AdoSession)">
+            <summary>
+            创建OrmObjectFactory新实例
+            </summary>
+            <param name="theNextPrimaryValueHandler">负责获取下一个有效主键值的代理方法</param>
+            <param name="theDbSession">OrmObjectFactory要使用的数据库会话对象</param>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateSaveDbCommand(System.Object)">
+            <summary>
+            创建用于向数据源写入数据的DbCommand，如果指定的object对应的主键值为设置，则创建INSERT，反之创建UPDATE
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateInsertCommand(System.Type)">
+            <summary>
+            通过类型创建插入命令
+            </summary>
+            <param name="theType"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateUpdateCommand(System.Type)">
+            <summary>
+            通过类型创建更新命令
+            </summary>
+            <param name="theType"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateDeleteCommand(System.Type)">
+            <summary>
+            通过类型创建删除命令
+            </summary>
+            <param name="theType"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateDeleteDbCommand(System.Object)">
+            <summary>
+            创建用于删除主键值对应记录的的DbCommand
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateTableInfo(System.Type)">
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateUpdateCommand(System.Object,FyndSharp.Data.Orm.OrmObjectFactory.TableInfo)">
+            <summary>
+            创建UPDATE语句
+            </summary>
+            <param name="obj"></param>
+            <param name="theTableInfo"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CheckTable(FyndSharp.Data.Orm.OrmObjectFactory.TableInfo)">
+            <summary>
+            检查表信息对象，判断主键和其他字段信息是否存在
+            </summary>
+            <param name="theTableInfo"></param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CheckField(FyndSharp.Data.Orm.OrmObjectFactory.FieldInfo)">
+            <summary>
+            检查字段信息对象，判断字段名称是否为空
+            </summary>
+            <param name="theTableInfo"></param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateDbParameter(System.Object,FyndSharp.Data.Orm.OrmObjectFactory.FieldInfo)">
+            <summary>
+            创建DbParamater
+            </summary>
+            <param name="obj"></param>
+            <param name="aFeild"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateInsertCommand(System.Object,FyndSharp.Data.Orm.OrmObjectFactory.TableInfo)">
+            <summary>
+            创建INSERT INTO语句
+            </summary>
+            <param name="obj"></param>
+            <param name="theTableInfo"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.NotSupportedException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateSelectSql(System.Type)">
+            <summary>
+            根据ORM对象类型创建基本的SELECT语句，如SELECT f1, f2 FROM table1
+            </summary>
+            <param name="theType"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateOrmObject``1(System.Data.DataRow)">
+            <summary>
+            创建类为T的对象，并将data中的数据按类型T映射关系绑定到该对象。
+            </summary>
+            <typeparam name="T">ORM对象类型</typeparam>
+            <param name="data">数据行</param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.FillDbParameters(System.Data.Common.DbCommand,System.Object)">
+            <summary>
+            以obj对应的属性值填充DbCommand的参数列表
+            </summary>
+            <param name="cmd">要填充参数值的DbCommand对象</param>
+            <param name="obj">参数值来源对象</param>
+        </member>
+        <member name="P:FyndSharp.Data.Orm.OrmObjectFactory.DbSession">
+            <summary>
+            获取或设置数据库会话对象
+            </summary>
+        </member>
+        <member name="T:FyndSharp.Data.Orm.OrmObjectFactory.NextPrimaryValueHandler">
+            <summary>
+            表示获取下一个有效主键值的代理方法
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:FyndSharp.Data.FieldDifferent">
+            <summary>
+            FieldDifferent类表示数据库表中字段差异
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.FieldName">
+            <summary>
+            获取或设置字段名称
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.DataType">
+            <summary>
+            获取或设置字段数据类型
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.NewValue">
+            <summary>
+            获取或设置字段新值
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.NewValueField">
+            <summary>
+            获取或设置字段新值对应的其他字段
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.UseParentPrimaryFieldValue">
+            <summary>
+            获取或设置一个值，表示该字段是否使用父表的主键值作为它的值
+            </summary>
+        </member>
+    </members>
+</doc>
