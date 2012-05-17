@@ -45,6 +45,9 @@ namespace FyndSharp.Data.Orm
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.NotSupportedException"></exception>
         public DbCommand CreateSaveDbCommand(object obj)
         {
             Type theType = obj.GetType();
@@ -62,7 +65,73 @@ namespace FyndSharp.Data.Orm
                 return CreateUpdateCommand(obj, theTableInfo);
             }
         }
+        /// <summary>
+        /// 通过类型创建插入命令
+        /// </summary>
+        /// <param name="theType"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public DbCommand CreateInsertCommand(Type theType)
+        {            
+            return CreateInsertCommand(null, CreateTableInfo(theType));
+        }
+        /// <summary>
+        /// 通过类型创建更新命令
+        /// </summary>
+        /// <param name="theType"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public DbCommand CreateUpdateCommand(Type theType)
+        {
+            return CreateInsertCommand(null, CreateTableInfo(theType));
+        }
+        /// <summary>
+        /// 通过类型创建删除命令
+        /// </summary>
+        /// <param name="theType"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public DbCommand CreateDeleteCommand(Type theType)
+        {
+            return CreateDeleteCommand(null, CreateTableInfo(theType));
+        }
+        /// <summary>
+        /// 创建用于删除主键值对应记录的的DbCommand
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.NotSupportedException"></exception>
+        public DbCommand CreateDeleteDbCommand(object obj)
+        {
+            Type theType = obj.GetType();
+            TableInfo theTableInfo = CreateTableInfo(theType);
+            return CreateDeleteCommand(obj, theTableInfo);
+        }
 
+        private DbCommand CreateDeleteCommand(object obj, TableInfo theTableInfo)
+        {
+            // 检查表信息是否合法
+            CheckTable(theTableInfo);
+
+            StringBuilder builder = new StringBuilder("DELETE FROM ");
+            builder.Append(theTableInfo.TableAttribute.TableName);
+
+            builder.Append(" WHERE ");
+            builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
+            builder.Append("=@");
+            builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
+            List<DbParameter> theDbParams = new List<DbParameter>(1);
+            // 创建主键参数
+            theDbParams.Add(CreateDbParameter(obj, theTableInfo.Primary));
+
+            return DbSession.CreateCommand(builder.ToString(), theDbParams.ToArray());
+        }
+        /// <exception cref="System.ArgumentException"></exception>
         private static TableInfo CreateTableInfo(Type theType)
         {
             TableInfo theTableInfo = null;
@@ -104,7 +173,7 @@ namespace FyndSharp.Data.Orm
                 {
                     theTableInfo.Primary = new FieldInfo()
                     {
-                        FeildAttribute = theCurrentFeild,
+                        FieldAttribute = theCurrentFeild,
                         Property = aProperty
                     };
                 }
@@ -112,7 +181,7 @@ namespace FyndSharp.Data.Orm
                 {
                     theTableInfo.FieldList.Add(new FieldInfo()
                     {
-                        FeildAttribute = theCurrentFeild,
+                        FieldAttribute = theCurrentFeild,
                         Property = aProperty
                     });
                 }
@@ -120,6 +189,15 @@ namespace FyndSharp.Data.Orm
             _TableInfoCache.Add(theType.FullName, theTableInfo);
             return theTableInfo;
         }
+        /// <summary>
+        /// 创建UPDATE语句
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="theTableInfo"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.NotSupportedException"></exception>
         private DbCommand CreateUpdateCommand(object obj, TableInfo theTableInfo)
         {
             // 检查表信息是否合法
@@ -140,61 +218,94 @@ namespace FyndSharp.Data.Orm
                 // 检查字段信息是否合法
                 CheckField(aFeild);
 
-                builder.Append(aFeild.FeildAttribute.FieldName);
+                builder.Append(aFeild.FieldAttribute.FieldName);
                 builder.Append("=@");
-                builder.Append(aFeild.FeildAttribute.FieldName);
+                builder.Append(aFeild.FieldAttribute.FieldName);
                 // 创建参数对象
                 theDbParams.Add(CreateDbParameter(obj, aFeild));
                 i++;
             }
             
             builder.Append(" WHERE ");
-            builder.Append(theTableInfo.Primary.FeildAttribute.FieldName);
+            builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
             builder.Append("=@");
-            builder.Append(theTableInfo.Primary.FeildAttribute.FieldName);
+            builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
             // 创建主键参数
             theDbParams.Add(CreateDbParameter(obj, theTableInfo.Primary));
 
             return DbSession.CreateCommand(builder.ToString(), theDbParams.ToArray());
         }
-
+        /// <summary>
+        /// 检查表信息对象，判断主键和其他字段信息是否存在
+        /// </summary>
+        /// <param name="theTableInfo"></param>
+        /// <exception cref="System.ArgumentException"></exception>
         private static void CheckTable(TableInfo theTableInfo)
         {
             Checker.Assert<ArgumentException>((null != theTableInfo.Primary)
-                    && (null != theTableInfo.Primary.FeildAttribute)
-                    && !String.IsNullOrEmpty(theTableInfo.Primary.FeildAttribute.FieldName)
+                    && (null != theTableInfo.Primary.FieldAttribute)
+                    && !String.IsNullOrEmpty(theTableInfo.Primary.FieldAttribute.FieldName)
                     && (theTableInfo.FieldList.Count > 0)
                 , "The table is invalid.");
         }
+        /// <summary>
+        /// 检查字段信息对象，判断字段名称是否为空
+        /// </summary>
+        /// <param name="theTableInfo"></param>
+        /// <exception cref="System.ArgumentException"></exception>
         private static void CheckField(FieldInfo aFeild)
         {
             Checker.Assert<ArgumentException>(null != aFeild
-                        && null != aFeild.FeildAttribute
-                        && !String.IsNullOrEmpty(aFeild.FeildAttribute.FieldName)
+                        && null != aFeild.FieldAttribute
+                        && !String.IsNullOrEmpty(aFeild.FieldAttribute.FieldName)
                     , "The feild is invalid.");
         }
+        /// <summary>
+        /// 创建DbParamater
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="aFeild"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.NotSupportedException"></exception>
         private DbParameter CreateDbParameter(object obj, FieldInfo aFeild)
         {
             Checker.Assert<ArgumentNullException>(null != aFeild);
 
-            object theFeildValue = aFeild.Property.GetValue(obj, null);
-            if (aFeild.FeildAttribute.IsPrimary && null == theFeildValue)
+            object theFeildValue = null;
+            if (null != obj)
             {
-                // 获取主键值
-                theFeildValue = PrimaryValueHandler();
-                Checker.Assert<NotSupportedException>(theFeildValue != null, "Can not set the primary to null.");
-            }
-            else
-            {
-                Checker.Assert<ArgumentException>(aFeild.FeildAttribute.AllowNull || (!aFeild.FeildAttribute.AllowNull && null != theFeildValue)
-                    , String.Format("The field {0} can not be null.", aFeild.FeildAttribute.FieldName));
-                if (null == theFeildValue)
+                theFeildValue = aFeild.Property.GetValue(obj, null);
+                if (aFeild.FieldAttribute.IsPrimary && null == theFeildValue)
                 {
-                    theFeildValue = DBNull.Value;
+                    // 获取主键值
+                    theFeildValue = PrimaryValueHandler();
+                    Checker.Assert<NotSupportedException>(theFeildValue != null, "Can not set the primary to null.");
+                }
+                else
+                {
+                    Checker.Assert<ArgumentException>(aFeild.FieldAttribute.AllowNull || (!aFeild.FieldAttribute.AllowNull && null != theFeildValue)
+                        , String.Format("The field {0} can not be null.", aFeild.FieldAttribute.FieldName));
+                    if (null == theFeildValue)
+                    {
+                        theFeildValue = DBNull.Value;
+                    }
                 }
             }
-            return this.DbSession.CreateParameter("@" + aFeild.FeildAttribute.FieldName, aFeild.FeildAttribute.DataType, theFeildValue);
+            return this.DbSession.CreateParameter("@" + aFeild.FieldAttribute.FieldName
+                , aFeild.FieldAttribute.DataType
+                , (theFeildValue == null) ? DBNull.Value : theFeildValue);
         }
+        /// <summary>
+        /// 创建INSERT INTO语句
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="theTableInfo"></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException"></exception>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.NotSupportedException"></exception>
         private DbCommand CreateInsertCommand(object obj, TableInfo theTableInfo)
         {
             // 检查表信息是否合法
@@ -205,18 +316,18 @@ namespace FyndSharp.Data.Orm
             builder.Append(theTableInfo.TableAttribute.TableName);
             builder.Append(" (");
             // 主键及其参数
-            StringBuilder colList = new StringBuilder(theTableInfo.Primary.FeildAttribute.FieldName);
+            StringBuilder colList = new StringBuilder(theTableInfo.Primary.FieldAttribute.FieldName);
             StringBuilder valList = new StringBuilder("@");
-            valList.Append(theTableInfo.Primary.FeildAttribute.FieldName);
+            valList.Append(theTableInfo.Primary.FieldAttribute.FieldName);
             theDbParams.Add(this.CreateDbParameter(obj, theTableInfo.Primary));
             // INSERT子句非主键column列表和参数
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
                 colList.Append(",");
-                colList.Append(aFeild.FeildAttribute.FieldName);
+                colList.Append(aFeild.FieldAttribute.FieldName);
                 valList.Append(",");
                 valList.Append("@");
-                valList.Append(aFeild.FeildAttribute.FieldName);
+                valList.Append(aFeild.FieldAttribute.FieldName);
                 theDbParams.Add(CreateDbParameter(obj, aFeild));
             }
             builder.Append(colList);
@@ -231,6 +342,8 @@ namespace FyndSharp.Data.Orm
         /// </summary>
         /// <param name="theType"></param>
         /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        /// <exception cref="System.ArgumentException"></exception>
         public static string CreateSelectSql(Type theType)
         {
             Checker.Assert<ArgumentNullException>(null != theType);
@@ -241,13 +354,13 @@ namespace FyndSharp.Data.Orm
 
             StringBuilder builder = new StringBuilder("SELECT ");
             CheckField(theTableInfo.Primary);
-            builder.Append(theTableInfo.Primary.FeildAttribute.FieldName);
+            builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
                 builder.Append(",");
                 // 检查字段信息是否合法
                 CheckField(aFeild);
-                builder.Append(aFeild.FeildAttribute.FieldName);
+                builder.Append(aFeild.FieldAttribute.FieldName);
             }
             
             builder.Append(" FROM ");
@@ -270,17 +383,49 @@ namespace FyndSharp.Data.Orm
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
                 CheckField(aFeild);
-                aFeild.Property.SetValue(obj, data[aFeild.FeildAttribute.FieldName], null);
+                aFeild.Property.SetValue(obj, data[aFeild.FieldAttribute.FieldName], null);
             }
             CheckField(theTableInfo.Primary);
-            theTableInfo.Primary.Property.SetValue(obj, data[theTableInfo.Primary.FeildAttribute.FieldName], null);
+            theTableInfo.Primary.Property.SetValue(obj, data[theTableInfo.Primary.FieldAttribute.FieldName], null);
             return obj;
+        }
+        /// <summary>
+        /// 以obj对应的属性值填充DbCommand的参数列表
+        /// </summary>
+        /// <param name="cmd">要填充参数值的DbCommand对象</param>
+        /// <param name="obj">参数值来源对象</param>
+        public static void FillDbParameters(DbCommand cmd, object obj)
+        {
+            Type theType = obj.GetType();
+            TableInfo theTableInfo = CreateTableInfo(theType);
+            // 检查表信息是否合法
+            CheckTable(theTableInfo);
+            string paramFieldName = String.Empty;
+            foreach (DbParameter aParam in cmd.Parameters)
+            {
+                paramFieldName = aParam.ParameterName.Replace("@", String.Empty).Replace(":", String.Empty).Replace("$", String.Empty);
+                if (paramFieldName.Equals(theTableInfo.Primary.FieldAttribute.FieldName))
+                {
+                    aParam.Value = theTableInfo.Primary.Property.GetValue(obj, null);
+                }
+                else
+                {
+                    foreach (FieldInfo aField in theTableInfo.FieldList)
+                    {
+                        if (paramFieldName.Equals(aField.FieldAttribute.FieldName))
+                        {
+                            aParam.Value = aField.Property.GetValue(obj, null);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private class FieldInfo
         {
             public PropertyInfo Property;
-            public FieldAttribute FeildAttribute;
+            public FieldAttribute FieldAttribute;
         }
         private class TableInfo
         {

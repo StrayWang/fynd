@@ -22,5 +22,18 @@ namespace FyndSharp.TreeLayerArchitecture.Logic
             obj.Initialize();
             return obj;
         }
+
+
+        public T CreateLogic<T>(BaseLogic theParent) where T : BaseLogic
+        {
+            Checker.Assert<ArgumentNullException>(null != theParent);
+
+            T obj = default(T);
+            Type theType = typeof(T);
+            obj = typeof(T).Assembly.CreateInstance(theType.FullName) as T;
+            obj.Context = theParent.Context;
+            obj.Initialize();
+            return obj;
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace FyndSharp.TreeLayerArchitecture.Logic
     public interface ILogicFactory
     {
         T CreateLogic<T>(IUser theUser) where T : BaseLogic;
+        T CreateLogic<T>(BaseLogic theParent) where T : BaseLogic;
     }
 }
