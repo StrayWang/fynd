@@ -85,7 +85,7 @@ namespace FyndSharp.Data.Orm
         /// <exception cref="System.ArgumentNullException"></exception>
         public DbCommand CreateUpdateCommand(Type theType)
         {
-            return CreateInsertCommand(null, CreateTableInfo(theType));
+            return CreateUpdateCommand(null, CreateTableInfo(theType));
         }
         /// <summary>
         /// 通过类型创建删除命令
@@ -251,7 +251,7 @@ namespace FyndSharp.Data.Orm
         /// <summary>
         /// 检查字段信息对象，判断字段名称是否为空
         /// </summary>
-        /// <param name="theTableInfo"></param>
+        /// <param name="aFeild"></param>
         /// <exception cref="System.ArgumentException"></exception>
         private static void CheckField(FieldInfo aFeild)
         {
