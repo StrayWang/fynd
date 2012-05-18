@@ -4,6 +4,11 @@
         <name>FyndSharp.Data</name>
     </assembly>
     <members>
+        <member name="T:FyndSharp.Data.DatabaseType">
+            <summary>
+            表示数据类型，如SQLServer，SQLite等
+            </summary>
+        </member>
         <member name="M:FyndSharp.Data.AdoSession.Open">
             <summary>
             建立数据库连接
@@ -120,7 +125,7 @@
             <summary>
             检查字段信息对象，判断字段名称是否为空
             </summary>
-            <param name="theTableInfo"></param>
+            <param name="aFeild"></param>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="M:FyndSharp.Data.Orm.OrmObjectFactory.CreateDbParameter(System.Object,FyndSharp.Data.Orm.OrmObjectFactory.FieldInfo)">
