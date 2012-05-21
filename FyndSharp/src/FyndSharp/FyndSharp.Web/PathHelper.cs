@@ -11,7 +11,12 @@ namespace FyndSharp.Web
         public static string ConvertToVirtualPath (string path)
         {
             Checker.Assert<ArgumentNullException>(!String.IsNullOrEmpty(path));
-            return HttpContext.Current.Request.ApplicationPath + path;
+            string appPath = HttpContext.Current.Request.ApplicationPath;
+            if (appPath.EndsWith("/"))
+            {
+                return appPath + path;
+            }
+            return appPath + "/" + path;
         }
     }
 }
