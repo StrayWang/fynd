@@ -4,6 +4,149 @@
         <name>FyndSharp.Utilities</name>
     </assembly>
     <members>
+        <member name="T:FyndSharp.Utilities.Collections.SynchronizedSortedList`2">
+            <summary>
+            This class is used to store key-value based items in a thread safe manner.
+            It uses System.Collections.Generic.SortedList internally.
+            </summary>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Items">
+            <summary>
+            Internal collection to store items.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Lock">
+            <summary>
+            Used to synchronize access to _items list.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.#ctor">
+            <summary>
+            Creates a new ThreadSafeSortedList object.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsKey(`0)">
+            <summary>
+            Checks if collection contains spesified key.
+            </summary>
+            <param name="key">Key to check</param>
+            <returns>True; if collection contains given key</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsValue(`1)">
+            <summary>
+            Checks if collection contains spesified item.
+            </summary>
+            <param name="item">Item to check</param>
+            <returns>True; if collection contains given item</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Remove(`0)">
+            <summary>
+            Removes an item from collection.
+            </summary>
+            <param name="key">Key of item to remove</param>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Clear">
+            <summary>
+            Removes all items from list.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.GetAndClearAllItems">
+            <summary>
+            Gets then removes all items in collection.
+            </summary>
+            <returns>Item list</returns>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Item(`0)">
+            <summary>
+            Gets/adds/replaces an item by key.
+            </summary>
+            <param name="key">Key to get/set value</param>
+            <returns>Item associated with this key</returns>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Count">
+            <summary>
+            Gets count of items in the collection.
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Values">
+            <summary>
+            Gets all items in collection.
+            </summary>
+            <returns>Item list</returns>
+        </member>
+        <member name="T:FyndSharp.Utilities.Serialization.LimitedSerializer">
+            <summary>
+            Reads the same variant prefixed string and byte[] but with a hard-limit on size
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.LimitedSerializer.#ctor(System.Int32)">
+            <summary>
+            Constructs a limited length-prefix data reader/writer
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes1024">
+            <summary> Reads up to 1024 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes2048">
+            <summary> Reads up to 2048 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes4092">
+            <summary> Reads up to 4092 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes8196">
+            <summary> Reads up to 8196 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String256">
+            <summary> Reads up to 256 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String512">
+            <summary> Reads up to 512 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String1024">
+            <summary> Reads up to 1024 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Unlimited">
+            <summary> This is the only class with read/write prefixed data </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToCurrency(System.String,System.Decimal,System.String,System.Decimal,System.Decimal)">
+            <summary>
+            按汇率进行货币转换
+            </summary>
+            <param name="srcCurrencyCode">原币代码，大写</param>
+            <param name="srcExchangeRate">原币汇率</param>
+            <param name="dstCurrencyCode"></param>
+            <param name="dstExchangeRate"></param>
+            <param name="srcAmount">原币金额</param>
+            <returns></returns>
+        </member>
+        <member name="T:FyndSharp.Utilities.Serialization.VariantNumberSerializer">
+            <summary>
+            Provides numeric serializers for packed int/long values.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Instance">
+            <summary> Gets a singleton of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int32">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt32">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int64">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt64">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Write(System.UInt64,System.IO.Stream)">
+            <summary> Writes the object to the stream </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Read(System.IO.Stream)">
+            <summary> Reads the object from a stream </summary>
+        </member>
         <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Instance">
             <summary> Gets a singleton of the PrimitiveSerializer </summary>
         </member>
@@ -63,40 +206,6 @@
         </member>
         <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.UIntPtr">
             <summary> Gets a typed version of the PrimitiveSerializer </summary>
-        </member>
-        <member name="T:FyndSharp.Utilities.Serialization.LimitedSerializer">
-            <summary>
-            Reads the same variant prefixed string and byte[] but with a hard-limit on size
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Serialization.LimitedSerializer.#ctor(System.Int32)">
-            <summary>
-            Constructs a limited length-prefix data reader/writer
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes1024">
-            <summary> Reads up to 1024 length-prefixed byte array </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes2048">
-            <summary> Reads up to 2048 length-prefixed byte array </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes4092">
-            <summary> Reads up to 4092 length-prefixed byte array </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes8196">
-            <summary> Reads up to 8196 length-prefixed byte array </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String256">
-            <summary> Reads up to 256 length-prefixed string </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String512">
-            <summary> Reads up to 512 length-prefixed string </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String1024">
-            <summary> Reads up to 1024 length-prefixed string </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Unlimited">
-            <summary> This is the only class with read/write prefixed data </summary>
         </member>
         <member name="T:FyndSharp.Utilities.Common.Checker">
             <summary>
@@ -197,78 +306,6 @@
             Used to delay creation of the excpetion until the condition fails.
             </summary>
         </member>
-        <member name="T:FyndSharp.Utilities.Collections.SynchronizedSortedList`2">
-            <summary>
-            This class is used to store key-value based items in a thread safe manner.
-            It uses System.Collections.Generic.SortedList internally.
-            </summary>
-            <typeparam name="TKey">Key type</typeparam>
-            <typeparam name="TValue">Value type</typeparam>
-        </member>
-        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Items">
-            <summary>
-            Internal collection to store items.
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Lock">
-            <summary>
-            Used to synchronize access to _items list.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.#ctor">
-            <summary>
-            Creates a new ThreadSafeSortedList object.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsKey(`0)">
-            <summary>
-            Checks if collection contains spesified key.
-            </summary>
-            <param name="key">Key to check</param>
-            <returns>True; if collection contains given key</returns>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsValue(`1)">
-            <summary>
-            Checks if collection contains spesified item.
-            </summary>
-            <param name="item">Item to check</param>
-            <returns>True; if collection contains given item</returns>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Remove(`0)">
-            <summary>
-            Removes an item from collection.
-            </summary>
-            <param name="key">Key of item to remove</param>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Clear">
-            <summary>
-            Removes all items from list.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.GetAndClearAllItems">
-            <summary>
-            Gets then removes all items in collection.
-            </summary>
-            <returns>Item list</returns>
-        </member>
-        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Item(`0)">
-            <summary>
-            Gets/adds/replaces an item by key.
-            </summary>
-            <param name="key">Key to get/set value</param>
-            <returns>Item associated with this key</returns>
-        </member>
-        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Count">
-            <summary>
-            Gets count of items in the collection.
-            </summary>
-        </member>
-        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Values">
-            <summary>
-            Gets all items in collection.
-            </summary>
-            <returns>Item list</returns>
-        </member>
         <member name="T:FyndSharp.Utilities.Threading.SequentialItemProcessor`1">
             <summary>
             This class is used to process items sequentially in a multithreaded manner.
@@ -327,43 +364,6 @@
             This method runs on a new seperated Task (thread) to process
             items on the queue.
             </summary>
-        </member>
-        <member name="T:FyndSharp.Utilities.Serialization.VariantNumberSerializer">
-            <summary>
-            Provides numeric serializers for packed int/long values.
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Instance">
-            <summary> Gets a singleton of the VariantNumberSerializer </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int32">
-            <summary> Gets a typed version of the VariantNumberSerializer </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt32">
-            <summary> Gets a typed version of the VariantNumberSerializer </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int64">
-            <summary> Gets a typed version of the VariantNumberSerializer </summary>
-        </member>
-        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt64">
-            <summary> Gets a typed version of the VariantNumberSerializer </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Write(System.UInt64,System.IO.Stream)">
-            <summary> Writes the object to the stream </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Read(System.IO.Stream)">
-            <summary> Reads the object from a stream </summary>
-        </member>
-        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToCurrency(System.String,System.Decimal,System.String,System.Decimal,System.Decimal)">
-            <summary>
-            按汇率进行货币转换
-            </summary>
-            <param name="srcCurrencyCode">原币代码，大写</param>
-            <param name="srcExchangeRate">原币汇率</param>
-            <param name="dstCurrencyCode"></param>
-            <param name="dstExchangeRate"></param>
-            <param name="srcAmount">原币金额</param>
-            <returns></returns>
         </member>
     </members>
 </doc>

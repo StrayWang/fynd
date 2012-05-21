@@ -4,125 +4,6 @@
         <name>FyndSharp.Communication</name>
     </assembly>
     <members>
-        <member name="T:FyndSharp.Communication.Channels.ChannelEventArgs">
-            <summary>
-            Stores communication channel information to be used by an event.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.ChannelEventArgs.#ctor(FyndSharp.Communication.Channels.IChannel)">
-            <summary>
-            Creates a new CommunicationChannelEventArgs object.
-            </summary>
-            <param name="channel">Communication channel that is associated with this event</param>
-        </member>
-        <member name="P:FyndSharp.Communication.Channels.ChannelEventArgs.Channel">
-            <summary>
-            Communication channel that is associated with this event.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Clients.IClient.Connect">
-            <summary>
-            Connects to server.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Clients.IClient.Disconnect">
-            <summary>
-            Disconnects from server.
-            Does nothing if already disconnected.
-            </summary>
-        </member>
-        <member name="E:FyndSharp.Communication.Clients.IClient.Connected">
-            <summary>
-            This event is raised when client connected to server.
-            </summary>
-        </member>
-        <member name="E:FyndSharp.Communication.Clients.IClient.Disconnected">
-            <summary>
-            This event is raised when client disconnected from server.
-            </summary>
-        </member>
-        <member name="P:FyndSharp.Communication.Clients.IClient.ConnectTimeout">
-            <summary>
-            Timeout for connecting to a server (as milliseconds).
-            Default value: 15 seconds (15000 ms).
-            </summary>
-        </member>
-        <member name="P:FyndSharp.Communication.Clients.IClient.CommunicationStatus">
-            <summary>
-            Gets the current communication state.
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Communication.Server.BaseServer._LastClientId">
-            <summary>
-            Used to set an auto incremential unique identifier to clients.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Server.BaseServer.GetClientId">
-            <summary>
-            Gets an unique number to be used as idenfitier of a client.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:FyndSharp.Communication.Channels.BaseListener">
-            <summary>
-            Represents a communication listener.
-            A connection listener is used to accept incoming client connection requests.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.BaseListener.Start">
-            <summary>
-            Starts listening incoming connections.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.BaseListener.Stop">
-            <summary>
-            Stops listening incoming connections.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.BaseListener.FireChannelConnectedEvent(FyndSharp.Communication.Channels.BaseChannel)">
-            <summary>
-            Raises CommunicationChannelConnected event.
-            </summary>
-            <param name="client"></param>
-        </member>
-        <member name="E:FyndSharp.Communication.Channels.BaseListener.ChannelConnected">
-            <summary>
-            This event is raised when a new communication channel connected.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor">
-            <summary>
-            Contstructor.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
-            <summary>
-            Contstructor for serializing.
-            </summary>
-        </member>
-        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.String)">
-            <summary>
-            Contstructor.
-            </summary>
-            <param name="message">Exception message</param>
-        </member>
-        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.String,System.Exception)">
-            <summary>
-            Contstructor.
-            </summary>
-            <param name="message">Exception message</param>
-            <param name="innerException">Inner exception</param>
-        </member>
-        <member name="T:FyndSharp.Communication.Channels.SynchronizedMessager`1">
-            <summary>
-            This class is a wrapper for IMessager and is used
-            to synchronize message receiving operation.
-            It extends RequestReplyMessenger.
-            It is suitable to use in applications those want to receive
-            messages by synchronized method calls instead of asynchronous 
-            MessageReceived event.
-            </summary>
-        </member>
         <member name="T:FyndSharp.Communication.Channels.RequestReplyMessager`1">
             <summary>
             This class adds SendMessageAndWaitForResponse(...) and SendAndReceiveMessage methods
@@ -328,105 +209,42 @@
             Response is properly received.
             </summary>
         </member>
-        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._ReceivingMessageQueue">
+        <member name="F:FyndSharp.Communication.Server.BaseServer._LastClientId">
             <summary>
-            A queue that is used to store receiving messages until Receive(...)
-            method is called to get them.
+            Used to set an auto incremential unique identifier to clients.
             </summary>
         </member>
-        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._ReceiveWaitEvent">
+        <member name="M:FyndSharp.Communication.Server.BaseServer.GetClientId">
             <summary>
-            This object is used to synchronize/wait threads.
+            Gets an unique number to be used as idenfitier of a client.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:FyndSharp.Communication.Channels.BaseListener">
+            <summary>
+            Represents a communication listener.
+            A connection listener is used to accept incoming client connection requests.
             </summary>
         </member>
-        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._IsRunning">
+        <member name="M:FyndSharp.Communication.Channels.BaseListener.Start">
             <summary>
-            This boolean value indicates the running state of this class.
+            Starts listening incoming connections.
             </summary>
         </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.#ctor(`0)">
+        <member name="M:FyndSharp.Communication.Channels.BaseListener.Stop">
             <summary>
-             Creates a new SynchronizedMessenger object.
-            </summary>
-            <param name="aMessager">A IMessager object to be used to send/receive messages</param>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.#ctor(`0,System.Int32)">
-            <summary>
-             Creates a new SynchronizedMessenger object.
-            </summary>
-            <param name="aMessager">A IMessager object to be used to send/receive messages</param>
-            <param name="theIncomingMessageQueueCapacity">capacity of the incoming message queue</param>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.Start">
-            <summary>
-            Starts the messenger.
+            Stops listening incoming connections.
             </summary>
         </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.Stop">
+        <member name="M:FyndSharp.Communication.Channels.BaseListener.FireChannelConnectedEvent(FyndSharp.Communication.Channels.BaseChannel)">
             <summary>
-            Stops the messenger.
+            Raises CommunicationChannelConnected event.
             </summary>
+            <param name="client"></param>
         </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage">
+        <member name="E:FyndSharp.Communication.Channels.BaseListener.ChannelConnected">
             <summary>
-            This method is used to receive a message from remote application.
-            It waits until a message is received.
-            </summary>
-            <returns>Received message</returns>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage(System.Int32)">
-            <summary>
-            This method is used to receive a message from remote application.
-            It waits until a message is received or timeout occurs.
-            </summary>
-            <param name="theTimeout">
-            Timeout value to wait if no message is received.
-            Use -1 to wait indefinitely.
-            </param>
-            <returns>Received message</returns>
-            <exception cref="T:System.TimeoutException">Throws TimeoutException if timeout occurs</exception>
-            <exception cref="T:System.Exception">Throws Exception if SynchronizedMessenger stops before a message is received</exception>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage``1">
-            <summary>
-            This method is used to receive a specific type of message from remote application.
-            It waits until a message is received.
-            </summary>
-            <returns>Received message</returns>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage``1(System.Int32)">
-            <summary>
-            This method is used to receive a specific type of message from remote application.
-            It waits until a message is received or timeout occurs.
-            </summary>
-            <param name="theTimeout">
-            Timeout value to wait if no message is received.
-            Use -1 to wait indefinitely.
-            </param>
-            <returns>Received message</returns>
-        </member>
-        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.FireMessageReceivedEvent(FyndSharp.Communication.Common.IMessage)">
-            <summary>
-            Overrides
-            </summary>
-            <param name="theMessage"></param>
-        </member>
-        <member name="P:FyndSharp.Communication.Channels.SynchronizedMessager`1.IncomingMessageQueueCapacity">
-            <summary>
-             Gets/sets capacity of the incoming message queue.
-             No message is received from remote application if
-             number of messages in internal queue exceeds this value.
-             Default value: int.MaxValue (2147483647).
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Communication.Protocols.BinarySerializationProtocol.MaxMessageLength">
-            <summary>
-            Maximum length of a message.
-            </summary>
-        </member>
-        <member name="F:FyndSharp.Communication.Protocols.BinarySerializationProtocol._ReceiveMemoryStream">
-            <summary>
-            This MemoryStream object is used to collect receiving bytes to build messages.
+            This event is raised when a new communication channel connected.
             </summary>
         </member>
         <member name="F:FyndSharp.Communication.Channels.TcpConnectionListener._EndPoint">
@@ -469,6 +287,38 @@
             <summary>
             Entrance point of the thread.
             This method is used by the thread to listen incoming requests.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Clients.IClient.Connect">
+            <summary>
+            Connects to server.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Clients.IClient.Disconnect">
+            <summary>
+            Disconnects from server.
+            Does nothing if already disconnected.
+            </summary>
+        </member>
+        <member name="E:FyndSharp.Communication.Clients.IClient.Connected">
+            <summary>
+            This event is raised when client connected to server.
+            </summary>
+        </member>
+        <member name="E:FyndSharp.Communication.Clients.IClient.Disconnected">
+            <summary>
+            This event is raised when client disconnected from server.
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Communication.Clients.IClient.ConnectTimeout">
+            <summary>
+            Timeout for connecting to a server (as milliseconds).
+            Default value: 15 seconds (15000 ms).
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Communication.Clients.IClient.CommunicationStatus">
+            <summary>
+            Gets the current communication state.
             </summary>
         </member>
         <member name="F:FyndSharp.Communication.Clients.BaseClient.DefaultConnectionAttemptTimeout">
@@ -608,6 +458,156 @@
         <member name="P:FyndSharp.Communication.Clients.BaseClient.LastSentTime">
             <summary>
             Gets the time of the last succesfully received message.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Communication.Protocols.BinarySerializationProtocol.MaxMessageLength">
+            <summary>
+            Maximum length of a message.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Communication.Protocols.BinarySerializationProtocol._ReceiveMemoryStream">
+            <summary>
+            This MemoryStream object is used to collect receiving bytes to build messages.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor">
+            <summary>
+            Contstructor.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Contstructor for serializing.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.String)">
+            <summary>
+            Contstructor.
+            </summary>
+            <param name="message">Exception message</param>
+        </member>
+        <member name="M:FyndSharp.Communication.Common.CommunicationException.#ctor(System.String,System.Exception)">
+            <summary>
+            Contstructor.
+            </summary>
+            <param name="message">Exception message</param>
+            <param name="innerException">Inner exception</param>
+        </member>
+        <member name="T:FyndSharp.Communication.Channels.SynchronizedMessager`1">
+            <summary>
+            This class is a wrapper for IMessager and is used
+            to synchronize message receiving operation.
+            It extends RequestReplyMessenger.
+            It is suitable to use in applications those want to receive
+            messages by synchronized method calls instead of asynchronous 
+            MessageReceived event.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._ReceivingMessageQueue">
+            <summary>
+            A queue that is used to store receiving messages until Receive(...)
+            method is called to get them.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._ReceiveWaitEvent">
+            <summary>
+            This object is used to synchronize/wait threads.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Communication.Channels.SynchronizedMessager`1._IsRunning">
+            <summary>
+            This boolean value indicates the running state of this class.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.#ctor(`0)">
+            <summary>
+             Creates a new SynchronizedMessenger object.
+            </summary>
+            <param name="aMessager">A IMessager object to be used to send/receive messages</param>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.#ctor(`0,System.Int32)">
+            <summary>
+             Creates a new SynchronizedMessenger object.
+            </summary>
+            <param name="aMessager">A IMessager object to be used to send/receive messages</param>
+            <param name="theIncomingMessageQueueCapacity">capacity of the incoming message queue</param>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.Start">
+            <summary>
+            Starts the messenger.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.Stop">
+            <summary>
+            Stops the messenger.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage">
+            <summary>
+            This method is used to receive a message from remote application.
+            It waits until a message is received.
+            </summary>
+            <returns>Received message</returns>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage(System.Int32)">
+            <summary>
+            This method is used to receive a message from remote application.
+            It waits until a message is received or timeout occurs.
+            </summary>
+            <param name="theTimeout">
+            Timeout value to wait if no message is received.
+            Use -1 to wait indefinitely.
+            </param>
+            <returns>Received message</returns>
+            <exception cref="T:System.TimeoutException">Throws TimeoutException if timeout occurs</exception>
+            <exception cref="T:System.Exception">Throws Exception if SynchronizedMessenger stops before a message is received</exception>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage``1">
+            <summary>
+            This method is used to receive a specific type of message from remote application.
+            It waits until a message is received.
+            </summary>
+            <returns>Received message</returns>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.ReceiveMessage``1(System.Int32)">
+            <summary>
+            This method is used to receive a specific type of message from remote application.
+            It waits until a message is received or timeout occurs.
+            </summary>
+            <param name="theTimeout">
+            Timeout value to wait if no message is received.
+            Use -1 to wait indefinitely.
+            </param>
+            <returns>Received message</returns>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.SynchronizedMessager`1.FireMessageReceivedEvent(FyndSharp.Communication.Common.IMessage)">
+            <summary>
+            Overrides
+            </summary>
+            <param name="theMessage"></param>
+        </member>
+        <member name="P:FyndSharp.Communication.Channels.SynchronizedMessager`1.IncomingMessageQueueCapacity">
+            <summary>
+             Gets/sets capacity of the incoming message queue.
+             No message is received from remote application if
+             number of messages in internal queue exceeds this value.
+             Default value: int.MaxValue (2147483647).
+            </summary>
+        </member>
+        <member name="T:FyndSharp.Communication.Channels.ChannelEventArgs">
+            <summary>
+            Stores communication channel information to be used by an event.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Communication.Channels.ChannelEventArgs.#ctor(FyndSharp.Communication.Channels.IChannel)">
+            <summary>
+            Creates a new CommunicationChannelEventArgs object.
+            </summary>
+            <param name="channel">Communication channel that is associated with this event</param>
+        </member>
+        <member name="P:FyndSharp.Communication.Channels.ChannelEventArgs.Channel">
+            <summary>
+            Communication channel that is associated with this event.
             </summary>
         </member>
     </members>

@@ -4,37 +4,35 @@
         <name>FyndSharp.Data</name>
     </assembly>
     <members>
-        <member name="T:FyndSharp.Data.DatabaseType">
+        <member name="T:FyndSharp.Data.FieldDifferent">
             <summary>
-            表示数据类型，如SQLServer，SQLite等
+            FieldDifferent类表示数据库表中字段差异
             </summary>
         </member>
-        <member name="M:FyndSharp.Data.AdoSession.Open">
+        <member name="P:FyndSharp.Data.FieldDifferent.FieldName">
             <summary>
-            建立数据库连接
+            获取或设置字段名称
             </summary>
-            <returns>如果之前未建立连接，则返回True，反之返回False</returns>
-            <remarks>
-            如果返回True，则调用方负责调用Close关闭该连接。
-            如果返回False，调用方不能关闭该连接，因为可能该连接还在被其他对象使用。
-            遵循谁打开谁关闭的原则。
-            </remarks>
         </member>
-        <member name="M:FyndSharp.Data.AdoSession.ExecuteReader(System.Data.Common.DbCommand)">
+        <member name="P:FyndSharp.Data.FieldDifferent.DataType">
             <summary>
-            执行SQL命令，返回SqlDataReader，使用该方法必须自己管理数据库连接。
+            获取或设置字段数据类型
             </summary>
-            <param name="cmd"></param>
-            <returns></returns>
         </member>
-        <member name="M:FyndSharp.Data.AdoSession.CreateParameter(System.String,System.Data.DbType,System.Object)">
+        <member name="P:FyndSharp.Data.FieldDifferent.NewValue">
             <summary>
-            创建SQL Server查询参数
+            获取或设置字段新值
             </summary>
-            <param name="name">参数名</param>
-            <param name="dataType">参数数据类型</param>
-            <param name="value">参数值</param>
-            <returns></returns>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.NewValueField">
+            <summary>
+            获取或设置字段新值对应的其他字段
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Data.FieldDifferent.UseParentPrimaryFieldValue">
+            <summary>
+            获取或设置一个值，表示该字段是否使用父表的主键值作为它的值
+            </summary>
         </member>
         <member name="T:FyndSharp.Data.Orm.OrmObjectFactory">
             <summary>
@@ -185,34 +183,36 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:FyndSharp.Data.FieldDifferent">
+        <member name="M:FyndSharp.Data.AdoSession.Open">
             <summary>
-            FieldDifferent类表示数据库表中字段差异
+            建立数据库连接
             </summary>
+            <returns>如果之前未建立连接，则返回True，反之返回False</returns>
+            <remarks>
+            如果返回True，则调用方负责调用Close关闭该连接。
+            如果返回False，调用方不能关闭该连接，因为可能该连接还在被其他对象使用。
+            遵循谁打开谁关闭的原则。
+            </remarks>
         </member>
-        <member name="P:FyndSharp.Data.FieldDifferent.FieldName">
+        <member name="M:FyndSharp.Data.AdoSession.ExecuteReader(System.Data.Common.DbCommand)">
             <summary>
-            获取或设置字段名称
+            执行SQL命令，返回SqlDataReader，使用该方法必须自己管理数据库连接。
             </summary>
+            <param name="cmd"></param>
+            <returns></returns>
         </member>
-        <member name="P:FyndSharp.Data.FieldDifferent.DataType">
+        <member name="M:FyndSharp.Data.AdoSession.CreateParameter(System.String,System.Data.DbType,System.Object)">
             <summary>
-            获取或设置字段数据类型
+            创建SQL Server查询参数
             </summary>
+            <param name="name">参数名</param>
+            <param name="dataType">参数数据类型</param>
+            <param name="value">参数值</param>
+            <returns></returns>
         </member>
-        <member name="P:FyndSharp.Data.FieldDifferent.NewValue">
+        <member name="T:FyndSharp.Data.DatabaseType">
             <summary>
-            获取或设置字段新值
-            </summary>
-        </member>
-        <member name="P:FyndSharp.Data.FieldDifferent.NewValueField">
-            <summary>
-            获取或设置字段新值对应的其他字段
-            </summary>
-        </member>
-        <member name="P:FyndSharp.Data.FieldDifferent.UseParentPrimaryFieldValue">
-            <summary>
-            获取或设置一个值，表示该字段是否使用父表的主键值作为它的值
+            表示数据类型，如SQLServer，SQLite等
             </summary>
         </member>
     </members>
