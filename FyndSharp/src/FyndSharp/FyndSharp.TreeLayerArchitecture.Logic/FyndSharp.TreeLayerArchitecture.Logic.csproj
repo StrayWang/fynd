@@ -40,8 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnonymousUser.cs" />
     <Compile Include="AuthorizationManager.cs" />
     <Compile Include="BaseLogic.cs" />
+    <Compile Include="DebuggingUser.cs" />
     <Compile Include="ILogicFactory.cs" />
     <Compile Include="IUser.cs" />
     <Compile Include="LogicContext.cs" />

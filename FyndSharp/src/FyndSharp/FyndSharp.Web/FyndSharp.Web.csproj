@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthorizationModule.cs" />
+    <Compile Include="BaseRestHandler.cs" />
     <Compile Include="IRestHandler.cs" />
     <Compile Include="PathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

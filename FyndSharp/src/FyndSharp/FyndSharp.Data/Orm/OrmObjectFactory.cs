@@ -380,10 +380,15 @@ namespace FyndSharp.Data.Orm
             CheckTable(theTableInfo);
             T obj = default(T);
             obj = (T)theType.Assembly.CreateInstance(theType.FullName);
-            foreach (FieldInfo aFeild in theTableInfo.FieldList)
+            object fieldValue = null;
+            foreach (FieldInfo aField in theTableInfo.FieldList)
             {
-                CheckField(aFeild);
-                aFeild.Property.SetValue(obj, data[aFeild.FieldAttribute.FieldName], null);
+                CheckField(aField);
+                fieldValue = data[aField.FieldAttribute.FieldName];
+                if(!(fieldValue is DBNull))
+                {
+                    aField.Property.SetValue(obj, fieldValue, null);
+                }
             }
             CheckField(theTableInfo.Primary);
             theTableInfo.Primary.Property.SetValue(obj, data[theTableInfo.Primary.FieldAttribute.FieldName], null);
