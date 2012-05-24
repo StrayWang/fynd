@@ -15,15 +15,21 @@ namespace FyndSharp.Web
 
         public BaseRestHandler()
         {
-            this.Initialize();
+            RestRouter.Current.ErrorOccured += new EventHandler<ErrorOccuredEventArgs>(OnRestRouterErrorOccured);
+        }
+
+        protected virtual void OnRestRouterErrorOccured(object sender, ErrorOccuredEventArgs e)
+        {
+            
         }
 
         public void ProcessRequest(HttpContext context)
         {
-            RestRouter.Route(this, context);
+            this.Initialize(context);
+            RestRouter.Current.Route(this, context);
         }
 
-        protected abstract void Initialize();
+        protected abstract void Initialize(HttpContext context);
 
         public virtual RestResponse Add(HttpContext ctx)
         {

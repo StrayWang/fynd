@@ -6,9 +6,23 @@ using System.Net;
 
 namespace FyndSharp.Web
 {
+    public class ErrorOccuredEventArgs : EventArgs
+    {
+        public Exception Error { get; private set; }
+
+        public ErrorOccuredEventArgs(Exception anException)
+            : base()
+        {
+            Error = anException;
+        }
+    }
     public class RestRouter
     {
-        public static void Route(IRestHandler handler, HttpContext ctx)
+        public static readonly RestRouter Current = new RestRouter();
+
+        public event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
+
+        public void Route(IRestHandler handler, HttpContext ctx)
         {
             RestResponse result = null;
             try
@@ -67,8 +81,21 @@ namespace FyndSharp.Web
             }
             catch (Exception e)
             {
+
+                if (null != this.ErrorOccured)
+                {
+                    try
+                    {
+                        this.ErrorOccured(this, new ErrorOccuredEventArgs(e));
+                    }
+                    catch
+                    {
+
+                    }
+                }
                 ctx.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 ctx.Response.Write(e.Message);
+                ctx.Response.Write("\r\n");
             }
         }
     }
