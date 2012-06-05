@@ -33,5 +33,10 @@ namespace FyndSharp.Data
         {
             return new SqlDataAdapter((SqlCommand)cmd);
         }
+
+        public override string GetLastAutoIncrementValueSql()
+        {
+            return "SELECT SCOPE_IDENTITY() AS [SCOPE_IDENTITY]";
+        }
     }
 }

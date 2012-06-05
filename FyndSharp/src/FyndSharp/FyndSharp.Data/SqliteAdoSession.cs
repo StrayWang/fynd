@@ -33,5 +33,10 @@ namespace FyndSharp.Data
         {
             return new SQLiteDataAdapter((SQLiteCommand)cmd);
         }
+
+        public override string GetLastAutoIncrementValueSql()
+        {
+            throw new System.NotSupportedException();
+        }
     }
 }

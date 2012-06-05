@@ -395,5 +395,6 @@ namespace FyndSharp.Data
         protected abstract DbCommand CreateDbCommand();
         protected abstract DbParameter CreateDbParameter();
         protected abstract IDataAdapter CreateDataAdapter(DbCommand cmd);
+        public abstract string GetLastAutoIncrementValueSql();
     }
 }

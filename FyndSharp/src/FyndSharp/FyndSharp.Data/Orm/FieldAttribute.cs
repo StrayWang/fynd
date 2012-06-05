@@ -16,6 +16,7 @@ namespace FyndSharp.Data.Orm
         public int DataSize { get; set; }
         public bool IsPrimary { get; set; }
         public Type ParentType { get; set; }
+        public bool IsAutoIncrement { get; set; }
 
         public FieldAttribute(string theFieldName, DbType theDataType)
             : this(theFieldName, theDataType, 0, true, false, null)
@@ -28,8 +29,12 @@ namespace FyndSharp.Data.Orm
         {
 
         }
-
         public FieldAttribute(string theFieldName, DbType theDataType, int theDataSize, bool allowNullFlag, bool isPrimaryFlag, Type theParentType)
+            : this(theFieldName, theDataType, theDataSize, allowNullFlag, isPrimaryFlag, theParentType, false)
+        {
+
+        }
+        public FieldAttribute(string theFieldName, DbType theDataType, int theDataSize, bool allowNullFlag, bool isPrimaryFlag, Type theParentType, bool isAutoIncrementFlag)
         {
             Checker.Assert<ArgumentNullException>(!String.IsNullOrEmpty(theFieldName));
             Checker.Assert<ArgumentOutOfRangeException>(theDataSize >= -1);
@@ -40,6 +45,7 @@ namespace FyndSharp.Data.Orm
             this.AllowNull = allowNullFlag;
             this.IsPrimary = isPrimaryFlag;
             this.ParentType = theParentType;
+            this.IsAutoIncrement = isAutoIncrementFlag;
 
             if (this.IsPrimary)
             {

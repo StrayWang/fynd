@@ -316,10 +316,16 @@ namespace FyndSharp.Data.Orm
             builder.Append(theTableInfo.TableAttribute.TableName);
             builder.Append(" (");
             // 主键及其参数
-            StringBuilder colList = new StringBuilder(theTableInfo.Primary.FieldAttribute.FieldName);
-            StringBuilder valList = new StringBuilder("@");
-            valList.Append(theTableInfo.Primary.FieldAttribute.FieldName);
-            theDbParams.Add(this.CreateDbParameter(obj, theTableInfo.Primary));
+            StringBuilder colList = new StringBuilder();
+            StringBuilder valList = new StringBuilder();
+            if (!theTableInfo.Primary.FieldAttribute.IsAutoIncrement)
+            {
+                colList.Append(theTableInfo.Primary.FieldAttribute.FieldName);
+                valList.Append("@");
+                valList.Append(theTableInfo.Primary.FieldAttribute.FieldName);
+                theDbParams.Add(this.CreateDbParameter(obj, theTableInfo.Primary));
+            }
+            
             // INSERT子句非主键column列表和参数
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
@@ -334,7 +340,11 @@ namespace FyndSharp.Data.Orm
             builder.Append(") VALUES (");
             builder.Append(valList);
             builder.Append(")");
-
+            if (theTableInfo.Primary.FieldAttribute.IsAutoIncrement)
+            {
+                builder.AppendLine();
+                builder.Append(DbSession.GetLastAutoIncrementValueSql());
+            }
             return DbSession.CreateCommand(builder.ToString(), theDbParams.ToArray());
         }
         /// <summary>
