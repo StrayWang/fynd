@@ -54,7 +54,16 @@ namespace FyndSharp.Data.Orm
             TableInfo theTableInfo = CreateTableInfo(theType);
 
             object thePrimaryValue = theTableInfo.Primary.Property.GetValue(obj, null);
-            if (null == thePrimaryValue || String.IsNullOrEmpty(thePrimaryValue.ToString()))
+            if (null == thePrimaryValue 
+                || String.IsNullOrEmpty(thePrimaryValue.ToString())
+                || (
+                           (
+                                  theTableInfo.Primary.Property.PropertyType.Equals(typeof(int))
+                               || theTableInfo.Primary.Property.PropertyType.Equals(typeof(long))
+                           )
+                        && thePrimaryValue.Equals(0)
+                   )
+               )
             {
                 // TODO Insert
                 return CreateInsertCommand(obj, theTableInfo);
@@ -277,7 +286,17 @@ namespace FyndSharp.Data.Orm
             if (null != obj)
             {
                 theFeildValue = aFeild.Property.GetValue(obj, null);
-                if (aFeild.FieldAttribute.IsPrimary && null == theFeildValue)
+                if (
+                           (aFeild.FieldAttribute.IsPrimary && null == theFeildValue)
+                        || (
+                                   aFeild.FieldAttribute.IsPrimary 
+                                && (
+                                           aFeild.Property.PropertyType.Equals(typeof(int)) 
+                                        || aFeild.Property.PropertyType.Equals(typeof(long))
+                                   )
+                                && theFeildValue.Equals(0)
+                           )
+                   )
                 {
                     // 获取主键值
                     theFeildValue = PrimaryValueHandler();
