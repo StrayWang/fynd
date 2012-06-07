@@ -327,14 +327,24 @@ namespace FyndSharp.Data.Orm
             }
             
             // INSERT子句非主键column列表和参数
+            int i = 0;
             foreach (FieldInfo aFeild in theTableInfo.FieldList)
             {
-                colList.Append(",");
+                if (i == 0 && !theTableInfo.Primary.FieldAttribute.IsAutoIncrement)
+                {
+                    colList.Append(",");
+                }
+                else if(i > 0)
+                {
+                    colList.Append(",");
+                }
                 colList.Append(aFeild.FieldAttribute.FieldName);
                 valList.Append(",");
                 valList.Append("@");
                 valList.Append(aFeild.FieldAttribute.FieldName);
                 theDbParams.Add(CreateDbParameter(obj, aFeild));
+
+                i++;
             }
             builder.Append(colList);
             builder.Append(") VALUES (");
