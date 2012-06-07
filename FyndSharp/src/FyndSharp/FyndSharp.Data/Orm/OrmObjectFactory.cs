@@ -333,13 +333,15 @@ namespace FyndSharp.Data.Orm
                 if (i == 0 && !theTableInfo.Primary.FieldAttribute.IsAutoIncrement)
                 {
                     colList.Append(",");
+                    valList.Append(",");
                 }
                 else if(i > 0)
                 {
                     colList.Append(",");
+                    valList.Append(",");
                 }
                 colList.Append(aFeild.FieldAttribute.FieldName);
-                valList.Append(",");
+                
                 valList.Append("@");
                 valList.Append(aFeild.FieldAttribute.FieldName);
                 theDbParams.Add(CreateDbParameter(obj, aFeild));
