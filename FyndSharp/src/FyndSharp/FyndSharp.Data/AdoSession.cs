@@ -327,6 +327,10 @@ namespace FyndSharp.Data
 
         public virtual DataTable ExecuteDataTable(DbCommand cmd)
         {
+            return ExecuteDataSet(cmd).Tables[0];
+        }
+        public virtual DataSet ExecuteDataSet(DbCommand cmd)
+        {
             bool isOpen = this.Open();
             try
             {
@@ -338,7 +342,7 @@ namespace FyndSharp.Data
                 IDataAdapter adapter = CreateDataAdapter(cmd);
                 DataSet aDataSet = new DataSet();
                 adapter.Fill(aDataSet);
-                return aDataSet.Tables[0];
+                return aDataSet;
             }
             finally
             {
