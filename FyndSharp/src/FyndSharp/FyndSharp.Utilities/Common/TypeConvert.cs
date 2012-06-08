@@ -99,6 +99,39 @@ namespace FyndSharp.Utilities.Common
                 return defaultValue;
             }
         }
+
+        /// <summary>
+        /// 将对象转换成Double类型
+        /// </summary>
+        /// <param name="obj">要转换的对象</param>
+        /// <returns>obj对应的Double形式，无法转换时返回0.0F</returns>
+        public static double ToDouble(object obj)
+        {
+            return ToDouble(obj, 0.0D);
+        }
+        /// <summary>
+        /// 将对象转换成Double类型
+        /// </summary>
+        /// <param name="obj">要转换的对象</param>
+        /// <param name="defaultValue">无法转换时返回的默认值</param>
+        /// <returns>obj对应的Double形式，无法转换时返回defaultValue参数指定的值</returns>
+        public static double ToDouble(object obj, double defaultValue)
+        {
+            if (null == obj)
+            {
+                return defaultValue;
+            }
+            try
+            {
+                return Convert.ToDouble(obj);
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
+
         /// <summary>
         /// 将对象转换成Boolean类型
         /// </summary>

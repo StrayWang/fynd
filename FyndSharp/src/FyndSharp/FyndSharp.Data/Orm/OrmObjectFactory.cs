@@ -428,7 +428,34 @@ namespace FyndSharp.Data.Orm
                 fieldValue = data[aField.FieldAttribute.FieldName];
                 if(!(fieldValue is DBNull))
                 {
-                    aField.Property.SetValue(obj, fieldValue, null);
+                    if (aField.Property.PropertyType.Equals(typeof(string)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToString(fieldValue), null);
+                    }
+                    else if (aField.Property.PropertyType.Equals(typeof(int)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToInt32(fieldValue), null);
+                    }
+                    else if (aField.Property.PropertyType.Equals(typeof(float)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToFloat(fieldValue), null);
+                    }
+                    else if (aField.Property.PropertyType.Equals(typeof(double)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToDouble(fieldValue), null);
+                    }
+                    else if (aField.Property.PropertyType.Equals(typeof(decimal)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToDecimal(fieldValue), null);
+                    }
+                    else if (aField.Property.PropertyType.Equals(typeof(long)))
+                    {
+                        aField.Property.SetValue(obj, TypeConvert.ToInt64(fieldValue), null);
+                    }
+                    else
+                    {
+                        aField.Property.SetValue(obj, fieldValue, null);
+                    }
                 }
             }
             CheckField(theTableInfo.Primary);
