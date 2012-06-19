@@ -10,6 +10,11 @@ namespace FyndSharp.Data
 {
     public abstract class AdoSession : IDisposable
     {
+        /// <summary>
+        /// 获取或设置异常发生时是否在异常消息中输出对于的CommandText
+        /// </summary>
+        public static bool IsOutputCommandTextWhenException;
+
         protected string ConnectionString = String.Empty;
         protected DbTransaction Transaction;
         protected DbConnection Connection;
@@ -267,7 +272,12 @@ namespace FyndSharp.Data
             cmd.Parameters.AddRange(parameters);
             return cmd;
         }
-
+        /// <summary>
+        /// 执行DbCommand，不获取结果集。
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        /// <exception cref="FyndSharp.Data.AdoSessionException"></exception>
         public virtual int ExecuteNonQuery(DbCommand cmd)
         {
             bool isOpen = this.Open();
@@ -279,6 +289,10 @@ namespace FyndSharp.Data
                     cmd.Transaction = Transaction;
                 }
                 return cmd.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                throw CreateAdoSessionException(e, cmd);
             }
             finally
             {
@@ -293,6 +307,7 @@ namespace FyndSharp.Data
         /// </summary>
         /// <param name="cmd"></param>
         /// <returns></returns>
+        /// <exception cref="FyndSharp.Data.AdoSessionException"></exception>
         public virtual IDataReader ExecuteReader(DbCommand cmd)
         {
             bool isOpen = this.Open();
@@ -301,9 +316,21 @@ namespace FyndSharp.Data
             {
                 cmd.Transaction = Transaction;
             }
-            return cmd.ExecuteReader();
+            try
+            {
+                return cmd.ExecuteReader();
+            }
+            catch (Exception e)
+            {
+                throw CreateAdoSessionException(e, cmd);
+            }
         }
-
+        /// <summary>
+        /// 执行DbCommand，并返回结果集中第一行第一列的值
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        /// <exception cref="FyndSharp.Data.AdoSessionException"></exception>
         public virtual object ExecuteScalar(DbCommand cmd)
         {
             bool isOpen = this.Open();
@@ -316,6 +343,10 @@ namespace FyndSharp.Data
                 }
                 return cmd.ExecuteScalar();
             }
+            catch (Exception e)
+            {
+                throw CreateAdoSessionException(e, cmd);
+            }
             finally
             {
                 if (isOpen)
@@ -324,11 +355,22 @@ namespace FyndSharp.Data
                 }
             }
         }
-
+        /// <summary>
+        /// 执行DbCommand，返回结果集集合中的第一个结果集。
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        /// <exception cref="FyndSharp.Data.AdoSessionException"></exception>
         public virtual DataTable ExecuteDataTable(DbCommand cmd)
         {
             return ExecuteDataSet(cmd).Tables[0];
         }
+        /// <summary>
+        /// 执行DbCommand，返回所有结果集。
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        /// <exception cref="FyndSharp.Data.AdoSessionException"></exception>
         public virtual DataSet ExecuteDataSet(DbCommand cmd)
         {
             bool isOpen = this.Open();
@@ -343,6 +385,10 @@ namespace FyndSharp.Data
                 DataSet aDataSet = new DataSet();
                 adapter.Fill(aDataSet);
                 return aDataSet;
+            }
+            catch (Exception e)
+            {
+                throw CreateAdoSessionException(e, cmd);
             }
             finally
             {
@@ -400,5 +446,31 @@ namespace FyndSharp.Data
         protected abstract DbParameter CreateDbParameter();
         protected abstract IDataAdapter CreateDataAdapter(DbCommand cmd);
         public abstract string GetLastAutoIncrementValueSql();
+
+        private static AdoSessionException CreateAdoSessionException(Exception inner, IDbCommand cmd)
+        {
+            if (IsOutputCommandTextWhenException)
+            {
+                System.Text.StringBuilder parameterText = new System.Text.StringBuilder();
+                parameterText.AppendLine();
+                foreach (IDataParameter p in cmd.Parameters)
+                {
+                    parameterText.AppendLine(String.Format("{0} = {1},", p.ParameterName, p.Value));
+                }
+                return new AdoSessionException(String.Format(@"Exception when execute command: {0}
+                    SqlCommand: CommandText: {1}, 
+                    CommandType: {2}, 
+                    Parameters: {3}"
+                        , inner.Message
+                        , cmd.CommandText
+                        , cmd.CommandType
+                        , parameterText)
+                    , inner);
+            }
+            else
+            {
+                return new AdoSessionException("Exception when execute command: " + inner.Message, inner);
+            }
+        }
     }
 }

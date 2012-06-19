@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdoSessionException.cs" />
     <Compile Include="AdoSessionManager.cs" />
     <Compile Include="AdoSessionFactory.cs" />
     <Compile Include="DatabaseConfig.cs" />
