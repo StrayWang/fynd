@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{29D9FFD3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FyndSharp.TreeLayerArchitecture.Logic", "FyndSharp.TreeLayerArchitecture.Logic\FyndSharp.TreeLayerArchitecture.Logic.csproj", "{F27C8A38-1338-456E-B02C-1BE31CCEE879}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2C112C1-A9E7-4F7D-BDA6-6D36F58780D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

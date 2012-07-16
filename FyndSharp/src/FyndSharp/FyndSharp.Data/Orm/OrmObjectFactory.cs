@@ -129,6 +129,11 @@ namespace FyndSharp.Data.Orm
 
             StringBuilder builder = new StringBuilder("DELETE FROM ");
             builder.Append(theTableInfo.TableAttribute.TableName);
+            if (!String.IsNullOrEmpty(theTableInfo.TableAttribute.DeletionPostfix))
+            {
+                builder.Append(" ");
+                builder.Append(theTableInfo.TableAttribute.DeletionPostfix);
+            }
 
             builder.Append(" WHERE ");
             builder.Append(theTableInfo.Primary.FieldAttribute.FieldName);
@@ -214,6 +219,11 @@ namespace FyndSharp.Data.Orm
 
             StringBuilder builder = new StringBuilder("UPDATE ");
             builder.Append(theTableInfo.TableAttribute.TableName);
+            if (!String.IsNullOrEmpty(theTableInfo.TableAttribute.UpdationPostfix))
+            {
+                builder.Append(" ");
+                builder.Append(theTableInfo.TableAttribute.UpdationPostfix);
+            }
             builder.Append(" SET ");
             int i = 0;
             List<DbParameter> theDbParams = new List<DbParameter>(theTableInfo.FieldList.Count + 1);
@@ -406,6 +416,11 @@ namespace FyndSharp.Data.Orm
             
             builder.Append(" FROM ");
             builder.Append(theTableInfo.TableAttribute.TableName);
+            if (!String.IsNullOrEmpty(theTableInfo.TableAttribute.SelectionPostfix))
+            {
+                builder.Append(" ");
+                builder.Append(theTableInfo.TableAttribute.SelectionPostfix);
+            }
             return builder.ToString();
         }
         /// <summary>
