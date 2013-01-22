@@ -8,8 +8,8 @@
     <ProjectGuid>{F27C8A38-1338-456E-B02C-1BE31CCEE879}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FyndSharp.TreeLayerArchitecture.Logic</RootNamespace>
-    <AssemblyName>FyndSharp.TreeLayerArchitecture.Logic</AssemblyName>
+    <RootNamespace>FyndSharp.BusinessLogic</RootNamespace>
+    <AssemblyName>FyndSharp.BusinessLogic</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -25,11 +25,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\bin\0.1\</OutputPath>
+    <OutputPath>..\..\..\bin\0.2\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\..\bin\0.1\FyndSharp.TreeLayerArchitecture.Logic.XML</DocumentationFile>
+    <DocumentationFile>..\..\..\bin\0.2\FyndSharp.BusinessLogic.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

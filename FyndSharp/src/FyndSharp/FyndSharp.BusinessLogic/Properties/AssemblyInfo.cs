@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过以下
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("FyndSharp.Communication")]
+[assembly: AssemblyTitle("FyndSharp.BusinessLogic")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("fishtrees.cn")]
-[assembly: AssemblyProduct("FyndSharp.Communication")]
-[assembly: AssemblyCopyright("Copyright © fishtrees.cn 2011")]
+[assembly: AssemblyProduct("FyndSharp.BusinessLogic")]
+[assembly: AssemblyCopyright("CopyRight © 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("330c5ec6-ccad-4680-aa21-ec5654f3cf93")]
+[assembly: Guid("94577fea-9501-4c1d-93cc-4ddca04a1703")]
 
 // 程序集的版本信息由下面四个值组成:
 //

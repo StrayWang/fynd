@@ -42,8 +42,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <OutputPath>..\..\..\bin\0.1\</OutputPath>
-    <DocumentationFile>..\..\..\bin\0.1\FyndSharp.Web.XML</DocumentationFile>
+    <OutputPath>..\..\..\bin\0.2\</OutputPath>
+    <DocumentationFile>..\..\..\bin\0.2\FyndSharp.Web.XML</DocumentationFile>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
     <DebugType>pdbonly</DebugType>
