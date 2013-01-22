@@ -1,0 +1,594 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FyndSharp.Utilities</name>
+    </assembly>
+    <members>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Instance">
+            <summary> Gets a singleton of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.String">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Boolean">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Byte">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.SByte">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Bytes">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Char">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.DateTime">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.TimeSpan">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Int16">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.UInt16">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Int32">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.UInt32">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Int64">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.UInt64">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Double">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Float">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.Guid">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.IntPtr">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.BaseTypeSerializer.UIntPtr">
+            <summary> Gets a typed version of the PrimitiveSerializer </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Serialization.LimitedSerializer">
+            <summary>
+            Reads the same variant prefixed string and byte[] but with a hard-limit on size
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.LimitedSerializer.#ctor(System.Int32)">
+            <summary>
+            Constructs a limited length-prefix data reader/writer
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes1024">
+            <summary> Reads up to 1024 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes2048">
+            <summary> Reads up to 2048 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes4092">
+            <summary> Reads up to 4092 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Bytes8196">
+            <summary> Reads up to 8196 length-prefixed byte array </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String256">
+            <summary> Reads up to 256 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String512">
+            <summary> Reads up to 512 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.String1024">
+            <summary> Reads up to 1024 length-prefixed string </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.LimitedSerializer.Unlimited">
+            <summary> This is the only class with read/write prefixed data </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Common.Checker">
+            <summary>
+            provides a set of runtime validations for inputs
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.Assert``1(System.Boolean)">
+            <summary>
+            Verifies that the condition is true and if it fails constructs the specified type of
+            exception and throws.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.Assert``1(System.Boolean,System.String)">
+            <summary>
+            Verifies that the condition is true and if it fails constructs the specified type of
+            exception with any arguments provided and throws.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.Assert(System.Boolean,FyndSharp.Utilities.Common.Checker.ExceptionBuilder)">
+            <summary>
+            Verifies that the condition is true and if it fails throws the execption returned
+            by fnExceptionBuilder()
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.Assert``1(System.Boolean,System.String,System.Exception)">
+            <summary>
+            Verifies that the condition is true and if it fails constructs the specified type of
+            exception with any arguments provided and throws.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.NotNull``1(``0)">
+            <summary>
+            Verifies that value is not null and returns the value or throws ArgumentNullException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.NotEmpty(System.String)">
+            <summary>
+            Verfies that the string is not null and not empty and returns the string.
+            throws ArgumentNullException, ArgumentOutOfRangeException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.NotEmpty(System.Guid)">
+            <summary>
+            Verfies that the Guid is not empty.
+            throws ArgumentOutOfRangeException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.NotEmpty``1(``0)">
+            <summary>
+            Verfies that the collection is not null and not empty and returns the collection.
+            throws ArgumentNullException, ArgumentOutOfRangeException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.IsEqual``1(``0,``0)">
+            <summary>
+            Verifies that the two values are the same
+            throws ArgumentException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.NotEqual``1(``0,``0)">
+            <summary>
+            Verifies that the two values are NOT the same
+            throws ArgumentException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.ArraySize``1(``0[],System.Int32,System.Int32)">
+            <summary>
+            Verifies that the array is not empty and has at least min, but not more than max items.
+            throws ArgumentNullExcpetion
+            throws ArgumentOutOfRangeException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.InRange``1(``0,``0,``0)">
+            <summary>
+            Verifies that the value is min, max, or between the two.
+            throws ArgumentOutOfRangeException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.IsAssignable``1(System.Object)">
+            <summary>
+            Returns (T)value if the object provided can be assinged to a variable of type T
+            throws ArgumentException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.IsAssignable(System.Type,System.Object)">
+            <summary>
+            Returns value if the object provided can be assinged to a variable of type toType
+            throws ArgumentException
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.Checker.IsAssignable(System.Type,System.Type)">
+            <summary>
+            Throws ArgumentException if the type fromType cannot be assigned to variable of type toType
+            </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Common.Checker.ExceptionBuilder">
+            <summary>
+            Used to delay creation of the excpetion until the condition fails.
+            </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Collections.SynchronizedSortedList`2">
+            <summary>
+            This class is used to store key-value based items in a thread safe manner.
+            It uses System.Collections.Generic.SortedList internally.
+            </summary>
+            <typeparam name="TKey">Key type</typeparam>
+            <typeparam name="TValue">Value type</typeparam>
+        </member>
+        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Items">
+            <summary>
+            Internal collection to store items.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Collections.SynchronizedSortedList`2._Lock">
+            <summary>
+            Used to synchronize access to _items list.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.#ctor">
+            <summary>
+            Creates a new ThreadSafeSortedList object.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsKey(`0)">
+            <summary>
+            Checks if collection contains spesified key.
+            </summary>
+            <param name="key">Key to check</param>
+            <returns>True; if collection contains given key</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.ContainsValue(`1)">
+            <summary>
+            Checks if collection contains spesified item.
+            </summary>
+            <param name="item">Item to check</param>
+            <returns>True; if collection contains given item</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Remove(`0)">
+            <summary>
+            Removes an item from collection.
+            </summary>
+            <param name="key">Key of item to remove</param>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Clear">
+            <summary>
+            Removes all items from list.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.GetAndClearAllItems">
+            <summary>
+            Gets then removes all items in collection.
+            </summary>
+            <returns>Item list</returns>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Item(`0)">
+            <summary>
+            Gets/adds/replaces an item by key.
+            </summary>
+            <param name="key">Key to get/set value</param>
+            <returns>Item associated with this key</returns>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Count">
+            <summary>
+            Gets count of items in the collection.
+            </summary>
+        </member>
+        <member name="P:FyndSharp.Utilities.Collections.SynchronizedSortedList`2.Values">
+            <summary>
+            Gets all items in collection.
+            </summary>
+            <returns>Item list</returns>
+        </member>
+        <member name="T:FyndSharp.Utilities.Threading.SequentialItemProcessor`1">
+            <summary>
+            This class is used to process items sequentially in a multithreaded manner.
+            </summary>
+            <typeparam name="T">Type of item to process</typeparam>
+        </member>
+        <member name="F:FyndSharp.Utilities.Threading.SequentialItemProcessor`1._ProcessMethod">
+            <summary>
+            The method delegate that is called to actually process items.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Threading.SequentialItemProcessor`1._Queue">
+            <summary>
+            Item queue. Used to process items sequentially.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Threading.SequentialItemProcessor`1._IsProcessing">
+            <summary>
+            Indicates state of the item processing.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Threading.SequentialItemProcessor`1._IsRunning">
+            <summary>
+            A boolean value to control running of SequentialItemProcessor.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Threading.SequentialItemProcessor`1._SyncObject">
+            <summary>
+            An object to synchronize threads.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Threading.SequentialItemProcessor`1.#ctor(System.Action{`0})">
+            <summary>
+            Creates a new SequentialItemProcessor object.
+            </summary>
+            <param name="processMethod">The method delegate that is called to actually process items</param>
+        </member>
+        <member name="M:FyndSharp.Utilities.Threading.SequentialItemProcessor`1.EnqueueMessage(`0)">
+            <summary>
+            Adds an item to queue to process the item.
+            </summary>
+            <param name="item">Item to add to the queue</param>
+        </member>
+        <member name="M:FyndSharp.Utilities.Threading.SequentialItemProcessor`1.Start">
+            <summary>
+            Starts processing of items.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Threading.SequentialItemProcessor`1.Stop">
+            <summary>
+            Stops processing of items and waits stopping of current item.
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Threading.SequentialItemProcessor`1.ProcessItem">
+            <summary>
+            This method runs on a new seperated Task (thread) to process
+            items on the queue.
+            </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Serialization.VariantNumberSerializer">
+            <summary>
+            Provides numeric serializers for packed int/long values.
+            </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Instance">
+            <summary> Gets a singleton of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int32">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt32">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.Int64">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="F:FyndSharp.Utilities.Serialization.VariantNumberSerializer.UInt64">
+            <summary> Gets a typed version of the VariantNumberSerializer </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Write(System.UInt64,System.IO.Stream)">
+            <summary> Writes the object to the stream </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Serialization.VariantNumberSerializer.FyndSharp#Utilities#Serialization#ISerializer{System#UInt64}#Read(System.IO.Stream)">
+            <summary> Reads the object from a stream </summary>
+        </member>
+        <member name="T:FyndSharp.Utilities.Common.TypeConvert">
+            <summary>
+            类型或内容转换工具
+            </summary>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToString(System.Object)">
+            <summary>
+            将对象转换成String类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的String形式，无法转换时返回String.Empty</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToString(System.Object,System.String)">
+            <summary>
+            将对象转换成String类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultString">无法转换时返回的默认值</param>
+            <returns>obj对应的String形式，无法转换时返回defaultString参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToInt32(System.Object)">
+            <summary>
+            将对象转换成Int32类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Int32形式，无法转换时返回0</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToInt32(System.Object,System.Int32)">
+            <summary>
+            将对象转换成Int32类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Int32形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToFloat(System.Object)">
+            <summary>
+            将对象转换成Float类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Float形式，无法转换时返回0.0F</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToFloat(System.Object,System.Single)">
+            <summary>
+            将对象转换成Float类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Float形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDouble(System.Object)">
+            <summary>
+            将对象转换成Double类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Double形式，无法转换时返回0.0F</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDouble(System.Object,System.Double)">
+            <summary>
+            将对象转换成Double类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Double形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToBool(System.Object)">
+            <summary>
+            将对象转换成Boolean类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Boolean形式，无法转换时返回False</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToBool(System.Object,System.Boolean)">
+            <summary>
+            将对象转换成Boolean类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Boolean形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.CopyBySerialize``1(``0)">
+            <summary>
+            通过序列化和反序列化复制对象
+            </summary>
+            <typeparam name="T">要复制的对象的类型</typeparam>
+            <param name="source">要复制的对象</param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDecimal(System.Object)">
+            <summary>
+            将对象转换成Decimal类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Decimal形式，无法转换时返回0.0M</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDecimal(System.Object,System.Decimal)">
+            <summary>
+            将对象转换成Decimal类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Decimal形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDateTime(System.Object)">
+            <summary>
+            将对象转换成DateTime类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的DateTime形式，无法转换时返回DateTime的默认实例</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDateTime(System.Object,System.DateTime)">
+            <summary>
+            将对象转换成DateTime类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的DateTime形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToInt64(System.Object)">
+            <summary>
+            将对象转换成Int64类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <returns>obj对应的Int64形式，无法转换时返回0L</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToInt64(System.Object,System.Int64)">
+            <summary>
+            将对象转换成Int64类型
+            </summary>
+            <param name="obj">要转换的对象</param>
+            <param name="defaultValue">无法转换时返回的默认值</param>
+            <returns>obj对应的Int64形式，无法转换时返回defaultValue参数指定的值</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToCurrency(System.String,System.Decimal,System.String,System.Decimal,System.Decimal)">
+            <summary>
+            按汇率进行货币转换
+            </summary>
+            <param name="srcCurrencyCode">原币代码，大写</param>
+            <param name="srcExchangeRate">原币汇率</param>
+            <param name="dstCurrencyCode"></param>
+            <param name="dstExchangeRate"></param>
+            <param name="srcAmount">原币金额</param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToDbValue(System.Object)">
+            <summary>
+            判断obj是否等于null，是则返回DBNull.Value,否则返回obj本身
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToModHashValue(System.Object,System.Int32)">
+            <summary>
+            按取模哈希算法得到对象的哈希值
+            </summary>
+            <param name="obj">要计算哈希值的对象</param>
+            <param name="seed">取模基数</param>
+            <returns>如果obj == null，则返回0，如果seed == 0，则返回0，除此之外返回Math.Abs(obj.GetHashCode % seed)</returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToMD5String(System.String,System.Text.Encoding)">
+            <summary>
+            计算字符串MD5值，并将MD5值转换成对应的字符串形式
+            </summary>
+            <param name="aString">要计算MD5值</param>
+            <param name="anEncoding">MD5值字符串编码</param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToEnum``1(System.Int32)">
+            <summary>
+            将整数转换成指定的枚举类型
+            </summary>
+            <typeparam name="T">要转换为的枚举类型</typeparam>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToJson(System.Object)">
+            <summary>
+            尝试将对象转换JSON格式的扩展方法
+            </summary>
+            <param name="anObject"></param>
+            <returns></returns>
+            <exception cref="T:System.InvalidOperationException">所生成的 JSON 字符串超出了 System.Web.Script.Serialization.JavaScriptSerializer.MaxJsonLength 的值。- 或 - obj 包含循环引用。当子对象引用父对象，而父对象又引用子对象时，将会发生循环引用。</exception>
+            <exception cref="T:System.ArgumentException">超出了由 System.Web.Script.Serialization.JavaScriptSerializer.RecursionLimit 定义的递归限制。</exception>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToText(System.String)">
+            <summary>
+            将HTML转换为纯文本，即去掉所有HTML标记。
+            </summary>
+            <param name="html"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToSqlInClause(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            将字符串集合转换成半角逗号分隔的，用于SQL语句中IN子句的字符串
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToSqlInClause(System.Collections.Generic.IEnumerable{System.Int64})">
+            <summary>
+            将long集合转换成半角逗号分隔的，用于SQL语句中IN子句的字符串
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToSqlInClause(System.Collections.Generic.IEnumerable{System.Int32})">
+            <summary>
+            将int集合转换成半角逗号分隔的，用于SQL语句中IN子句的字符串
+            </summary>
+            <param name="list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToSequenceString(System.Collections.IEnumerable,System.String)">
+            <summary>
+            将对象集合转换成半角逗号分隔的，用于SQL语句中IN子句的字符串
+            </summary>
+            <param name="collection">对象集合</param>
+            <param name="wrapper">用该参数对应的字符串将对象的字符串形式包裹起来</param>
+            <returns></returns>
+        </member>
+        <member name="M:FyndSharp.Utilities.Common.TypeConvert.ToSequenceString(System.Collections.IEnumerable,System.String,FyndSharp.Utilities.Common.TypeConvert.ToStringFunction)">
+            <summary>
+            将对象集合转换成半角逗号分隔的，用于SQL语句中IN子句的字符串
+            </summary>
+            <param name="collection">对象集合</param>
+            <param name="wrapper">用该参数对应的字符串将对象的字符串形式包裹起来</param>
+            <param name="theToStringFunc">对象转换成字符串的代理函数，在需要将对象转换成字符串时会使用该代理方法的返回值替换默认对象字符串值</param>
+            <returns></returns>
+        </member>
+        <member name="T:FyndSharp.Utilities.Common.TypeConvert.ToStringFunction">
+            <summary>
+            用于ToSequenceString(IEnumerable, string, ToStringFunction)方法转换对象为字符串
+            </summary>
+            <param name="anObject"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
