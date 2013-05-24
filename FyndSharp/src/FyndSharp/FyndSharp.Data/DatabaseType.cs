@@ -8,6 +8,7 @@ namespace FyndSharp.Data
     public enum DatabaseType
     {
         SqlServer,
-        Sqlite
+        Sqlite,
+        MySQL
     }
 }

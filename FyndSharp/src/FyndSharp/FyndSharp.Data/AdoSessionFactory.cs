@@ -16,6 +16,8 @@ namespace FyndSharp.Data
             {
                 case DatabaseType.Sqlite:
                     return new SqliteAdoSession(theConfig.ConnectionString);
+                case DatabaseType.MySQL:
+                    return new MySQLAdoSession(theConfig.ConnectionString);
                 case DatabaseType.SqlServer:
                 default:
                     return new SqlAdoSession(theConfig.ConnectionString);

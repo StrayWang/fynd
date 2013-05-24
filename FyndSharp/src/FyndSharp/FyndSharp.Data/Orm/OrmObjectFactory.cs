@@ -6,6 +6,7 @@ using FyndSharp.Utilities.Common;
 using System.Reflection;
 using System.Data;
 using System.Collections;
+using MySql.Data.Types;
 
 namespace FyndSharp.Data.Orm
 {
@@ -461,7 +462,14 @@ namespace FyndSharp.Data.Orm
                     }
                     else if (aField.Property.PropertyType.Equals(typeof(decimal)))
                     {
-                        aField.Property.SetValue(obj, TypeConvert.ToDecimal(fieldValue), null);
+                        if (fieldValue is MySqlDecimal)
+                        {
+                            aField.Property.SetValue(obj, ((MySqlDecimal)fieldValue).Value, null);
+                        }
+                        else
+                        {
+                            aField.Property.SetValue(obj, TypeConvert.ToDecimal(fieldValue), null);
+                        }
                     }
                     else if (aField.Property.PropertyType.Equals(typeof(long)))
                     {
@@ -469,7 +477,14 @@ namespace FyndSharp.Data.Orm
                     }
                     else
                     {
-                        aField.Property.SetValue(obj, fieldValue, null);
+                        if (fieldValue is MySqlDateTime)
+                        {
+                            aField.Property.SetValue(obj, ((MySqlDateTime)fieldValue).Value, null);
+                        }
+                        else
+                        {
+                            aField.Property.SetValue(obj, fieldValue, null);
+                        }
                     }
                 }
             }
