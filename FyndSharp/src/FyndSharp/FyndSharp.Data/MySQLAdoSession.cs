@@ -35,7 +35,8 @@ namespace FyndSharp.Data
 
         public override string GetLastAutoIncrementValueSql()
         {
-            return "SELECT LAST_INSERT_ID();";
+            // MySQL 中的SQL语句以分号结尾，但SQL Server中的分号的含义与MySQL不同，所以在这个SQL语句前加一个分号，可以保证MySQL执行时不会出错。
+            return ";SELECT LAST_INSERT_ID();";
         }
     }
 }
